@@ -1,0 +1,9 @@
+node_modules
+.next
+out
+build
+coverage
+.turbo
+.vercel
+.cache
+.DS_Store
