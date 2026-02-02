@@ -1,5 +1,5 @@
 import { SiteHeader, SiteShell } from "@/components/layout";
-import { HomeMain } from "@/features/home";
+import { HomeMain } from "@/components/page-sections/home";
 
 import type { Metadata } from "next";
 
