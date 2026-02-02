@@ -87,11 +87,11 @@ export function ThemeToggleButton({
     >
       <motion.span
         aria-hidden="true"
-        className="inline-flex items-center justify-center"
+        className="relative inline-flex h-4 w-4 items-center justify-center"
         animate={iconControls}
       >
-        <Sun className="size-4 dark:hidden" />
-        <Moon className="hidden size-4 dark:inline" />
+        <Sun className="absolute inset-0 size-4 opacity-100 transition-opacity duration-150 dark:opacity-0" />
+        <Moon className="absolute inset-0 size-4 opacity-0 transition-opacity duration-150 dark:opacity-100" />
       </motion.span>
     </Button>
   );
