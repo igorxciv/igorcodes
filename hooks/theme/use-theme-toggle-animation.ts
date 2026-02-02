@@ -15,6 +15,15 @@ export function useThemeToggleAnimation(): ThemeToggleAnimation {
   const shouldReduceMotion = useReducedMotion();
   const animatingRef = useRef(false);
 
+  const animateThemeSwap = useCallback(() => {
+    if (shouldReduceMotion) return;
+    const root = document.documentElement;
+    root.classList.add("theme-animate");
+    window.setTimeout(() => {
+      root.classList.remove("theme-animate");
+    }, 360);
+  }, [shouldReduceMotion]);
+
   const toggleTheme = useCallback(async () => {
     if (animatingRef.current) return;
     animatingRef.current = true;
@@ -31,6 +40,7 @@ export function useThemeToggleAnimation(): ThemeToggleAnimation {
         },
       });
     }
+    animateThemeSwap();
     setTheme(isDark ? "light" : "dark");
     if (!shouldReduceMotion) {
       await iconControls.start({
@@ -45,7 +55,7 @@ export function useThemeToggleAnimation(): ThemeToggleAnimation {
       });
     }
     animatingRef.current = false;
-  }, [iconControls, setTheme, shouldReduceMotion]);
+  }, [animateThemeSwap, iconControls, setTheme, shouldReduceMotion]);
 
   return { iconControls, toggleTheme };
 }

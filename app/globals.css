@@ -123,3 +123,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  html.theme-animate,
+  html.theme-animate body,
+  html.theme-animate *,
+  html.theme-animate *::before,
+  html.theme-animate *::after {
+    transition-property:
+      background-color, color, border-color, box-shadow, fill, stroke;
+    transition-duration: 220ms;
+    transition-timing-function: ease;
+  }
+}
