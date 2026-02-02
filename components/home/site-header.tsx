@@ -33,11 +33,11 @@ export function SiteHeader({ className, ...restProps }: SiteHeaderProps) {
           </span>
         </div>
         <HeaderNav>
-          <HeaderNavLink>Home</HeaderNavLink>
-          <HeaderNavLink>About</HeaderNavLink>
-          <HeaderNavLink>Resume</HeaderNavLink>
-          <HeaderNavLink>Projects</HeaderNavLink>
-          <HeaderNavLink>Blog</HeaderNavLink>
+          <HeaderNavLink aria-label="Home">./home</HeaderNavLink>
+          <HeaderNavLink aria-label="About">./about</HeaderNavLink>
+          <HeaderNavLink aria-label="Resume">./resume</HeaderNavLink>
+          <HeaderNavLink aria-label="Projects">./projects</HeaderNavLink>
+          <HeaderNavLink aria-label="Blog">./blog</HeaderNavLink>
           <ThemeToggleButton />
         </HeaderNav>
       </div>
@@ -49,7 +49,7 @@ export function HeaderNav({ className, ...restProps }: HeaderNavProps) {
   return (
     <nav
       className={cn(
-        "hidden items-center gap-6 text-sm text-zinc-600 md:flex dark:text-zinc-300",
+        "hidden items-center gap-6 text-[15px] font-medium text-zinc-600 md:flex dark:text-zinc-300",
         className,
       )}
       {...restProps}
@@ -64,7 +64,7 @@ export function HeaderNavLink({
 }: HeaderNavLinkProps) {
   return (
     <Button
-      className={cn("px-2 text-xs font-medium", className)}
+      className={cn("px-2 text-[15px] font-medium", className)}
       size="sm"
       type={type}
       variant="ghost"
