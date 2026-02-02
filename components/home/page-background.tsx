@@ -11,7 +11,10 @@ export function PageBackground({
   return (
     <div
       aria-hidden="true"
-      className={cn("pointer-events-none absolute inset-0", className)}
+      className={cn(
+        "pointer-events-none absolute inset-0 overflow-hidden",
+        className,
+      )}
       {...restProps}
     >
       <div className="absolute -top-32 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-gradient-to-br from-emerald-500/20 via-cyan-400/10 to-transparent blur-3xl" />

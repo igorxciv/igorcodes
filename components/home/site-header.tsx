@@ -20,22 +20,27 @@ type ThemeToggleButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 export function SiteHeader({ className, ...restProps }: SiteHeaderProps) {
   return (
     <header
-      className={cn("flex items-center justify-between", className)}
+      className={cn(
+        "sticky top-0 z-50 w-full border-b border-zinc-200/80 bg-white/70 shadow-[0_1px_0_rgba(15,23,42,0.04)] backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 dark:bg-[#0b0b0c]/30 dark:shadow-none",
+        className,
+      )}
       {...restProps}
     >
-      <div className="flex items-center gap-3 text-sm font-semibold text-zinc-900 dark:text-white">
-        <span className="inline-flex h-10 items-center rounded-full border border-zinc-200 bg-zinc-100 px-4 font-mono text-xs tracking-wide text-zinc-700 dark:border-white/15 dark:bg-white/5 dark:text-zinc-200">
-          &lt;/dev&gt;
-        </span>
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4 sm:px-10">
+        <div className="flex items-center gap-3 text-sm font-semibold text-zinc-900 dark:text-white">
+          <span className="inline-flex h-10 items-center rounded-full border border-zinc-200 bg-zinc-100 px-4 font-mono text-xs tracking-wide text-zinc-700 dark:border-white/15 dark:bg-white/5 dark:text-zinc-200">
+            &lt;/dev&gt;
+          </span>
+        </div>
+        <HeaderNav>
+          <HeaderNavLink>Home</HeaderNavLink>
+          <HeaderNavLink>About</HeaderNavLink>
+          <HeaderNavLink>Resume</HeaderNavLink>
+          <HeaderNavLink>Projects</HeaderNavLink>
+          <HeaderNavLink>Blog</HeaderNavLink>
+          <ThemeToggleButton />
+        </HeaderNav>
       </div>
-      <HeaderNav>
-        <HeaderNavLink>Home</HeaderNavLink>
-        <HeaderNavLink>About</HeaderNavLink>
-        <HeaderNavLink>Resume</HeaderNavLink>
-        <HeaderNavLink>Projects</HeaderNavLink>
-        <HeaderNavLink>Blog</HeaderNavLink>
-        <ThemeToggleButton />
-      </HeaderNav>
     </header>
   );
 }

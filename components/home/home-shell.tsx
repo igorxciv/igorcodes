@@ -14,13 +14,13 @@ export function HomeShell({
   return (
     <div
       className={cn(
-        "relative min-h-screen overflow-hidden bg-white text-zinc-900 dark:bg-[#0b0b0c] dark:text-zinc-100",
+        "relative min-h-screen bg-white text-zinc-900 dark:bg-[#0b0b0c] dark:text-zinc-100",
         className,
       )}
       {...restProps}
     >
       <PageBackground />
-      <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-20 px-6 pt-10 pb-20 sm:px-10">
+      <div className="relative flex min-h-screen flex-col gap-20">
         {children}
       </div>
     </div>
