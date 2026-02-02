@@ -1,5 +1,7 @@
 "use client";
 
+import { AlertTriangle, ArrowRight } from "lucide-react";
+
 interface GlobalErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
@@ -21,7 +23,11 @@ export default function GlobalError({ reset }: GlobalErrorProps) {
           <div className="relative mx-auto flex min-h-screen w-full max-w-4xl flex-col items-center justify-center px-6 text-center">
             <div className="flex flex-col items-center gap-4">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-[11px] text-zinc-300">
-                <span className="text-rose-300">!</span> global error
+                <AlertTriangle
+                  aria-hidden="true"
+                  className="size-3 text-rose-300"
+                />
+                global error
               </span>
               <h1 className="text-3xl font-semibold text-white sm:text-4xl">
                 We hit a fatal issue.
@@ -36,7 +42,7 @@ export default function GlobalError({ reset }: GlobalErrorProps) {
                 type="button"
               >
                 Reload
-                <span aria-hidden="true">-&gt;</span>
+                <ArrowRight aria-hidden="true" className="size-4" />
               </button>
             </div>
           </div>

@@ -1,3 +1,5 @@
+import { ArrowUpRight, Terminal } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/styles/cn";
 
@@ -11,7 +13,8 @@ export function HeroIntro({ className, ...restProps }: HeroIntroProps) {
   return (
     <div className={cn("flex flex-col gap-7", className)} {...restProps}>
       <SectionEyebrow>
-        <span className="text-emerald-300">&gt;_</span> $ whoami
+        <Terminal aria-hidden="true" className="size-3 text-emerald-300" />
+        <span>$ whoami</span>
       </SectionEyebrow>
       <div className="flex flex-col gap-5">
         <h1 className="text-4xl leading-tight font-semibold tracking-tight text-white sm:text-5xl">
@@ -26,7 +29,7 @@ export function HeroIntro({ className, ...restProps }: HeroIntroProps) {
       <div className="flex flex-wrap gap-3">
         <Button className="hover:translate-y-[-1px]">
           View Projects
-          <span aria-hidden="true">-&gt;</span>
+          <ArrowUpRight aria-hidden="true" />
         </Button>
         <Button variant="outline">Resume</Button>
       </div>

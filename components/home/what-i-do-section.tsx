@@ -1,3 +1,5 @@
+import { Code2 } from "lucide-react";
+
 import { cn } from "@/lib/styles/cn";
 
 import {
@@ -26,7 +28,8 @@ export function WhatIDoSection({
     <section className={cn("flex flex-col gap-10", className)} {...restProps}>
       <SectionHeader>
         <SectionEyebrow>
-          <span className="text-emerald-300">&lt;/&gt;</span> ./what-i-do
+          <Code2 aria-hidden="true" className="size-3 text-emerald-300" />
+          <span>./what-i-do</span>
         </SectionEyebrow>
         <SectionTitle>Building with purpose</SectionTitle>
         <SectionDescription>

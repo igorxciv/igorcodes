@@ -1,3 +1,5 @@
+import { Sun } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/styles/cn";
 
@@ -76,7 +78,7 @@ export function ThemeToggleButton({
       variant="outline"
       {...restProps}
     >
-      <span aria-hidden="true">O</span>
+      <Sun aria-hidden="true" className="size-4" />
     </Button>
   );
 }

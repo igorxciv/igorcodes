@@ -1,3 +1,5 @@
+import { Sparkles } from "lucide-react";
+
 import { cn } from "@/lib/styles/cn";
 
 import { SectionEyebrow } from "./section-header";
@@ -20,7 +22,8 @@ export function CatNoteSection({
     >
       <div className="flex flex-col gap-4">
         <SectionEyebrow>
-          <span className="text-emerald-300">*</span> ./digital-cats
+          <Sparkles aria-hidden="true" className="size-3 text-emerald-300" />
+          <span>./digital-cats</span>
         </SectionEyebrow>
         <h3 className="text-xl font-semibold text-white">
           Why cats are everywhere here

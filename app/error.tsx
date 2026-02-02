@@ -1,5 +1,7 @@
 "use client";
 
+import { AlertTriangle, ArrowRight } from "lucide-react";
+
 interface ErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
@@ -16,7 +18,11 @@ export default function Error({ reset }: ErrorProps) {
       <div className="relative mx-auto flex min-h-screen w-full max-w-4xl flex-col items-center justify-center px-6 text-center">
         <div className="flex flex-col items-center gap-4">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-[11px] text-zinc-300">
-            <span className="text-rose-300">!</span> error
+            <AlertTriangle
+              aria-hidden="true"
+              className="size-3 text-rose-300"
+            />
+            error
           </span>
           <h1 className="text-3xl font-semibold text-white sm:text-4xl">
             Something broke. We are on it.
@@ -31,7 +37,7 @@ export default function Error({ reset }: ErrorProps) {
             type="button"
           >
             Retry
-            <span aria-hidden="true">-&gt;</span>
+            <ArrowRight aria-hidden="true" className="size-4" />
           </button>
         </div>
       </div>
