@@ -10,7 +10,7 @@ interface GlobalErrorProps {
 export default function GlobalError({ reset }: GlobalErrorProps) {
   return (
     <html lang="en">
-      <body className="bg-[#0b0b0c] text-zinc-100">
+      <body className="bg-white text-zinc-900 dark:bg-[#0b0b0c] dark:text-zinc-100">
         <div className="relative min-h-screen overflow-hidden">
           <div
             aria-hidden="true"
@@ -22,22 +22,22 @@ export default function GlobalError({ reset }: GlobalErrorProps) {
           </div>
           <div className="relative mx-auto flex min-h-screen w-full max-w-4xl flex-col items-center justify-center px-6 text-center">
             <div className="flex flex-col items-center gap-4">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-[11px] text-zinc-300">
+              <span className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-100 px-3 py-1 font-mono text-[11px] text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300">
                 <AlertTriangle
                   aria-hidden="true"
                   className="size-3 text-rose-300"
                 />
                 global error
               </span>
-              <h1 className="text-3xl font-semibold text-white sm:text-4xl">
+              <h1 className="text-3xl font-semibold text-zinc-900 sm:text-4xl dark:text-white">
                 We hit a fatal issue.
               </h1>
-              <p className="max-w-xl text-sm leading-relaxed text-zinc-300 sm:text-base">
+              <p className="max-w-xl text-sm leading-relaxed text-zinc-600 sm:text-base dark:text-zinc-300">
                 Something went wrong at the app level. Try refreshing or
                 retrying below.
               </p>
               <button
-                className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:translate-y-[-1px] hover:bg-zinc-200"
+                className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:translate-y-[-1px] hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
                 onClick={reset}
                 type="button"
               >

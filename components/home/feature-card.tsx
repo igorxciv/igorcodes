@@ -34,7 +34,10 @@ export function FeatureCardMedia({
 }: FeatureCardMediaProps) {
   return (
     <div
-      className={cn("mb-4 h-40 rounded-xl border border-white/10", className)}
+      className={cn(
+        "mb-4 h-40 rounded-xl border border-zinc-200 dark:border-white/10",
+        className,
+      )}
       {...restProps}
     />
   );

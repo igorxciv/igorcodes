@@ -14,7 +14,7 @@ export function HomeShell({
   return (
     <div
       className={cn(
-        "relative min-h-screen overflow-hidden bg-[#0b0b0c] text-zinc-100",
+        "relative min-h-screen overflow-hidden bg-white text-zinc-900 dark:bg-[#0b0b0c] dark:text-zinc-100",
         className,
       )}
       {...restProps}

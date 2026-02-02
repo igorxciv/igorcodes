@@ -23,8 +23,8 @@ export function SiteHeader({ className, ...restProps }: SiteHeaderProps) {
       className={cn("flex items-center justify-between", className)}
       {...restProps}
     >
-      <div className="flex items-center gap-3 text-sm font-semibold text-white">
-        <span className="inline-flex h-10 items-center rounded-full border border-white/15 bg-white/5 px-4 font-mono text-xs tracking-wide">
+      <div className="flex items-center gap-3 text-sm font-semibold text-zinc-900 dark:text-white">
+        <span className="inline-flex h-10 items-center rounded-full border border-zinc-200 bg-zinc-100 px-4 font-mono text-xs tracking-wide text-zinc-700 dark:border-white/15 dark:bg-white/5 dark:text-zinc-200">
           &lt;/dev&gt;
         </span>
       </div>
@@ -44,7 +44,7 @@ export function HeaderNav({ className, ...restProps }: HeaderNavProps) {
   return (
     <nav
       className={cn(
-        "hidden items-center gap-6 text-sm text-zinc-300 md:flex",
+        "hidden items-center gap-6 text-sm text-zinc-600 md:flex dark:text-zinc-300",
         className,
       )}
       {...restProps}

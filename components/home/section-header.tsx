@@ -21,13 +21,25 @@ export function SectionEyebrow({
   className,
   ...restProps
 }: SectionEyebrowProps) {
-  return <Badge className={cn("font-mono", className)} {...restProps} />;
+  return (
+    <Badge
+      variant="outline"
+      className={cn(
+        "gap-2 border-zinc-200 bg-zinc-100 font-mono text-[11px] text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300",
+        className,
+      )}
+      {...restProps}
+    />
+  );
 }
 
 export function SectionTitle({ className, ...restProps }: SectionTitleProps) {
   return (
     <h2
-      className={cn("text-2xl font-semibold text-white sm:text-3xl", className)}
+      className={cn(
+        "text-2xl font-semibold text-zinc-900 sm:text-3xl dark:text-white",
+        className,
+      )}
       {...restProps}
     />
   );
@@ -40,7 +52,7 @@ export function SectionDescription({
   return (
     <p
       className={cn(
-        "max-w-2xl text-sm leading-relaxed text-zinc-300 sm:text-base",
+        "max-w-2xl text-sm leading-relaxed text-zinc-600 sm:text-base dark:text-zinc-300",
         className,
       )}
       {...restProps}
