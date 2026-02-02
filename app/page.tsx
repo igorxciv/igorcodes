@@ -1,4 +1,5 @@
-import { HomeMain, HomeShell, SiteHeader } from "@/components/home";
+import { SiteHeader, SiteShell } from "@/components/layout";
+import { HomeMain } from "@/features/home";
 
 import type { Metadata } from "next";
 
@@ -13,9 +14,9 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <HomeShell>
+    <SiteShell>
       <SiteHeader />
       <HomeMain />
-    </HomeShell>
+    </SiteShell>
   );
 }

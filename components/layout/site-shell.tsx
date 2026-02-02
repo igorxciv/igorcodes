@@ -4,13 +4,13 @@ import { PageBackground } from "./page-background";
 
 import type { HTMLAttributes } from "react";
 
-type HomeShellProps = HTMLAttributes<HTMLDivElement>;
+type SiteShellProps = HTMLAttributes<HTMLDivElement>;
 
-export function HomeShell({
+export function SiteShell({
   className,
   children,
   ...restProps
-}: HomeShellProps) {
+}: SiteShellProps) {
   return (
     <div
       className={cn(
