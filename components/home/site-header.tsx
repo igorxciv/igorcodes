@@ -4,7 +4,7 @@ import { Moon, Sun } from "lucide-react";
 import { motion } from "motion/react";
 
 import { Button } from "@/components/ui/button";
-import { useThemeToggleAnimation } from "@/hooks/use-theme-toggle-animation";
+import { useThemeToggleAnimation } from "@/hooks/theme/use-theme-toggle-animation";
 import { cn } from "@/lib/styles/cn";
 
 import type { ButtonHTMLAttributes, HTMLAttributes } from "react";
