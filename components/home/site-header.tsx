@@ -1,4 +1,7 @@
-import { Sun } from "lucide-react";
+"use client";
+
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/styles/cn";
@@ -69,16 +72,23 @@ export function ThemeToggleButton({
   type = "button",
   ...restProps
 }: ThemeToggleButtonProps) {
+  const { setTheme } = useTheme();
+
   return (
     <Button
       aria-label="Toggle theme"
       className={cn("text-base", className)}
+      onClick={() => {
+        const isDark = document.documentElement.classList.contains("dark");
+        setTheme(isDark ? "light" : "dark");
+      }}
       size="icon"
       type={type}
       variant="outline"
       {...restProps}
     >
-      <Sun aria-hidden="true" className="size-4" />
+      <Sun aria-hidden="true" className="size-4 dark:hidden" />
+      <Moon aria-hidden="true" className="hidden size-4 dark:inline" />
     </Button>
   );
 }
