@@ -2,7 +2,6 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 import { dankMono, wotfard } from "./fonts";
 
-
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -59,8 +58,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${wotfard.variable} ${dankMono.variable} antialiased`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${wotfard.variable} ${dankMono.variable}`}
+    >
+      <body className="antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
         </ThemeProvider>
