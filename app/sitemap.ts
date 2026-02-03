@@ -4,7 +4,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const pages = ["/", "/about", "/projects", "/blog"];
+  const pages = ["/", "/about", "/projects", "/blog", "/resume"];
 
   return pages.map((path) => ({
     url: `${siteUrl}${path === "/" ? "" : path}`,
