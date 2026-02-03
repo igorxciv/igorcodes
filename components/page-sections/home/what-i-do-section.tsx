@@ -1,20 +1,19 @@
 import { Code2 } from "lucide-react";
 
-import { cn } from "@/lib/styles/cn";
-
 import {
   FeatureCard,
   FeatureCardDescription,
   FeatureCardMedia,
   FeatureCardTitle,
-} from "./feature-card";
-import { FeatureGrid } from "./feature-grid";
+} from "@/components/page-sections/shared/feature-card";
+import { FeatureGrid } from "@/components/page-sections/shared/feature-grid";
 import {
   SectionDescription,
   SectionEyebrow,
   SectionHeader,
   SectionTitle,
-} from "./section-header";
+} from "@/components/page-sections/shared/section-header";
+import { cn } from "@/lib/styles/cn";
 
 import type { HTMLAttributes } from "react";
 

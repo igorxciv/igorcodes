@@ -1,9 +1,8 @@
 import { ArrowUpRight, Terminal } from "lucide-react";
 
+import { SectionEyebrow } from "@/components/page-sections/shared/section-header";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/styles/cn";
-
-import { SectionEyebrow } from "./section-header";
 
 import type { HTMLAttributes } from "react";
 

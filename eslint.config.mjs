@@ -18,10 +18,10 @@ const eslintConfig = defineConfig([
     files: ["**/*.{js,jsx,ts,tsx}"],
     ...jsxA11y.flatConfigs.recommended,
     plugins: {
-      "import": importPlugin,
+      import: importPlugin,
       "unused-imports": unusedImports,
-      "security": security,
-      "sonarjs": sonarjs,
+      security: security,
+      sonarjs: sonarjs,
     },
     settings: {
       "import/resolver": {
@@ -32,7 +32,7 @@ const eslintConfig = defineConfig([
       "import/order": [
         "error",
         {
-          "groups": [
+          groups: [
             "builtin",
             "external",
             "internal",
@@ -41,7 +41,7 @@ const eslintConfig = defineConfig([
             "index",
             "type",
           ],
-          "alphabetize": { "order": "asc", "caseInsensitive": true },
+          alphabetize: { order: "asc", caseInsensitive: true },
           "newlines-between": "always",
         },
       ],
@@ -49,10 +49,10 @@ const eslintConfig = defineConfig([
       "unused-imports/no-unused-vars": [
         "warn",
         {
-          "vars": "all",
-          "varsIgnorePattern": "^_",
-          "args": "after-used",
-          "argsIgnorePattern": "^_",
+          vars: "all",
+          varsIgnorePattern: "^_",
+          args: "after-used",
+          argsIgnorePattern: "^_",
         },
       ],
       "security/detect-object-injection": "warn",

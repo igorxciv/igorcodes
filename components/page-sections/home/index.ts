@@ -4,8 +4,8 @@ export {
   FeatureCardDescription,
   FeatureCardMedia,
   FeatureCardTitle,
-} from "./feature-card";
-export { FeatureGrid } from "./feature-grid";
+} from "@/components/page-sections/shared/feature-card";
+export { FeatureGrid } from "@/components/page-sections/shared/feature-grid";
 export { HeroIntro } from "./hero-intro";
 export { HeroSection } from "./hero-section";
 export { HeroVisual } from "./hero-visual";
@@ -15,5 +15,5 @@ export {
   SectionEyebrow,
   SectionHeader,
   SectionTitle,
-} from "./section-header";
+} from "@/components/page-sections/shared/section-header";
 export { WhatIDoSection } from "./what-i-do-section";

@@ -1,22 +1,24 @@
-"use client";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/styles/cn";
 
-import type { ButtonHTMLAttributes } from "react";
+import type { ComponentPropsWithoutRef } from "react";
 
-type MobileNavLinkProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+type MobileNavLinkProps = ComponentPropsWithoutRef<typeof Link> & {
   active?: boolean;
 };
 
 export function MobileNavLink({
   active = false,
   className,
-  type = "button",
+  href,
+  children,
   ...restProps
 }: MobileNavLinkProps) {
   return (
     <Button
+      asChild
       className={cn(
         "h-11 w-full justify-start rounded-lg px-4 text-sm",
         active
@@ -24,9 +26,11 @@ export function MobileNavLink({
           : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white",
         className,
       )}
-      type={type}
       variant="ghost"
-      {...restProps}
-    />
+    >
+      <Link href={href} {...restProps}>
+        {children}
+      </Link>
+    </Button>
   );
 }

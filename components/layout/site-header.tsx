@@ -2,6 +2,7 @@
 
 import { Menu, Moon, Sun, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
 
 import { MobileNavLink } from "@/components/navigation/mobile-nav-link";
 import { Button } from "@/components/ui/button";
@@ -9,15 +10,15 @@ import { useMobileMenu } from "@/hooks/navigation/use-mobile-menu";
 import { useThemeToggleAnimation } from "@/hooks/theme/use-theme-toggle-animation";
 import { cn } from "@/lib/styles/cn";
 
-import type { ButtonHTMLAttributes, HTMLAttributes } from "react";
+import type { ComponentPropsWithoutRef, HTMLAttributes } from "react";
 
 type SiteHeaderProps = HTMLAttributes<HTMLElement>;
 
 type HeaderNavProps = HTMLAttributes<HTMLElement>;
 
-type HeaderNavLinkProps = ButtonHTMLAttributes<HTMLButtonElement>;
+type HeaderNavLinkProps = ComponentPropsWithoutRef<typeof Link>;
 
-type ThemeToggleButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
+type ThemeToggleButtonProps = ComponentPropsWithoutRef<"button">;
 
 export function SiteHeader({ className, ...restProps }: SiteHeaderProps) {
   const { isOpen, closeMenu, toggleMenu } = useMobileMenu();
@@ -38,11 +39,21 @@ export function SiteHeader({ className, ...restProps }: SiteHeaderProps) {
             </span>
           </div>
           <HeaderNav>
-            <HeaderNavLink aria-label="Home">./home</HeaderNavLink>
-            <HeaderNavLink aria-label="About">./about</HeaderNavLink>
-            <HeaderNavLink aria-label="Resume">./resume</HeaderNavLink>
-            <HeaderNavLink aria-label="Projects">./projects</HeaderNavLink>
-            <HeaderNavLink aria-label="Blog">./blog</HeaderNavLink>
+            <HeaderNavLink href="/" aria-label="Home">
+              ./home
+            </HeaderNavLink>
+            <HeaderNavLink href="/about" aria-label="About">
+              ./about
+            </HeaderNavLink>
+            <HeaderNavLink href="/resume" aria-label="Resume">
+              ./resume
+            </HeaderNavLink>
+            <HeaderNavLink href="/projects" aria-label="Projects">
+              ./projects
+            </HeaderNavLink>
+            <HeaderNavLink href="/blog" aria-label="Blog">
+              ./blog
+            </HeaderNavLink>
             <ThemeToggleButton />
           </HeaderNav>
           <div className="flex items-center gap-3 md:hidden">
@@ -83,17 +94,18 @@ export function HeaderNav({ className, ...restProps }: HeaderNavProps) {
 
 export function HeaderNavLink({
   className,
-  type = "button",
+  children,
   ...restProps
 }: HeaderNavLinkProps) {
   return (
     <Button
+      asChild
       className={cn("px-2 text-[15px] font-medium", className)}
       size="sm"
-      type={type}
       variant="ghost"
-      {...restProps}
-    />
+    >
+      <Link {...restProps}>{children}</Link>
+    </Button>
   );
 }
 
@@ -166,13 +178,21 @@ function MobileMenu({ isOpen, closeMenu }: MobileMenuProps) {
               </button>
             </div>
             <nav className="flex flex-col gap-2">
-              <MobileNavLink active onClick={closeMenu}>
+              <MobileNavLink href="/" active onClick={closeMenu}>
                 Home
               </MobileNavLink>
-              <MobileNavLink onClick={closeMenu}>About</MobileNavLink>
-              <MobileNavLink onClick={closeMenu}>Resume</MobileNavLink>
-              <MobileNavLink onClick={closeMenu}>Projects</MobileNavLink>
-              <MobileNavLink onClick={closeMenu}>Blog</MobileNavLink>
+              <MobileNavLink href="/about" onClick={closeMenu}>
+                About
+              </MobileNavLink>
+              <MobileNavLink href="/resume" onClick={closeMenu}>
+                Resume
+              </MobileNavLink>
+              <MobileNavLink href="/projects" onClick={closeMenu}>
+                Projects
+              </MobileNavLink>
+              <MobileNavLink href="/blog" onClick={closeMenu}>
+                Blog
+              </MobileNavLink>
             </nav>
           </motion.div>
         </motion.div>
