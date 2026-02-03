@@ -8,9 +8,19 @@ export const wotfard = localFont({
       style: "normal",
     },
     {
+      path: "./fonts/wotfard/wotfard-thinitalic-webfont.woff2",
+      weight: "100",
+      style: "italic",
+    },
+    {
       path: "./fonts/wotfard/wotfard-extralight-webfont.woff2",
       weight: "200",
       style: "normal",
+    },
+    {
+      path: "./fonts/wotfard/wotfard-extralightitalic-webfont.woff2",
+      weight: "200",
+      style: "italic",
     },
     {
       path: "./fonts/wotfard/wotfard-light-webfont.woff2",
@@ -18,9 +28,19 @@ export const wotfard = localFont({
       style: "normal",
     },
     {
+      path: "./fonts/wotfard/wotfard-lightitalic-webfont.woff2",
+      weight: "300",
+      style: "italic",
+    },
+    {
       path: "./fonts/wotfard/wotfard-regular-webfont.woff2",
       weight: "400",
       style: "normal",
+    },
+    {
+      path: "./fonts/wotfard/wotfard-regularitalic-webfont.woff2",
+      weight: "400",
+      style: "italic",
     },
     {
       path: "./fonts/wotfard/wotfard-medium-webfont.woff2",
@@ -28,14 +48,29 @@ export const wotfard = localFont({
       style: "normal",
     },
     {
+      path: "./fonts/wotfard/wotfard-mediumitalic-webfont.woff2",
+      weight: "500",
+      style: "italic",
+    },
+    {
       path: "./fonts/wotfard/wotfard-semibold-webfont.woff2",
       weight: "600",
       style: "normal",
     },
     {
+      path: "./fonts/wotfard/wotfard-semibolditalic-webfont.woff2",
+      weight: "600",
+      style: "italic",
+    },
+    {
       path: "./fonts/wotfard/wotfard-bold-webfont.woff2",
       weight: "700",
       style: "normal",
+    },
+    {
+      path: "./fonts/wotfard/wotfard-bolditalic-webfont.woff2",
+      weight: "700",
+      style: "italic",
     },
   ],
   variable: "--font-wotfard",
