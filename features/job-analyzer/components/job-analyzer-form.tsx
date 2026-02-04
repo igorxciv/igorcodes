@@ -201,7 +201,8 @@ export function JobAnalyzerForm({
 
         <Button
           type="submit"
-          className="h-12 w-full bg-emerald-400 text-xs font-semibold tracking-[0.2em] text-zinc-950 uppercase shadow-[0_12px_24px_-18px_rgba(16,185,129,0.9)] transition hover:bg-emerald-300 hover:text-zinc-950 dark:bg-emerald-400 dark:text-zinc-950 dark:hover:bg-emerald-300"
+          variant="outline"
+          className="h-12 w-full border-emerald-400/70 text-xs font-semibold tracking-[0.2em] text-emerald-200 uppercase shadow-[0_0_0_1px_rgba(16,185,129,0.15)] transition hover:border-emerald-300 hover:text-emerald-100 dark:border-emerald-400/70 dark:text-emerald-200"
         >
           analyze_job()
         </Button>
