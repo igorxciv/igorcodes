@@ -6,6 +6,7 @@ import { JobAnalyzerDropzone } from "@/features/job-analyzer/components/job-anal
 import { JobAnalyzerFieldHint } from "@/features/job-analyzer/components/job-analyzer-form/job-analyzer-field-hint";
 import { JobAnalyzerFieldLabel } from "@/features/job-analyzer/components/job-analyzer-form/job-analyzer-field-label";
 import { JobAnalyzerPdfSelected } from "@/features/job-analyzer/components/job-analyzer-form/job-analyzer-pdf-selected";
+import { cn } from "@/lib/styles/cn";
 
 import type { JobAnalyzerFormApi } from "@/features/job-analyzer/components/job-analyzer-form/job-analyzer-form-types";
 import type { HTMLAttributes } from "react";
@@ -22,7 +23,7 @@ export function JobAnalyzerPdfField({
   const reduceMotion = useReducedMotion();
 
   return (
-    <div className={className} {...restProps}>
+    <div className={cn("flex flex-col gap-2", className)} {...restProps}>
       <form.Field name="jobFile">
         {(field) => (
           <>

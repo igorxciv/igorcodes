@@ -8,6 +8,7 @@ type JobAnalyzerFormShellProps = HTMLAttributes<HTMLDivElement>;
 
 export function JobAnalyzerFormShell({
   className,
+  children,
   ...restProps
 }: JobAnalyzerFormShellProps) {
   return (
@@ -17,6 +18,8 @@ export function JobAnalyzerFormShell({
         className,
       )}
       {...restProps}
-    />
+    >
+      {children}
+    </div>
   );
 }
