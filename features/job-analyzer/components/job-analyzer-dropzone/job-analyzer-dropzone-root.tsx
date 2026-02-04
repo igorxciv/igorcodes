@@ -13,6 +13,7 @@ export function JobAnalyzerDropzoneRoot({
   isDragActive,
   isDragReject,
   className,
+  children,
   ...restProps
 }: JobAnalyzerDropzoneRootProps) {
   return (
@@ -28,6 +29,8 @@ export function JobAnalyzerDropzoneRoot({
       )}
       aria-invalid={isDragReject}
       {...restProps}
-    />
+    >
+      {children}
+    </label>
   );
 }
