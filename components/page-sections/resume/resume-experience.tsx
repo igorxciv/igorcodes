@@ -111,18 +111,18 @@ export function ResumeExperience({
             </SectionTitle>
           </div>
           <TabsList
-            className="rounded-full border border-white/10 bg-white/5 p-1"
+            className="rounded-full border border-zinc-200/80 bg-zinc-100 p-1 dark:border-white/10 dark:bg-white/5"
             variant="default"
           >
             <TabsTrigger
               value="lyrically"
-              className="rounded-full px-4 text-xs text-zinc-400 data-[state=active]:bg-white/10 data-[state=active]:text-white"
+              className="rounded-full px-4 text-xs text-zinc-500 data-[state=active]:bg-white data-[state=active]:text-zinc-900 dark:text-zinc-400 dark:data-[state=active]:bg-white/10 dark:data-[state=active]:text-white"
             >
               lyrically
             </TabsTrigger>
             <TabsTrigger
               value="facts"
-              className="rounded-full px-4 text-xs text-zinc-400 data-[state=active]:bg-white/10 data-[state=active]:text-white"
+              className="rounded-full px-4 text-xs text-zinc-500 data-[state=active]:bg-white data-[state=active]:text-zinc-900 dark:text-zinc-400 dark:data-[state=active]:bg-white/10 dark:data-[state=active]:text-white"
             >
               facts
             </TabsTrigger>
@@ -133,28 +133,28 @@ export function ResumeExperience({
             {factExperience.map((item) => (
               <div
                 key={`${item.role}-${item.company}`}
-                className="flex flex-col gap-4 border-l border-white/10 pl-6"
+                className="flex flex-col gap-4 border-l border-zinc-200/70 pl-6 dark:border-white/10"
               >
                 <div className="flex flex-wrap items-center gap-3">
-                  <h3 className="text-lg font-semibold text-white">
+                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                     {item.role}
                   </h3>
                   {item.current ? (
                     <Badge
                       variant="outline"
-                      className="border-white/10 bg-white/5 text-[11px] text-zinc-200"
+                      className="border-zinc-200/80 bg-white text-[11px] text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200"
                     >
                       Current
                     </Badge>
                   ) : null}
                 </div>
-                <p className="text-sm text-zinc-400">
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
                   {item.company} · {item.timeframe}
                 </p>
-                <ul className="space-y-3 text-sm leading-relaxed text-zinc-400">
+                <ul className="space-y-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                   {item.details.map((detail) => (
                     <li key={detail} className="flex gap-2">
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-300/80" />
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500/70 dark:bg-emerald-300/80" />
                       <span>{detail}</span>
                     </li>
                   ))}
@@ -168,28 +168,28 @@ export function ResumeExperience({
             {lyricalExperience.map((item) => (
               <div
                 key={`${item.role}-${item.company}`}
-                className="flex flex-col gap-4 border-l border-white/10 pl-6"
+                className="flex flex-col gap-4 border-l border-zinc-200/70 pl-6 dark:border-white/10"
               >
                 <div className="flex flex-wrap items-center gap-3">
-                  <h3 className="text-lg font-semibold text-white">
+                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                     {item.role}
                   </h3>
                   {item.current ? (
                     <Badge
                       variant="outline"
-                      className="border-white/10 bg-white/5 text-[11px] text-zinc-200"
+                      className="border-zinc-200/80 bg-white text-[11px] text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200"
                     >
                       Current
                     </Badge>
                   ) : null}
                 </div>
-                <p className="text-sm text-zinc-400">
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
                   {item.company} · {item.timeframe}
                 </p>
-                <ul className="space-y-3 text-sm leading-relaxed text-zinc-400">
+                <ul className="space-y-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                   {item.details.map((detail) => (
                     <li key={detail} className="flex gap-2">
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-300/80" />
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500/70 dark:bg-emerald-300/80" />
                       <span>{detail}</span>
                     </li>
                   ))}

@@ -31,14 +31,14 @@ export function ResumeEducation({
         </SectionEyebrow>
         <SectionTitle className="text-2xl sm:text-3xl">Education</SectionTitle>
       </div>
-      <FeatureCard className="border-white/10 bg-white/5">
+      <FeatureCard className="border-zinc-200/70 bg-white dark:border-white/10 dark:bg-white/5">
         <FeatureCardTitle>
           Bachelor of Science in Computer Science
         </FeatureCardTitle>
-        <FeatureCardDescription className="text-sm text-zinc-400">
+        <FeatureCardDescription className="text-sm text-zinc-600 dark:text-zinc-400">
           University · 2014 - 2018
         </FeatureCardDescription>
-        <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+        <p className="mt-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
           Focus on algorithms, data structures, and software engineering
           principles.
         </p>

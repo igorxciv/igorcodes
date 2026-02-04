@@ -20,12 +20,12 @@ type BlogRecentProps = HTMLAttributes<HTMLElement>;
 export function BlogRecent({ className, ...restProps }: BlogRecentProps) {
   return (
     <section className={cn("flex flex-col gap-8", className)} {...restProps}>
-      <h2 className="text-xl font-semibold text-white sm:text-2xl">
+      <h2 className="text-xl font-semibold text-zinc-900 sm:text-2xl dark:text-white">
         Recent posts
       </h2>
       <FeatureGrid className="md:grid-cols-2">
         <BlogPostCard>
-          <BlogPostMedia className="bg-[linear-gradient(135deg,_rgba(34,197,94,0.18),_rgba(15,23,42,0.65))]" />
+          <BlogPostMedia className="bg-[linear-gradient(135deg,_rgba(34,197,94,0.14),_rgba(226,232,240,0.9))] dark:bg-[linear-gradient(135deg,_rgba(34,197,94,0.18),_rgba(15,23,42,0.65))]" />
           <BlogPostContent>
             <BlogPostTags>
               <BlogTag>Strategy</BlogTag>
@@ -48,7 +48,7 @@ export function BlogRecent({ className, ...restProps }: BlogRecentProps) {
           </BlogPostContent>
         </BlogPostCard>
         <BlogPostCard>
-          <BlogPostMedia className="bg-[linear-gradient(135deg,_rgba(99,102,241,0.18),_rgba(15,23,42,0.65))]" />
+          <BlogPostMedia className="bg-[linear-gradient(135deg,_rgba(99,102,241,0.14),_rgba(226,232,240,0.9))] dark:bg-[linear-gradient(135deg,_rgba(99,102,241,0.18),_rgba(15,23,42,0.65))]" />
           <BlogPostContent>
             <BlogPostTags>
               <BlogTag>AI</BlogTag>
@@ -72,7 +72,7 @@ export function BlogRecent({ className, ...restProps }: BlogRecentProps) {
           </BlogPostContent>
         </BlogPostCard>
         <BlogPostCard>
-          <BlogPostMedia className="bg-[linear-gradient(135deg,_rgba(251,191,36,0.18),_rgba(15,23,42,0.65))]" />
+          <BlogPostMedia className="bg-[linear-gradient(135deg,_rgba(251,191,36,0.14),_rgba(226,232,240,0.9))] dark:bg-[linear-gradient(135deg,_rgba(251,191,36,0.18),_rgba(15,23,42,0.65))]" />
           <BlogPostContent>
             <BlogPostTags>
               <BlogTag>Design</BlogTag>
@@ -95,7 +95,7 @@ export function BlogRecent({ className, ...restProps }: BlogRecentProps) {
           </BlogPostContent>
         </BlogPostCard>
         <BlogPostCard>
-          <BlogPostMedia className="bg-[linear-gradient(135deg,_rgba(45,212,191,0.18),_rgba(15,23,42,0.65))]" />
+          <BlogPostMedia className="bg-[linear-gradient(135deg,_rgba(45,212,191,0.14),_rgba(226,232,240,0.9))] dark:bg-[linear-gradient(135deg,_rgba(45,212,191,0.18),_rgba(15,23,42,0.65))]" />
           <BlogPostContent>
             <BlogPostTags>
               <BlogTag>Career</BlogTag>

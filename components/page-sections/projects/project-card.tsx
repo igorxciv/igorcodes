@@ -29,7 +29,10 @@ export function ProjectCard({
 }: ProjectCardProps) {
   return (
     <Card
-      className={cn("overflow-hidden border-white/10 bg-white/5", className)}
+      className={cn(
+        "overflow-hidden border-zinc-200/70 bg-white dark:border-white/10 dark:bg-white/5",
+        className,
+      )}
       {...restProps}
     >
       {children}
@@ -44,13 +47,13 @@ export function ProjectCardMedia({
   return (
     <div
       className={cn(
-        "relative h-44 w-full border-b border-white/10 bg-[linear-gradient(135deg,_rgba(59,130,246,0.18),_rgba(15,23,42,0.6))]",
+        "relative h-44 w-full border-b border-zinc-200/70 bg-[linear-gradient(135deg,_rgba(37,99,235,0.12),_rgba(226,232,240,0.9))] dark:border-white/10 dark:bg-[linear-gradient(135deg,_rgba(59,130,246,0.18),_rgba(15,23,42,0.6))]",
         className,
       )}
       {...restProps}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.3),_transparent_70%)]" />
-      <div className="relative flex h-full items-center justify-center text-xs font-semibold tracking-[0.32em] text-zinc-300 uppercase">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(15,23,42,0.08),_transparent_70%)] dark:bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.3),_transparent_70%)]" />
+      <div className="relative flex h-full items-center justify-center text-xs font-semibold tracking-[0.32em] text-zinc-500 uppercase dark:text-zinc-300">
         Image Placeholder
       </div>
     </div>
@@ -79,7 +82,10 @@ export function ProjectCardDescription({
 }: HTMLAttributes<HTMLParagraphElement>) {
   return (
     <CardDescription
-      className={cn("text-sm leading-relaxed text-zinc-400", className)}
+      className={cn(
+        "text-sm leading-relaxed text-zinc-600 dark:text-zinc-400",
+        className,
+      )}
       {...restProps}
     />
   );
@@ -105,7 +111,7 @@ export function ProjectTag({
     <Badge
       variant="outline"
       className={cn(
-        "border-white/10 bg-white/5 text-[11px] text-zinc-300",
+        "border-zinc-200/80 bg-white text-[11px] text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300",
         className,
       )}
       {...restProps}
@@ -128,7 +134,10 @@ export function ProjectLink({ className, ...restProps }: ProjectLinkProps) {
       asChild
       size="sm"
       variant="ghost"
-      className={cn("px-0 text-sm text-zinc-300 hover:text-white", className)}
+      className={cn(
+        "px-0 text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white",
+        className,
+      )}
     >
       <Link {...restProps} />
     </Button>
