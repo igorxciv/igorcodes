@@ -23,7 +23,7 @@ export function BlogFeatured({ className, ...restProps }: BlogFeaturedProps) {
           <BlogPostMedia className="h-full md:h-[320px]" />
         </div>
         <BlogPostContent className="md:w-1/2">
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-[0.24em] text-zinc-400 uppercase">
+          <div className="flex items-center gap-2 text-xs font-semibold tracking-[0.24em] text-zinc-500 uppercase dark:text-zinc-400">
             <BookOpen className="size-4" aria-hidden="true" />
             Featured Post
           </div>

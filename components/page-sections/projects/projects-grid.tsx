@@ -50,7 +50,7 @@ export function ProjectsGrid({ className, ...restProps }: ProjectsGridProps) {
           </ProjectCardContent>
         </ProjectCard>
         <ProjectCard>
-          <ProjectCardMedia className="bg-[linear-gradient(135deg,_rgba(45,212,191,0.18),_rgba(15,23,42,0.6))]" />
+          <ProjectCardMedia className="bg-[linear-gradient(135deg,_rgba(20,184,166,0.14),_rgba(226,232,240,0.9))] dark:bg-[linear-gradient(135deg,_rgba(45,212,191,0.18),_rgba(15,23,42,0.6))]" />
           <ProjectCardContent>
             <ProjectCardTitle>Design System</ProjectCardTitle>
             <ProjectCardDescription>
@@ -77,7 +77,7 @@ export function ProjectsGrid({ className, ...restProps }: ProjectsGridProps) {
           </ProjectCardContent>
         </ProjectCard>
         <ProjectCard>
-          <ProjectCardMedia className="bg-[linear-gradient(135deg,_rgba(248,113,113,0.2),_rgba(15,23,42,0.65))]" />
+          <ProjectCardMedia className="bg-[linear-gradient(135deg,_rgba(248,113,113,0.16),_rgba(226,232,240,0.9))] dark:bg-[linear-gradient(135deg,_rgba(248,113,113,0.2),_rgba(15,23,42,0.65))]" />
           <ProjectCardContent>
             <ProjectCardTitle>Real-time Collaboration Tool</ProjectCardTitle>
             <ProjectCardDescription>
@@ -104,7 +104,7 @@ export function ProjectsGrid({ className, ...restProps }: ProjectsGridProps) {
           </ProjectCardContent>
         </ProjectCard>
         <ProjectCard>
-          <ProjectCardMedia className="bg-[linear-gradient(135deg,_rgba(96,165,250,0.2),_rgba(15,23,42,0.65))]" />
+          <ProjectCardMedia className="bg-[linear-gradient(135deg,_rgba(96,165,250,0.16),_rgba(226,232,240,0.9))] dark:bg-[linear-gradient(135deg,_rgba(96,165,250,0.2),_rgba(15,23,42,0.65))]" />
           <ProjectCardContent>
             <ProjectCardTitle>Analytics Dashboard</ProjectCardTitle>
             <ProjectCardDescription>

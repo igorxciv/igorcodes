@@ -53,7 +53,10 @@ export function ResumeSkills({ className, ...restProps }: ResumeSkillsProps) {
       </div>
       <FeatureGrid className="md:grid-cols-3">
         {skillGroups.map((group) => (
-          <FeatureCard key={group.title} className="border-white/10 bg-white/5">
+          <FeatureCard
+            key={group.title}
+            className="border-zinc-200/70 bg-white dark:border-white/10 dark:bg-white/5"
+          >
             <FeatureCardTitle>{group.title}</FeatureCardTitle>
             <FeatureCardDescription>{group.description}</FeatureCardDescription>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -61,7 +64,7 @@ export function ResumeSkills({ className, ...restProps }: ResumeSkillsProps) {
                 <Badge
                   key={item}
                   variant="outline"
-                  className="border-white/10 bg-white/5 text-[11px] text-zinc-200"
+                  className="border-zinc-200/80 bg-white text-[11px] text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200"
                 >
                   {item}
                 </Badge>

@@ -52,7 +52,7 @@ export function JobAnalyzerForm({
   return (
     <div
       className={cn(
-        "mt-8 flex flex-col gap-6 rounded-2xl border border-zinc-200/60 bg-white/90 p-6 shadow-sm backdrop-blur dark:border-white/10 dark:bg-zinc-950/70",
+        "mt-8 flex flex-col gap-6 rounded-2xl border border-zinc-200/70 bg-white p-6 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.4)] dark:border-white/10 dark:bg-zinc-950/70",
         className,
       )}
       {...restProps}
@@ -62,7 +62,7 @@ export function JobAnalyzerForm({
           <Sparkles aria-hidden="true" className="size-4 text-emerald-400" />
           job_analyzer.ai
         </div>
-        <p className="text-sm text-zinc-600 dark:text-zinc-300">
+        <p className="text-sm text-zinc-700 dark:text-zinc-300">
           Analyze job postings to see how candidates fit the role, values, and
           culture.
         </p>
@@ -72,7 +72,7 @@ export function JobAnalyzerForm({
         <form.Subscribe selector={(state) => state.values.source}>
           {(source) => (
             <Tabs value={source} onValueChange={setSource}>
-              <TabsList className="grid h-auto w-full grid-cols-1 gap-2 rounded-xl border border-zinc-200/70 bg-zinc-50/80 p-2 sm:grid-cols-3 dark:border-white/10 dark:bg-white/5">
+              <TabsList className="grid h-auto w-full grid-cols-1 gap-2 rounded-xl border border-zinc-200/80 bg-zinc-50 p-2 sm:grid-cols-3 dark:border-white/10 dark:bg-white/5">
                 {sourceOptions.map((option) => {
                   const Icon = option.icon;
                   const triggerId = `job-analyzer-tab-${option.value}`;
@@ -129,9 +129,9 @@ export function JobAnalyzerForm({
                               }
                               placeholder="Paste the job description here..."
                               rows={6}
-                              className="min-h-[140px] rounded-xl border border-zinc-200/70 bg-white/80 px-4 py-3 text-sm text-zinc-900 shadow-inner transition outline-none focus-visible:border-emerald-400/60 focus-visible:ring-2 focus-visible:ring-emerald-400/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                              className="min-h-[140px] rounded-xl border border-zinc-200/80 bg-white px-4 py-3 text-sm text-zinc-900 shadow-[inset_0_1px_2px_rgba(15,23,42,0.08)] transition outline-none focus-visible:border-emerald-400/60 focus-visible:ring-2 focus-visible:ring-emerald-400/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
                             />
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400">
                               Include responsibilities, requirements, and skills
                               for a richer match.
                             </p>
@@ -160,9 +160,9 @@ export function JobAnalyzerForm({
                               placeholder="https://company.com/careers/job-posting"
                               type="url"
                               inputMode="url"
-                              className="h-12 rounded-xl border border-zinc-200/70 bg-white/80 px-4 text-sm text-zinc-900 shadow-inner transition outline-none focus-visible:border-emerald-400/60 focus-visible:ring-2 focus-visible:ring-emerald-400/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                              className="h-12 rounded-xl border border-zinc-200/80 bg-white px-4 text-sm text-zinc-900 shadow-[inset_0_1px_2px_rgba(15,23,42,0.08)] transition outline-none focus-visible:border-emerald-400/60 focus-visible:ring-2 focus-visible:ring-emerald-400/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
                             />
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400">
                               Use a direct link to the live posting.
                             </p>
                           </>
@@ -237,7 +237,7 @@ export function JobAnalyzerForm({
                                 </motion.div>
                               )}
                             </AnimatePresence>
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400">
                               PDF only, up to 10MB.
                             </p>
                           </>
@@ -254,16 +254,16 @@ export function JobAnalyzerForm({
         <Button
           type="submit"
           variant="outline"
-          className="h-12 w-full border-emerald-400/70 text-xs font-semibold tracking-[0.2em] text-emerald-200 uppercase shadow-[0_0_0_1px_rgba(16,185,129,0.15)] transition hover:border-emerald-300 hover:text-emerald-100 dark:border-emerald-400/70 dark:text-emerald-200"
+          className="h-12 w-full border-emerald-400/70 text-xs font-semibold tracking-[0.2em] text-emerald-700 uppercase shadow-[0_0_0_1px_rgba(16,185,129,0.1)] transition hover:border-emerald-500 hover:text-emerald-800 dark:border-emerald-400/70 dark:text-emerald-200 dark:hover:text-emerald-100"
         >
           analyze_job()
         </Button>
       </form>
 
-      <div className="flex flex-col gap-3 rounded-xl border border-dashed border-zinc-200/70 bg-zinc-50/80 p-4 text-xs text-zinc-500 dark:border-white/10 dark:bg-white/5 dark:text-zinc-400">
+      <div className="flex flex-col gap-3 rounded-xl border border-dashed border-zinc-200/80 bg-zinc-50 p-4 text-xs text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-400">
         {sourceOptions.map((option) => (
           <div key={option.value} className="flex items-center gap-2">
-            <span className="text-[10px] font-semibold tracking-[0.18em] text-zinc-400 uppercase dark:text-zinc-500">
+            <span className="text-[10px] font-semibold tracking-[0.18em] text-zinc-500 uppercase dark:text-zinc-500">
               {option.label}
             </span>
             <span>{option.description}</span>
