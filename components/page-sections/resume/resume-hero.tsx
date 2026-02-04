@@ -6,7 +6,9 @@ import {
   SectionTitle,
 } from "@/components/page-sections/shared/section-header";
 import { Button } from "@/components/ui/button";
+import { JobAnalyzerForm } from "@/features/job-analyzer/components/job-analyzer-form";
 import { cn } from "@/lib/styles/cn";
+
 
 import type { HTMLAttributes } from "react";
 
@@ -32,6 +34,7 @@ export function ResumeHero({ className, ...restProps }: ResumeHeroProps) {
         Systems-thinking builder with expertise in architecture, AI
         infrastructure, and product development.
       </SectionDescription>
+      <JobAnalyzerForm />
     </section>
   );
 }
