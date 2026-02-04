@@ -180,11 +180,63 @@ export function JobAnalyzerForm({
                             >
                               Upload PDF
                             </label>
-                            <JobAnalyzerDropzone
-                              id="job-pdf"
-                              name={field.name}
-                              onFileSelect={(file) => field.handleChange(file)}
-                            />
+                            <AnimatePresence mode="wait" initial={false}>
+                              {field.state.value ? (
+                                <motion.div
+                                  key="job-analyzer-file"
+                                  initial={
+                                    reduceMotion ? false : { opacity: 0, y: 6 }
+                                  }
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={
+                                    reduceMotion
+                                      ? { opacity: 1, y: 0 }
+                                      : { opacity: 0, y: -6 }
+                                  }
+                                  transition={{
+                                    duration: 0.2,
+                                    ease: "easeOut",
+                                  }}
+                                  className="flex items-center justify-between rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 text-xs text-emerald-100"
+                                >
+                                  <span className="truncate">
+                                    {(field.state.value as File).name}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => field.handleChange(null)}
+                                    className="ml-3 text-[10px] font-semibold tracking-[0.2em] text-emerald-200 uppercase transition hover:text-emerald-100"
+                                  >
+                                    Remove
+                                  </button>
+                                </motion.div>
+                              ) : (
+                                <motion.div
+                                  key="job-analyzer-dropzone"
+                                  initial={
+                                    reduceMotion ? false : { opacity: 0, y: 6 }
+                                  }
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={
+                                    reduceMotion
+                                      ? { opacity: 1, y: 0 }
+                                      : { opacity: 0, y: -6 }
+                                  }
+                                  transition={{
+                                    duration: 0.2,
+                                    ease: "easeOut",
+                                  }}
+                                >
+                                  <JobAnalyzerDropzone
+                                    id="job-pdf"
+                                    name={field.name}
+                                    onFileSelect={(file) =>
+                                      field.handleChange(file)
+                                    }
+                                  />
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
                             <p className="text-xs text-zinc-500 dark:text-zinc-400">
                               PDF only, up to 10MB.
                             </p>
