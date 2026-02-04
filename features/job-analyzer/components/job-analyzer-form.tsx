@@ -1,46 +1,18 @@
 "use client";
 
-import { FileText, Link2, Sparkles, Upload } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { JobAnalyzerDropzone } from "@/features/job-analyzer/components/job-analyzer-dropzone";
+import { jobAnalyzerOptions } from "@/features/job-analyzer/constants/job-analyzer-options";
 import { useJobAnalyzerForm } from "@/features/job-analyzer/hooks/use-job-analyzer-form";
 import { cn } from "@/lib/styles/cn";
 
-import type { JobAnalyzerSource } from "@/features/job-analyzer/utils/job-analyzer-schema";
 import type { HTMLAttributes } from "react";
 
 type JobAnalyzerFormProps = HTMLAttributes<HTMLDivElement>;
-
-type SourceOption = JobAnalyzerSource;
-
-const sourceOptions: {
-  value: SourceOption;
-  label: string;
-  description: string;
-  icon: typeof FileText;
-}[] = [
-  {
-    value: "text",
-    label: "Text",
-    description: "Paste a full job description.",
-    icon: FileText,
-  },
-  {
-    value: "link",
-    label: "Link",
-    description: "Use the posting URL.",
-    icon: Link2,
-  },
-  {
-    value: "pdf",
-    label: "PDF",
-    description: "Upload a PDF posting.",
-    icon: Upload,
-  },
-];
 
 export function JobAnalyzerForm({
   className,
@@ -68,12 +40,12 @@ export function JobAnalyzerForm({
         </p>
       </div>
 
-      <form onSubmit={submitForm} className="flex flex-col gap-4">
+      <form onSubmit={submitForm} noValidate className="flex flex-col gap-4">
         <form.Subscribe selector={(state) => state.values.source}>
           {(source) => (
             <Tabs value={source} onValueChange={setSource}>
               <TabsList className="grid h-auto w-full grid-cols-1 gap-2 rounded-xl border border-zinc-200/80 bg-zinc-50 p-2 sm:grid-cols-3 dark:border-white/10 dark:bg-white/5">
-                {sourceOptions.map((option) => {
+                {jobAnalyzerOptions.map((option) => {
                   const Icon = option.icon;
                   const triggerId = `job-analyzer-tab-${option.value}`;
                   const panelId = `job-analyzer-panel-${option.value}`;
@@ -127,6 +99,7 @@ export function JobAnalyzerForm({
                               onChange={(event) =>
                                 field.handleChange(event.target.value)
                               }
+                              onBlur={field.handleBlur}
                               placeholder="Paste the job description here..."
                               rows={6}
                               className="min-h-[140px] rounded-xl border border-zinc-200/80 bg-white px-4 py-3 text-sm text-zinc-900 shadow-[inset_0_1px_2px_rgba(15,23,42,0.08)] transition outline-none focus-visible:border-emerald-400/60 focus-visible:ring-2 focus-visible:ring-emerald-400/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
@@ -160,11 +133,29 @@ export function JobAnalyzerForm({
                               placeholder="https://company.com/careers/job-posting"
                               type="url"
                               inputMode="url"
+                              aria-invalid={field.state.meta.errors.length > 0}
+                              aria-describedby={
+                                field.state.meta.errors.length > 0
+                                  ? "job-url-error"
+                                  : undefined
+                              }
                               className="h-12 rounded-xl border border-zinc-200/80 bg-white px-4 text-sm text-zinc-900 shadow-[inset_0_1px_2px_rgba(15,23,42,0.08)] transition outline-none focus-visible:border-emerald-400/60 focus-visible:ring-2 focus-visible:ring-emerald-400/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
                             />
-                            <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                              Use a direct link to the live posting.
-                            </p>
+                            {field.state.meta.errors.length > 0 ? (
+                              <p
+                                id="job-url-error"
+                                className="text-xs text-rose-600 dark:text-rose-300"
+                              >
+                                {typeof field.state.meta.errors[0] === "string"
+                                  ? field.state.meta.errors[0]
+                                  : (field.state.meta.errors[0]?.message ??
+                                    "Enter a valid URL.")}
+                              </p>
+                            ) : (
+                              <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                Use a direct link to the live posting.
+                              </p>
+                            )}
                           </>
                         )}
                       </form.Field>
@@ -261,7 +252,7 @@ export function JobAnalyzerForm({
       </form>
 
       <div className="flex flex-col gap-3 rounded-xl border border-dashed border-zinc-200/80 bg-zinc-50 p-4 text-xs text-zinc-600 dark:border-white/10 dark:bg-white/5 dark:text-zinc-400">
-        {sourceOptions.map((option) => (
+        {jobAnalyzerOptions.map((option) => (
           <div key={option.value} className="flex items-center gap-2">
             <span className="text-[10px] font-semibold tracking-[0.18em] text-zinc-500 uppercase dark:text-zinc-500">
               {option.label}
