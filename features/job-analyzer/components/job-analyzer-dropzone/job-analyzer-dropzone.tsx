@@ -20,32 +20,17 @@ export function JobAnalyzerDropzone({
   className,
   ...restProps
 }: JobAnalyzerDropzoneProps) {
-  const {
-    isDragActive,
-    isDragReject,
-    startDrag,
-    endDrag,
-    allowDrop,
-    dropFile,
-    setFileFromInput,
-  } = useJobAnalyzerFileDropzone({ onFileSelect });
+  const { isDragActive, isDragReject, getRootProps, getInputProps } =
+    useJobAnalyzerFileDropzone({ onFileSelect });
 
   return (
     <JobAnalyzerDropzoneRoot
       isDragActive={isDragActive}
       isDragReject={isDragReject}
       className={className}
-      onDragEnter={startDrag}
-      onDragLeave={endDrag}
-      onDragOver={allowDrop}
-      onDrop={dropFile}
-      {...restProps}
+      {...getRootProps(restProps)}
     >
-      <JobAnalyzerDropzoneInput
-        id={id}
-        name={name}
-        onFileChange={setFileFromInput}
-      />
+      <JobAnalyzerDropzoneInput {...getInputProps({ id, name })} />
       <JobAnalyzerDropzoneStatus isDragReject={isDragReject} />
     </JobAnalyzerDropzoneRoot>
   );

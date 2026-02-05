@@ -2,7 +2,13 @@
 
 import { useCallback, useMemo, useState } from "react";
 
-import type { ChangeEvent, DragEvent } from "react";
+import type {
+  ChangeEvent,
+  ChangeEventHandler,
+  DragEvent,
+  HTMLAttributes,
+  InputHTMLAttributes,
+} from "react";
 
 interface UseJobAnalyzerFileDropzoneOptions {
   onFileSelect: (file: File | null) => void;
@@ -118,13 +124,60 @@ export function useJobAnalyzerFileDropzone({
     [selectFile],
   );
 
+  const getRootProps = useCallback(
+    <T extends HTMLAttributes<HTMLLabelElement>>(userProps?: T) => ({
+      ...userProps,
+      onDragEnter: (event: DragEvent<HTMLLabelElement>) => {
+        userProps?.onDragEnter?.(event);
+        if (!event.defaultPrevented) {
+          startDrag(event);
+        }
+      },
+      onDragLeave: (event: DragEvent<HTMLLabelElement>) => {
+        userProps?.onDragLeave?.(event);
+        if (!event.defaultPrevented) {
+          endDrag(event);
+        }
+      },
+      onDragOver: (event: DragEvent<HTMLLabelElement>) => {
+        userProps?.onDragOver?.(event);
+        if (!event.defaultPrevented) {
+          allowDrop(event);
+        }
+      },
+      onDrop: (event: DragEvent<HTMLLabelElement>) => {
+        userProps?.onDrop?.(event);
+        if (!event.defaultPrevented) {
+          dropFile(event);
+        }
+      },
+    }),
+    [allowDrop, dropFile, endDrag, startDrag],
+  );
+
+  const getInputProps = useCallback(
+    <
+      T extends InputHTMLAttributes<HTMLInputElement> & {
+        onFileChange?: ChangeEventHandler<HTMLInputElement>;
+      },
+    >(
+      userProps?: T,
+    ) => ({
+      ...userProps,
+      onFileChange: (event: ChangeEvent<HTMLInputElement>) => {
+        userProps?.onFileChange?.(event);
+        if (!event.defaultPrevented) {
+          setFileFromInput(event);
+        }
+      },
+    }),
+    [setFileFromInput],
+  );
+
   return {
     isDragActive,
     isDragReject,
-    startDrag,
-    endDrag,
-    allowDrop,
-    dropFile,
-    setFileFromInput,
+    getRootProps,
+    getInputProps,
   };
 }
