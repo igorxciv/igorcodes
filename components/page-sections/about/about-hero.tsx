@@ -23,8 +23,8 @@ export function AboutHero({ className, ...restProps }: AboutHeroProps) {
             About Me
           </h1>
           <SectionDescription className="max-w-2xl text-base sm:text-lg">
-            A builder at heart, driven by curiosity and the desire to create
-            tools that make a lasting impact.
+            A full-stack engineer since 2014, shaped by curiosity and a passion
+            for building products that deliver real impact.
           </SectionDescription>
         </div>
       </div>
@@ -39,19 +39,26 @@ export function AboutHero({ className, ...restProps }: AboutHeroProps) {
         </div>
         <div className="flex flex-col gap-5">
           <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl dark:text-white">
-            Hi, I&apos;m [Your Name]
+            Hi, I&apos;m Igor
           </h2>
           <p className="text-sm leading-relaxed text-zinc-600 sm:text-base dark:text-zinc-300">
-            I&apos;m a systems-thinking builder who believes in creating
-            leverage through thoughtful engineering. My work spans product
-            development, AI infrastructure, and architecture—always with an eye
-            toward long-term impact.
+            I started in 2014 after my first manager challenged me to dive into
+            frontend engineering. That spark turned into a full-stack career
+            spanning Fortune 500 clients, large product companies, and startups
+            across diverse business domains and tech stacks.
           </p>
           <p className="text-sm leading-relaxed text-zinc-600 sm:text-base dark:text-zinc-300">
-            I care deeply about structure, aesthetics, and building products
-            that feel both powerful and intuitive. Whether it&apos;s optimizing
-            infrastructure or crafting user experiences, I approach every
-            problem as an opportunity to create something meaningful.
+            I&apos;ve led distributed teams with a focus on innovation,
+            performance, and delivery. Today I&apos;m at{" "}
+            <a
+              className="underline-offset-4 transition hover:text-emerald-600 hover:underline dark:hover:text-emerald-300"
+              href="https://electives.io"
+              rel="noreferrer"
+              target="_blank"
+            >
+              Electives
+            </a>
+            , helping build a next-gen live learning platform.
           </p>
         </div>
       </div>
