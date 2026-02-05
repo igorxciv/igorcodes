@@ -30,29 +30,27 @@ export function WhatIDoSection({
           <Code2 aria-hidden="true" className="size-3 text-emerald-300" />
           <span>./what-i-do</span>
         </SectionEyebrow>
-        <SectionTitle>Building with purpose</SectionTitle>
+        <SectionTitle>How I work</SectionTitle>
         <SectionDescription>
-          I approach problems with systems thinking, caring deeply about
-          structure, aesthetics, and creating solutions that compound over time.
+          I care about clarity, momentum, and making complex systems feel simple
+          for real people.
         </SectionDescription>
       </SectionHeader>
       <FeatureGrid>
         <FeatureCard>
           <FeatureCardMedia className="bg-[linear-gradient(135deg,_rgba(56,189,248,0.18),_rgba(15,23,42,0.6))]" />
-          <FeatureCardTitle>Product Engineering</FeatureCardTitle>
+          <FeatureCardTitle>Build With Intent</FeatureCardTitle>
           <FeatureCardDescription>
-            Building full-stack applications that solve real problems. From
-            architecture to implementation, I focus on creating intuitive
-            experiences backed by robust systems.
+            From first sketch to production, I aim for software that feels calm,
+            fast, and dependable. The goal is always outcomes—not just output.
           </FeatureCardDescription>
         </FeatureCard>
         <FeatureCard>
           <FeatureCardMedia className="bg-[linear-gradient(135deg,_rgba(96,165,250,0.18),_rgba(30,41,59,0.65))]" />
-          <FeatureCardTitle>AI Infrastructure</FeatureCardTitle>
+          <FeatureCardTitle>Explore New Frontiers</FeatureCardTitle>
           <FeatureCardDescription>
-            Designing and implementing AI-powered features at scale. Passionate
-            about making complex technology accessible and useful for real
-            users.
+            I&apos;m currently obsessed with AI agents, realtime experiences,
+            and workflows that make teams more effective.
           </FeatureCardDescription>
         </FeatureCard>
       </FeatureGrid>
