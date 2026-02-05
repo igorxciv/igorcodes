@@ -1,0 +1,31 @@
+---
+title: "Hello MDX"
+description: "A starter post to prove the MDX pipeline, metadata, and custom components."
+date: "2026-02-05"
+topics: ["Engineering"]
+tags: ["MDX", "Next.js", "Writing"]
+published: true
+featured: true
+readingTime: 5
+---
+
+# Hello MDX
+
+This is a starter post to validate the MDX setup. You can drop future posts in
+`content/posts/YYYY/MM/DD/slug.mdx` and control their visibility with the
+`published` flag.
+
+<Callout title="Draft-friendly" variant="info">
+  Draft posts stay accessible in development, but they do not generate routes in
+  production builds.
+</Callout>
+
+## Why this structure
+
+- Dates are encoded in the folder path for easy grouping.
+- Topics and tags live in frontmatter for filters later.
+- Custom components like `<Callout />` are available without manual imports.
+
+## Next steps
+
+Try adding a second post with `published: false` and open the route locally.

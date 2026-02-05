@@ -7,15 +7,31 @@ import {
   BlogPostLink,
   BlogPostMedia,
   BlogPostMeta,
+  BlogPostTags,
   BlogPostTitle,
+  BlogTag,
 } from "@/components/page-sections/blog/blog-post-card";
+import { formatDate } from "@/lib/formatters/date";
 import { cn } from "@/lib/styles/cn";
 
+import type { PostSummary } from "@/lib/types/posts";
 import type { HTMLAttributes } from "react";
 
-type BlogFeaturedProps = HTMLAttributes<HTMLElement>;
+type BlogFeaturedProps = HTMLAttributes<HTMLElement> & {
+  post?: PostSummary;
+};
 
-export function BlogFeatured({ className, ...restProps }: BlogFeaturedProps) {
+export function BlogFeatured({
+  className,
+  post,
+  ...restProps
+}: BlogFeaturedProps) {
+  if (!post) {
+    return null;
+  }
+
+  const href = `/blog/${post.slug}`;
+
   return (
     <section className={cn("flex flex-col gap-6", className)} {...restProps}>
       <BlogPostCard className="md:flex md:min-h-[320px]">
@@ -27,23 +43,36 @@ export function BlogFeatured({ className, ...restProps }: BlogFeaturedProps) {
             <BookOpen className="size-4" aria-hidden="true" />
             Featured Post
           </div>
-          <BlogPostTitle className="text-2xl">
-            Building Systems That Scale
-          </BlogPostTitle>
-          <BlogPostDescription>
-            Lessons learned from architecting platforms that handle millions of
-            users. How thinking in systems creates better software.
-          </BlogPostDescription>
+          <BlogPostTitle className="text-2xl">{post.title}</BlogPostTitle>
+          {post.description ? (
+            <BlogPostDescription>{post.description}</BlogPostDescription>
+          ) : null}
+          {(!post.published ||
+            post.topics.length > 0 ||
+            post.tags.length > 0) && (
+            <BlogPostTags>
+              {!post.published && <BlogTag>Draft</BlogTag>}
+              {post.topics.map((topic) => (
+                <BlogTag key={`topic-${topic}`}>{topic}</BlogTag>
+              ))}
+              {post.tags.map((tag) => (
+                <BlogTag key={`tag-${tag}`}>{tag}</BlogTag>
+              ))}
+            </BlogPostTags>
+          )}
           <BlogPostMeta>
             <span className="inline-flex items-center gap-2">
               <Calendar className="size-4" aria-hidden="true" />
-              Jan 15, 2026
+              {formatDate(post.date)}
             </span>
-            <span className="inline-flex items-center gap-2">
-              <Clock className="size-4" aria-hidden="true" />8 min read
-            </span>
+            {post.readingTime ? (
+              <span className="inline-flex items-center gap-2">
+                <Clock className="size-4" aria-hidden="true" />
+                {post.readingTime} min read
+              </span>
+            ) : null}
           </BlogPostMeta>
-          <BlogPostLink href="#">
+          <BlogPostLink href={href}>
             Read article
             <ArrowRight aria-hidden="true" className="size-4" />
           </BlogPostLink>
