@@ -6,9 +6,19 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Learn more about the builder behind the work, the values that drive the craft, and the interests beyond the code.",
+    "Story, values, and interests of Igor — a full-stack engineer since 2014 focused on thoughtful, human-centered software.",
   alternates: {
     canonical: "/about",
+  },
+  openGraph: {
+    title: "About | Igor",
+    description:
+      "Story, values, and interests of Igor — a full-stack engineer since 2014 focused on thoughtful, human-centered software.",
+  },
+  twitter: {
+    title: "About | Igor",
+    description:
+      "Story, values, and interests of Igor — a full-stack engineer since 2014 focused on thoughtful, human-centered software.",
   },
 };
 
