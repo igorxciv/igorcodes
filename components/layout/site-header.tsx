@@ -6,6 +6,8 @@ import Link from "next/link";
 
 import { MobileNavLink } from "@/components/navigation/mobile-nav-link";
 import { Button } from "@/components/ui/button";
+import { MicroInteractionButton } from "@/components/ui/micro-interaction-button";
+import { MicroInteractionLink } from "@/components/ui/micro-interaction-link";
 import { useMobileMenu } from "@/hooks/navigation/use-mobile-menu";
 import { useThemeToggleAnimation } from "@/hooks/theme/use-theme-toggle-animation";
 import { cn } from "@/lib/styles/cn";
@@ -58,20 +60,21 @@ export function SiteHeader({ className, ...restProps }: SiteHeaderProps) {
           </HeaderNav>
           <div className="flex items-center gap-3 md:hidden">
             <ThemeToggleButton />
-            <Button
+            <MicroInteractionButton
               aria-label={isOpen ? "Close menu" : "Open menu"}
               size="icon"
               type="button"
               variant="outline"
               onClick={toggleMenu}
               className="text-base"
+              preset="icon"
             >
               {isOpen ? (
                 <X aria-hidden="true" className="size-4" />
               ) : (
                 <Menu aria-hidden="true" className="size-4" />
               )}
-            </Button>
+            </MicroInteractionButton>
           </div>
         </div>
       </header>
@@ -100,11 +103,16 @@ export function HeaderNavLink({
   return (
     <Button
       asChild
-      className={cn("px-2 text-[15px] font-medium", className)}
+      className={cn(
+        "px-2 text-[15px] font-medium transition-[color,background-color,border-color,box-shadow] duration-150",
+        className,
+      )}
       size="sm"
       variant="ghost"
     >
-      <Link {...restProps}>{children}</Link>
+      <MicroInteractionLink preset="text" {...restProps}>
+        {children}
+      </MicroInteractionLink>
     </Button>
   );
 }
@@ -117,10 +125,11 @@ export function ThemeToggleButton({
   const { iconControls, toggleTheme } = useThemeToggleAnimation();
 
   return (
-    <Button
+    <MicroInteractionButton
       aria-label="Toggle theme"
       className={cn("text-base", className)}
       onClick={toggleTheme}
+      preset="icon"
       size="icon"
       type={type}
       variant="outline"
@@ -134,7 +143,7 @@ export function ThemeToggleButton({
         <Sun className="absolute inset-0 size-4 opacity-100 transition-opacity duration-150 dark:opacity-0" />
         <Moon className="absolute inset-0 size-4 opacity-0 transition-opacity duration-150 dark:opacity-100" />
       </motion.span>
-    </Button>
+    </MicroInteractionButton>
   );
 }
 

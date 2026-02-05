@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { MicroInteractionLink } from "@/components/ui/micro-interaction-link";
 import { cn } from "@/lib/styles/cn";
 
 import type { ComponentPropsWithoutRef } from "react";
@@ -20,7 +21,7 @@ export function MobileNavLink({
     <Button
       asChild
       className={cn(
-        "h-11 w-full justify-start rounded-lg px-4 text-sm",
+        "h-11 w-full justify-start rounded-lg px-4 text-sm transition-[color,background-color,border-color,box-shadow] duration-150",
         active
           ? "bg-zinc-100 font-medium text-zinc-900 hover:bg-zinc-200 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
           : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white",
@@ -28,9 +29,9 @@ export function MobileNavLink({
       )}
       variant="ghost"
     >
-      <Link href={href} {...restProps}>
+      <MicroInteractionLink preset="text" href={href} {...restProps}>
         {children}
-      </Link>
+      </MicroInteractionLink>
     </Button>
   );
 }
