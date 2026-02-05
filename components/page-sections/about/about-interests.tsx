@@ -1,4 +1,4 @@
-import { Coffee, Mountain, PawPrint } from "lucide-react";
+import { Camera, ChefHat, Mountain, Music } from "lucide-react";
 
 import { FeatureGrid } from "@/components/page-sections/shared/feature-grid";
 import { SectionTitle } from "@/components/page-sections/shared/section-header";
@@ -17,7 +17,7 @@ type AboutInterestsProps = HTMLAttributes<HTMLElement>;
 type InterestCardProps = HTMLAttributes<HTMLDivElement> & {
   title: string;
   description: string;
-  icon: typeof PawPrint;
+  icon: typeof Mountain;
 };
 
 function InterestCard({
@@ -55,21 +55,26 @@ export function AboutInterests({
       <SectionTitle className="text-2xl sm:text-3xl">
         Beyond the code
       </SectionTitle>
-      <FeatureGrid className="md:grid-cols-3">
+      <FeatureGrid className="md:grid-cols-2 lg:grid-cols-4">
         <InterestCard
-          icon={PawPrint}
-          title="Digital Cat Parent"
-          description="Allergic to cats but love them, so I collect them digitally instead."
-        />
-        <InterestCard
-          icon={Coffee}
-          title="Coffee Enthusiast"
-          description="Fueled by espresso and the occasional cold brew."
+          icon={Music}
+          title="Guitar"
+          description="Finding balance and flow through music."
         />
         <InterestCard
           icon={Mountain}
-          title="Nature Seeker"
-          description="Finding balance through hiking and outdoor adventures."
+          title="Hiking"
+          description="Resetting in nature and exploring new trails."
+        />
+        <InterestCard
+          icon={Camera}
+          title="Photography"
+          description="Capturing moments and telling stories visually."
+        />
+        <InterestCard
+          icon={ChefHat}
+          title="Cooking"
+          description="Experimenting with flavors and techniques."
         />
       </FeatureGrid>
     </section>

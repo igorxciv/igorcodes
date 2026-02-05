@@ -17,6 +17,7 @@ type ResumeExperienceProps = HTMLAttributes<HTMLElement>;
 interface ExperienceItem {
   role: string;
   company: string;
+  companyUrl?: string;
   timeframe: string;
   current?: boolean;
   details: string[];
@@ -24,68 +25,107 @@ interface ExperienceItem {
 
 const factExperience: ExperienceItem[] = [
   {
-    role: "Senior Product Engineer",
-    company: "Tech Company",
-    timeframe: "2022 - Present",
+    role: "Principal Engineer",
+    company: "Electives",
+    companyUrl: "https://electives.io",
+    timeframe: "Nov 2022 - Present",
     current: true,
     details: [
-      "Led the architectural vision for AI-powered features serving 100k+ users, improving onboarding completion by 22% and retention by 18%.",
-      "Reduced operational costs by 30% through infrastructure optimization and a multi-region caching strategy.",
-      "Built a design system adopted by 6 product teams, cutting UI delivery time by 35%.",
-      "Mentored 4 engineers and established architecture reviews for cross-team alignment.",
+      "Boosted membership page performance (3x faster cold Lambda starts, up to 4x faster hot starts).",
+      "Built a local Lambda helper to run the serverless stack locally, reducing AWS costs and improving DX.",
+      "Migrated AWS SDK v2 to v3 and led refactors for a more maintainable, scalable codebase.",
+      "Established UI Kit + Storybook with CI/CD, and integrated it into the core product.",
+      "Championed TypeScript, testing, and accessibility improvements across teams.",
+      "Stack: React.js, Next.js, Node.js, TypeScript, GraphQL, AWS, Docker, Terraform, JMeter.",
     ],
   },
   {
-    role: "Product Engineer",
-    company: "Startup",
-    timeframe: "2020 - 2022",
+    role: "Lead Software Engineer",
+    company: "EPAM Systems",
+    companyUrl: "https://epam.com",
+    timeframe: "Nov 2017 - Nov 2022",
     details: [
-      "Owned the full product lifecycle for collaboration features that increased weekly active usage by 28%.",
-      "Designed real-time sync workflows that reduced conflict resolution time by 40%.",
-      "Shipped data-informed experiments, improving conversion rates by 12%.",
+      "Delivered Fortune 500 projects across e-commerce, finance, and media as a frontend/full-stack lead.",
+      "Led distributed teams through development, release, and delivery.",
+      "Built browser AR virtual try-on experiences (GLSL, WebGL, Three.js, TensorFlow).",
+      "Designed SPAs with Angular, React, and Node.js; aligned solutions with product goals.",
+      "Improved performance, accessibility, and DX; owned CI/CD and releases.",
+      "Stack: React.js, Angular, Node.js, TypeScript, GraphQL, AWS, Docker, Three.js, WebGL.",
+    ],
+  },
+  {
+    role: "Web Developer",
+    company: "Wargaming",
+    companyUrl: "https://wargaming.net/en",
+    timeframe: "Apr 2017 - Nov 2017",
+    details: [
+      "Raised unit test coverage from 0% to 88% by establishing a testing environment.",
+      "Advised other teams on React.js adoption and best practices.",
+      "Shipped new features using React and Knockout.",
+      "Stack: JavaScript, React.js, Knockout.js, Go.",
     ],
   },
   {
     role: "Software Engineer",
-    company: "Agency",
-    timeframe: "2018 - 2020",
+    company: "EPAM Systems",
+    companyUrl: "https://epam.com",
+    timeframe: "Nov 2014 - Apr 2017",
     details: [
-      "Delivered client platforms across fintech, healthcare, and education with consistent quality.",
-      "Built modern web apps using React, Node.js, and cloud infrastructure for end-to-end delivery.",
+      "Built SPAs from scratch using React, Angular, AngularJS, and Node.js (BFF + backend).",
+      "Designed and implemented UI mockups for internal applications.",
+      "Set up CI/CD pipelines to ensure reliable delivery.",
+      "Stack: JavaScript, React.js, Knockout.js, Node.js, TypeScript, GraphQL, AWS, Docker, Three.js.",
     ],
   },
 ];
 
 const lyricalExperience: ExperienceItem[] = [
   {
-    role: "Senior Product Engineer",
-    company: "Tech Company",
-    timeframe: "2022 - Present",
+    role: "Principal Engineer",
+    company: "Electives",
+    companyUrl: "https://electives.io",
+    timeframe: "Nov 2022 - Present",
     current: true,
     details: [
-      "Guided AI experiences that feel effortless for 100k+ users while holding the line on reliability at scale.",
-      "Turned infrastructure sprawl into a resilient system that compounds performance and reduces cost.",
-      "Crafted a design system that unified how teams build, accelerating velocity without sacrificing craft.",
-      "Mentored engineers to think in systems, not tasks, for stronger architecture decisions.",
+      "Drove substantial business value by optimizing system performance and reducing AWS resource costs.",
+      "Spearheaded a local Lambda helper, UI Kit development, and code refactoring to create a scalable and maintainable foundation.",
+      "Led critical package migrations for a 30% performance boost and championed a lasting testing culture.",
+      "Pioneered TypeScript adoption and accessibility improvements for a more inclusive, user-friendly product.",
+      "Shaped architectural solutions for new business domains, supporting the company's growth trajectory.",
     ],
   },
   {
-    role: "Product Engineer",
-    company: "Startup",
-    timeframe: "2020 - 2022",
+    role: "Lead Software Engineer",
+    company: "EPAM Systems",
+    companyUrl: "https://epam.com",
+    timeframe: "Nov 2017 - Nov 2022",
     details: [
-      "Took ideas from sketch to shipped and turned them into features customers kept coming back to.",
-      "Pioneered real-time collaboration flows that made remote teamwork feel seamless.",
-      "Built a habit of experimentation, translating intuition into measurable outcomes.",
+      "Led distributed teams delivering high-impact products for Fortune 500 clients across e-commerce, finance, and media.",
+      "Built immersive AR virtual try-on experiences in browsers using GLSL, WebGL, Three.js, and TensorFlow.",
+      "Shaped SPA architectures with Angular, React, and Node.js while aligning execution with business goals.",
+      "Elevated performance, accessibility, and developer experience with rigorous CI/CD and release practices.",
+    ],
+  },
+  {
+    role: "Web Developer",
+    company: "Wargaming",
+    companyUrl: "https://wargaming.net/en",
+    timeframe: "Apr 2017 - Nov 2017",
+    details: [
+      "Boosted code quality by establishing a testing environment and rapidly scaling unit test coverage.",
+      "Guided other teams on React.js adoption and implementation patterns.",
+      "Delivered new features with React and Knockout while raising the bar on maintainability.",
     ],
   },
   {
     role: "Software Engineer",
-    company: "Agency",
-    timeframe: "2018 - 2020",
+    company: "EPAM Systems",
+    companyUrl: "https://epam.com",
+    timeframe: "Nov 2014 - Apr 2017",
     details: [
-      "Shipped diverse client work with equal parts adaptability and polish.",
-      "Grew from frontend craft to full-stack confidence through hands-on delivery.",
+      "Led SPA delivery from inception to production using React, Angular, AngularJS, and Node.js.",
+      "Designed and implemented UI mockups that improved internal application usability.",
+      "Hardened delivery pipelines with CI/CD practices for reliable releases.",
     ],
   },
 ];
@@ -149,7 +189,20 @@ export function ResumeExperience({
                   ) : null}
                 </div>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  {item.company} · {item.timeframe}
+                  {item.companyUrl ? (
+                    <a
+                      className="underline-offset-4 transition hover:text-emerald-600 hover:underline dark:hover:text-emerald-300"
+                      href={item.companyUrl}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      {item.company}
+                    </a>
+                  ) : (
+                    <span>{item.company}</span>
+                  )}
+                  <span className="text-zinc-400"> · </span>
+                  <span>{item.timeframe}</span>
                 </p>
                 <ul className="space-y-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                   {item.details.map((detail) => (
@@ -184,7 +237,20 @@ export function ResumeExperience({
                   ) : null}
                 </div>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  {item.company} · {item.timeframe}
+                  {item.companyUrl ? (
+                    <a
+                      className="underline-offset-4 transition hover:text-emerald-600 hover:underline dark:hover:text-emerald-300"
+                      href={item.companyUrl}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      {item.company}
+                    </a>
+                  ) : (
+                    <span>{item.company}</span>
+                  )}
+                  <span className="text-zinc-400"> · </span>
+                  <span>{item.timeframe}</span>
                 </p>
                 <ul className="space-y-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                   {item.details.map((detail) => (

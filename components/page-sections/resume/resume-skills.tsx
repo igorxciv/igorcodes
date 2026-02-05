@@ -25,19 +25,46 @@ interface SkillGroup {
 
 const skillGroups: SkillGroup[] = [
   {
-    title: "Technical",
-    description: "Languages, frameworks, and infrastructure foundations.",
-    items: ["React", "TypeScript", "Node.js", "Python", "PostgreSQL", "AI/ML"],
+    title: "Frontend & UI",
+    description: "Web application and interface development.",
+    items: [
+      "React.js",
+      "Next.js",
+      "TypeScript",
+      "JavaScript",
+      "Angular",
+      "AngularJS",
+      "Knockout.js",
+      "Storybook",
+      "Three.js",
+      "WebGL",
+    ],
   },
   {
-    title: "Architecture",
-    description: "System-level thinking and platform reliability.",
-    items: ["System Design", "APIs", "Microservices", "Cloud Infra", "DevOps"],
+    title: "Backend & Cloud",
+    description: "APIs, infrastructure, and platform tooling.",
+    items: [
+      "Node.js",
+      "GraphQL",
+      "AWS",
+      "Docker",
+      "Terraform",
+      "Serverless",
+      "Microservices",
+      "Go",
+    ],
   },
   {
-    title: "Product",
-    description: "Bridging user needs with business outcomes.",
-    items: ["UX Design", "A/B Testing", "Analytics", "Metrics", "Strategy"],
+    title: "Engineering Practices",
+    description: "Quality, delivery, and performance.",
+    items: [
+      "Testing",
+      "CI/CD",
+      "Performance Optimization",
+      "Accessibility",
+      "Load Testing (JMeter)",
+      "System Design",
+    ],
   },
 ];
 

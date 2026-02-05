@@ -36,11 +36,11 @@ export function ResumeEducation({
           Bachelor of Science in Computer Science
         </FeatureCardTitle>
         <FeatureCardDescription className="text-sm text-zinc-600 dark:text-zinc-400">
-          University · 2014 - 2018
+          BSUIR University · 2013 - 2017 | Minsk, Belarus
         </FeatureCardDescription>
         <p className="mt-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-          Focus on algorithms, data structures, and software engineering
-          principles.
+          Completed a comprehensive computer science curriculum with a focus on
+          software engineering, algorithms, data structures, and systems.
         </p>
       </FeatureCard>
     </section>
