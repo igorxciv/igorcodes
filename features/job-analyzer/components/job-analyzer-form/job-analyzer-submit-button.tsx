@@ -18,7 +18,7 @@ export function JobAnalyzerSubmitButton({
   const tapMotion = reduceMotion ? undefined : { y: 0, scale: 0.985 };
   const motionTransition = reduceMotion
     ? undefined
-    : { type: "spring", stiffness: 520, damping: 32, mass: 0.6 };
+    : { type: "spring" as const, stiffness: 520, damping: 32, mass: 0.6 };
 
   return (
     <Button
