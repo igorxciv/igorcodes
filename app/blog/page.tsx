@@ -1,5 +1,6 @@
 import { SiteHeader, SiteShell } from "@/components/layout";
 import { BlogMain } from "@/components/page-sections/blog";
+import { getAllPosts } from "@/lib/server/posts";
 
 import type { Metadata } from "next";
 
@@ -22,11 +23,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const posts = await getAllPosts();
+
   return (
     <SiteShell>
       <SiteHeader />
-      <BlogMain />
+      <BlogMain posts={posts} />
     </SiteShell>
   );
 }
