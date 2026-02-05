@@ -6,9 +6,19 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Blog",
   description:
-    "Writing on systems thinking, product engineering, and building tools that create leverage.",
+    "Writing on full-stack engineering, performance, accessibility, and AI agents.",
   alternates: {
     canonical: "/blog",
+  },
+  openGraph: {
+    title: "Blog | Igor",
+    description:
+      "Writing on full-stack engineering, performance, accessibility, and AI agents.",
+  },
+  twitter: {
+    title: "Blog | Igor",
+    description:
+      "Writing on full-stack engineering, performance, accessibility, and AI agents.",
   },
 };
 

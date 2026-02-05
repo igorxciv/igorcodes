@@ -6,9 +6,19 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Projects",
   description:
-    "Explore a curated set of tools, platforms, and systems built to create leverage and solve real-world problems.",
+    "Selected projects across product engineering, platform systems, and AI-driven workflows.",
   alternates: {
     canonical: "/projects",
+  },
+  openGraph: {
+    title: "Projects | Igor",
+    description:
+      "Selected projects across product engineering, platform systems, and AI-driven workflows.",
+  },
+  twitter: {
+    title: "Projects | Igor",
+    description:
+      "Selected projects across product engineering, platform systems, and AI-driven workflows.",
   },
 };
 

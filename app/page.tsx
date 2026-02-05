@@ -4,11 +4,23 @@ import { HomeMain } from "@/components/page-sections/home";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Home",
+  title: {
+    absolute: "Igor — Principal Engineer",
+  },
   description:
-    "Short, compelling summary of your home page for search results.",
+    "Personal site of Igor, a Principal Engineer at Electives. Building thoughtful software, live learning experiences, and AI-driven workflows.",
   alternates: {
     canonical: "/",
+  },
+  openGraph: {
+    title: "Igor — Principal Engineer",
+    description:
+      "Personal site of Igor, a Principal Engineer at Electives. Building thoughtful software, live learning experiences, and AI-driven workflows.",
+  },
+  twitter: {
+    title: "Igor — Principal Engineer",
+    description:
+      "Personal site of Igor, a Principal Engineer at Electives. Building thoughtful software, live learning experiences, and AI-driven workflows.",
   },
 };
 

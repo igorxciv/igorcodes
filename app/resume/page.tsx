@@ -6,9 +6,19 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Resume",
   description:
-    "Experience, skills, and education details for a systems-thinking product engineer.",
+    "Resume for Igor — Principal Engineer with experience at Electives, EPAM, and Wargaming. Focused on performance, accessibility, and scalable systems.",
   alternates: {
     canonical: "/resume",
+  },
+  openGraph: {
+    title: "Resume | Igor",
+    description:
+      "Resume for Igor — Principal Engineer with experience at Electives, EPAM, and Wargaming. Focused on performance, accessibility, and scalable systems.",
+  },
+  twitter: {
+    title: "Resume | Igor",
+    description:
+      "Resume for Igor — Principal Engineer with experience at Electives, EPAM, and Wargaming. Focused on performance, accessibility, and scalable systems.",
   },
 };
 
