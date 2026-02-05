@@ -19,7 +19,7 @@ export function JobAnalyzerDropzoneRoot({
   return (
     <label
       className={cn(
-        "flex min-h-[140px] cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border px-4 py-6 text-center text-sm transition",
+        "flex min-h-35 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border px-4 py-6 text-center text-sm transition",
         isDragReject
           ? "border-2 border-dotted border-rose-400/70 bg-rose-500/10 text-rose-700 dark:border-rose-400/70 dark:bg-rose-500/10 dark:text-rose-200"
           : isDragActive
