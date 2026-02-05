@@ -5,10 +5,9 @@ import {
   SectionEyebrow,
   SectionTitle,
 } from "@/components/page-sections/shared/section-header";
-import { Button } from "@/components/ui/button";
+import { MicroInteractionButton } from "@/components/ui/micro-interaction-button";
 import { JobAnalyzerForm } from "@/features/job-analyzer/components/job-analyzer-form";
 import { cn } from "@/lib/styles/cn";
-
 
 import type { HTMLAttributes } from "react";
 
@@ -25,10 +24,10 @@ export function ResumeHero({ className, ...restProps }: ResumeHeroProps) {
           </SectionEyebrow>
           <SectionTitle className="text-4xl sm:text-5xl">Resume</SectionTitle>
         </div>
-        <Button variant="outline" className="self-start">
+        <MicroInteractionButton variant="outline" className="self-start">
           <Download aria-hidden="true" />
           Download PDF
-        </Button>
+        </MicroInteractionButton>
       </div>
       <SectionDescription className="max-w-2xl text-base sm:text-lg">
         Systems-thinking builder with expertise in architecture, AI

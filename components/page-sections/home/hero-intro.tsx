@@ -1,7 +1,7 @@
 import { ArrowUpRight, Terminal } from "lucide-react";
 
 import { SectionEyebrow } from "@/components/page-sections/shared/section-header";
-import { Button } from "@/components/ui/button";
+import { MicroInteractionButton } from "@/components/ui/micro-interaction-button";
 import { cn } from "@/lib/styles/cn";
 
 import type { HTMLAttributes } from "react";
@@ -26,11 +26,13 @@ export function HeroIntro({ className, ...restProps }: HeroIntroProps) {
         </p>
       </div>
       <div className="flex flex-wrap gap-3">
-        <Button className="hover:translate-y-[-1px]">
+        <MicroInteractionButton>
           View Projects
           <ArrowUpRight aria-hidden="true" />
-        </Button>
-        <Button variant="outline">Resume</Button>
+        </MicroInteractionButton>
+        <MicroInteractionButton variant="outline">
+          Resume
+        </MicroInteractionButton>
       </div>
     </div>
   );

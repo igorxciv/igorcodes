@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -7,6 +5,7 @@ import {
   CardDescription,
   CardTitle,
 } from "@/components/ui/card";
+import { MicroInteractionLink } from "@/components/ui/micro-interaction-link";
 import { cn } from "@/lib/styles/cn";
 
 import type { ComponentPropsWithoutRef, HTMLAttributes } from "react";
@@ -19,7 +18,7 @@ type BlogPostTagsProps = HTMLAttributes<HTMLDivElement>;
 
 type BlogPostMetaProps = HTMLAttributes<HTMLDivElement>;
 
-type BlogPostLinkProps = ComponentPropsWithoutRef<typeof Link>;
+type BlogPostLinkProps = ComponentPropsWithoutRef<typeof MicroInteractionLink>;
 
 export function BlogPostCard({
   className,
@@ -126,7 +125,8 @@ export function BlogPostMeta({ className, ...restProps }: BlogPostMetaProps) {
 
 export function BlogPostLink({ className, ...restProps }: BlogPostLinkProps) {
   return (
-    <Link
+    <MicroInteractionLink
+      preset="text"
       className={cn(
         "inline-flex items-center gap-2 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-200 dark:hover:text-white",
         className,

@@ -8,6 +8,7 @@ import {
   CardDescription,
   CardTitle,
 } from "@/components/ui/card";
+import { MicroInteractionLink } from "@/components/ui/micro-interaction-link";
 import { cn } from "@/lib/styles/cn";
 
 import type { ComponentPropsWithoutRef, HTMLAttributes } from "react";
@@ -135,11 +136,11 @@ export function ProjectLink({ className, ...restProps }: ProjectLinkProps) {
       size="sm"
       variant="ghost"
       className={cn(
-        "px-0 text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white",
+        "px-0 text-sm text-zinc-600 transition-[color,background-color,border-color,box-shadow] duration-150 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white",
         className,
       )}
     >
-      <Link {...restProps} />
+      <MicroInteractionLink preset="text" {...restProps} />
     </Button>
   );
 }
