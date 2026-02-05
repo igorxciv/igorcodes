@@ -10,6 +10,7 @@ A Next.js 16 + React 19 personal site/portfolio with Home, About, Projects, Blog
 - Local fonts (Wotfard + Dank Mono) via `next/font/local`.
 - shadcn/ui primitives + Radix UI, Tailwind CSS v4 tokens, and design system utilities.
 - Job analyzer form module with text/link/PDF inputs (UI only; no backend yet).
+- MDX blog with file-based posts, frontmatter metadata, and custom MDX components.
 
 **Tech Stack**
 
@@ -17,6 +18,7 @@ A Next.js 16 + React 19 personal site/portfolio with Home, About, Projects, Blog
 - Tailwind CSS v4, tw-animate-css, clsx + tailwind-merge
 - Motion for React (`motion`), lucide-react icons
 - TanStack React Form + Zod (used in job analyzer feature)
+- MDX via `@next/mdx` + `next-mdx-remote` + `gray-matter`
 
 **Getting Started**
 
@@ -59,9 +61,11 @@ npm run start
 - `features/` Domain modules like `job-analyzer`.
 - `hooks/` Reusable hooks (navigation, motion, theme).
 - `lib/` Utilities and style helpers like `lib/styles/cn.ts`.
+- `content/posts/` MDX blog posts (`YYYY/MM/DD/slug.mdx`).
 - `public/` Static assets.
 
 **Notes**
 
 - Metadata images are referenced in `app/layout.tsx` (Open Graph/Twitter). Add assets under `public/` or update paths.
-- MDX packages are installed, but MDX is not currently wired in `next.config.ts` and there is no `mdx-components.tsx` yet. Add those if you want MDX pages.
+- MDX is wired in `next.config.ts` with `@next/mdx`, and MDX component mappings live in `mdx-components.tsx`.
+- Draft posts (`published: false`) are available in development but excluded from production builds.
