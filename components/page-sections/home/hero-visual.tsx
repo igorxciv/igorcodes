@@ -13,10 +13,13 @@ export function HeroVisual({ className, ...restProps }: HeroVisualProps) {
           <div className="flex h-full w-full flex-col justify-between rounded-xl border border-zinc-200 bg-white/70 p-4 shadow-sm dark:border-white/10 dark:bg-black/40">
             <div className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
               <span className="h-2 w-2 rounded-full bg-emerald-400" />
-              Placeholder image
+              Shipping thoughtful systems
             </div>
             <div className="grid gap-2 text-[11px] text-zinc-500 dark:text-zinc-400">
-              <span>export default future;</span>
+              <span>
+                const northStar = &quot;clarity, craft, momentum&quot;
+              </span>
+              <span>export default buildWithIntent;</span>
             </div>
           </div>
         </div>

@@ -17,12 +17,21 @@ export function HeroIntro({ className, ...restProps }: HeroIntroProps) {
       </SectionEyebrow>
       <div className="flex flex-col gap-5">
         <h1 className="text-4xl leading-tight font-semibold tracking-tight text-zinc-900 sm:text-5xl dark:text-white">
-          Systems thinker building tools that create long-term leverage
+          Building thoughtful software with a human heartbeat
         </h1>
         <p className="max-w-xl text-base leading-relaxed text-zinc-600 sm:text-lg dark:text-zinc-300">
-          High-agency builder who transforms complex problems into elegant
-          solutions. Focused on architecture, AI infrastructure, and products
-          that scale.
+          I turn complex ideas into calm, reliable products. Today I&apos;m
+          building a next-gen live learning platform at{" "}
+          <a
+            className="underline-offset-4 transition hover:text-emerald-600 hover:underline dark:hover:text-emerald-300"
+            href="https://electives.io"
+            rel="noreferrer"
+            target="_blank"
+          >
+            Electives
+          </a>
+          . When I&apos;m not shipping, I&apos;m exploring new tools, refining
+          craft, and collaborating with teams that care about quality.
         </p>
       </div>
       <div className="flex flex-wrap gap-3">
