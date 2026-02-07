@@ -37,7 +37,7 @@ export function SiteHeader({ className, ...restProps }: SiteHeaderProps) {
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4 sm:px-10">
           <div className="flex items-center gap-3 text-sm font-semibold text-zinc-900 dark:text-white">
             <span className="inline-flex h-10 items-center rounded-full border border-zinc-200 bg-zinc-100 px-4 font-mono text-xs tracking-wide text-zinc-700 dark:border-white/15 dark:bg-white/5 dark:text-zinc-200">
-              &lt;/dev&gt;
+              &lt;/igorxciv&gt;
             </span>
           </div>
           <HeaderNav>
