@@ -32,6 +32,7 @@ const factExperience: ExperienceItem[] = [
     current: true,
     details: [
       "Boosted membership page performance (3x faster cold Lambda starts, up to 4x faster hot starts).",
+      "Designed and shipped multi-agent AI systems and workflow automations to streamline complex operations.",
       "Built a local Lambda helper to run the serverless stack locally, reducing AWS costs and improving DX.",
       "Migrated AWS SDK v2 to v3 and led refactors for a more maintainable, scalable codebase.",
       "Established UI Kit + Storybook with CI/CD, and integrated it into the core product.",
@@ -88,6 +89,7 @@ const lyricalExperience: ExperienceItem[] = [
     current: true,
     details: [
       "Drove substantial business value by optimizing system performance and reducing AWS resource costs.",
+      "Orchestrated specialized AI agents into elegant workflow pipelines that transformed fragmented tasks into scalable execution.",
       "Spearheaded a local Lambda helper, UI Kit development, and code refactoring to create a scalable and maintainable foundation.",
       "Led critical package migrations for a 30% performance boost and championed a lasting testing culture.",
       "Pioneered TypeScript adoption and accessibility improvements for a more inclusive, user-friendly product.",
