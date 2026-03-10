@@ -1,8 +1,7 @@
 /** @type {import("prettier").Config} */
 const config = {
-  plugins: ["prettier-plugin-tailwindcss"],
-  // Keep Prettier defaults; Tailwind plugin needs the stylesheet entrypoint.
-  tailwindStylesheet: "./app/globals.css",
+  printWidth: 100,
+  singleQuote: false,
 };
 
 export default config;

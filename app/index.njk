@@ -1,0 +1,77 @@
+---
+layout: layouts/base.njk
+title: Home
+description: Personal landing page and selected portfolio projects built with Eleventy.
+---
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <p class="eyebrow">{{ portfolio.role }}</p>
+      <h1>{{ portfolio.tagline }}</h1>
+      <p class="lead">{{ portfolio.intro }}</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="{{ '/work/' | url }}">View portfolio</a>
+        <a class="btn btn-ghost" href="#contact">Let’s collaborate</a>
+      </div>
+      <div class="stat-grid">
+        {% for stat in portfolio.stats %}
+          <article class="stat-card">
+            <span class="stat-value">{{ stat.value }}</span>
+            <span class="stat-label">{{ stat.label }}</span>
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+
+    <aside class="panel" aria-label="About me">
+      <img
+        src="{{ '/images/profile-blob.svg' | url }}"
+        alt="Abstract visual identity artwork"
+        width="640"
+        height="640"
+        loading="lazy"
+        decoding="async"
+      />
+      <h2 class="section-title">About</h2>
+      <p class="section-subtitle">
+        I work across UX, frontend architecture, and growth experiments to ship clear product value.
+      </p>
+      <ul class="skill-list" aria-label="Skills">
+        {% for skill in portfolio.skills %}
+          <li>{{ skill }}</li>
+        {% endfor %}
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<section class="section" id="work">
+  <div class="container">
+    <h2 class="section-title">Selected work</h2>
+    <p class="section-subtitle">Featured projects with measurable impact and performance-focused implementation.</p>
+    <div class="work-grid">
+      {% for project in collections.featuredWork %}
+        <article class="card">
+          <h3><a href="{{ project.url | url }}">{{ project.data.title }}</a></h3>
+          <span class="meta">{{ project.data.stack }}</span>
+          <p>{{ project.data.summary }}</p>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section" id="contact">
+  <div class="container panel">
+    <h2 class="section-title">Contact</h2>
+    <p class="section-subtitle">Open to senior frontend and product engineering opportunities.</p>
+    <p>
+      Email: <a href="mailto:{{ site.email }}">{{ site.email }}</a>
+    </p>
+    <ul class="social-list">
+      {% for social in portfolio.socialLinks %}
+        <li><a href="{{ social.href }}" target="_blank" rel="noopener noreferrer">{{ social.label }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>

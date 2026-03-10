@@ -1,71 +1,60 @@
 # igorxciv
 
-A Next.js 16 + React 19 personal site/portfolio with Home, About, Projects, Blog, and Resume pages, plus a job analyzer form UI.
+Performance-first personal landing page + portfolio built with Eleventy.
 
-**Features**
+## Stack
 
-- App Router pages under `app/` with route-level metadata, loading/error, not-found, and status pages.
-- Motion-based micro-interactions, animated mobile nav, and theme toggle.
-- Light/dark mode via `next-themes`.
-- Local fonts (Wotfard + Dank Mono) via `next/font/local`.
-- shadcn/ui primitives + Radix UI, Tailwind CSS v4 tokens, and design system utilities.
-- Job analyzer form module with text/link/PDF inputs (UI only; no backend yet).
-- MDX blog with file-based posts, frontmatter metadata, and custom MDX components.
+- [Eleventy](https://www.11ty.dev/) static site generator
+- Nunjucks templates + Markdown content collections
+- Performance plugins:
+  - `@11ty/eleventy-plugin-bundle`
+  - `@11ty/eleventy-img`
+  - `@11ty/eleventy-plugin-rss`
+  - `@quasibit/eleventy-plugin-sitemap`
+  - `html-minifier-terser` transform (production)
+- DX tooling: ESLint (flat config), Prettier, Husky + lint-staged
 
-**Tech Stack**
+## Project structure
 
-- Next.js 16 App Router, React 19, TypeScript
-- Tailwind CSS v4, tw-animate-css, clsx + tailwind-merge
-- Motion for React (`motion`), lucide-react icons
-- TanStack React Form + Zod (used in job analyzer feature)
-- MDX via `@next/mdx` + `next-mdx-remote` + `gray-matter`
+- `app/` Eleventy input directory
+- `app/_includes/` layouts and partials
+- `app/_data/` global data (`site`, `portfolio`)
+- `app/work/` portfolio case studies (Markdown)
+- `app/assets/css/site.css` global styles
+- `public/` passthrough static assets
+- `_site/` generated static output
 
-**Getting Started**
+## Scripts
 
-1. Install dependencies.
+- `npm run dev` start Eleventy dev server
+- `npm run build` production build (`NODE_ENV=production`)
+- `npm run clean` remove build/cache folders
+- `npm run lint` run ESLint
+- `npm run format` run Prettier write
+- `npm run format:check` run Prettier check
+
+## Setup
 
 ```bash
 npm install
-```
-
-2. Start the dev server.
-
-```bash
 npm run dev
 ```
 
-3. Build and run production.
+Production build:
 
 ```bash
 npm run build
-npm run start
 ```
 
-**Scripts**
+## Environment variables
 
-- `npm run dev` Start the dev server.
-- `npm run build` Create a production build.
-- `npm run start` Run the production build locally.
-- `npm run lint` Run ESLint.
-- `npm run format` Format with Prettier.
-- `npm run format:check` Check formatting.
+- `SITE_URL`: canonical site URL used for RSS/sitemap/canonical links.
 
-**Environment Variables**
+## Best practices already wired
 
-- `NEXT_PUBLIC_SITE_URL` Base URL used for metadata, sitemap, and robots. Defaults to `https://example.com` if not set.
-
-**Project Structure**
-
-- `app/` App Router routes, global layout, metadata, sitemap/robots.
-- `components/` Shared UI, layout, navigation, and page sections.
-- `features/` Domain modules like `job-analyzer`.
-- `hooks/` Reusable hooks (navigation, motion, theme).
-- `lib/` Utilities and style helpers like `lib/styles/cn.ts`.
-- `content/posts/` MDX blog posts (`YYYY/MM/DD/slug.mdx`).
-- `public/` Static assets.
-
-**Notes**
-
-- Metadata images are referenced in `app/layout.tsx` (Open Graph/Twitter). Add assets under `public/` or update paths.
-- MDX is wired in `next.config.ts` with `@next/mdx`, and MDX component mappings live in `mdx-components.tsx`.
-- Draft posts (`published: false`) are available in development but excluded from production builds.
+- Static-first architecture (no runtime framework hydration)
+- Minified HTML in production
+- Sitemap + RSS generation
+- Structured global data files for content maintainability
+- Collection-based portfolio entries for easy scaling
+- Statically served assets via passthrough copy

@@ -1,56 +1,87 @@
 # Repository Guidelines
 
-## Project Structure (Root App Router)
+## Project Structure (Eleventy Static Site)
 
-- `app/`: Next.js App Router (pages, layouts, route handlers).
-- `app/(site)/`: Marketing/site routes and blog pages (route group).
-- `app/(dashboard)/`: Authenticated app routes (route group).
-- `app/api/`: API route handlers (`route.ts`).
-- `components/`: Shared UI components.
-  - `ui/` (shadcn/ui primitives), `layout/`, `forms/`, `modals/`, `icons/`, `page-sections/` (page-specific sections).
-- `content/`: Static MDX content (e.g., `posts/`), if not colocated in `app/`.
-- `lib/`: Utilities and helpers; `lib/server/` for server-only code.
-- `hooks/`: Reusable React hooks.
-- `features/`: Optional feature modules (domain-first grouping).
-- `styles/`: Extra global styles or theme files (if needed).
-- `public/`: Static assets served as-is (must stay at repo root).
-- Config at repo root (e.g., `next.config.*`, `tsconfig.json`, `tailwind.config.*`, `eslint.config.*`, `postcss.config.*`).
+- `app/`: Eleventy input directory (templates, pages, content).
+- `app/_includes/`: Shared layouts and partials.
+  - `layouts/` for page/item layouts.
+  - `partials/` for reusable fragments (header, footer, etc.).
+- `app/_data/`: Global data files (`*.js`) shared across templates.
+- `app/assets/`: Source assets copied to output (e.g. `app/assets/css/site.css`).
+- `app/work/`: Portfolio case studies (Markdown content + index template).
+- `public/`: Static passthrough assets served as-is.
+- `_site/`: Generated static output (build artifact, never committed).
+- Config at repo root:
+  - `.eleventy.js`, `eslint.config.mjs`, `prettier.config.mjs`, `package.json`.
 
 ## Default File Placement (When Creating New Files)
 
-- Pages/layouts/route handlers: `app/**`.
-- Blog MDX pages: `app/(site)/blog/[slug]/page.mdx` or `content/posts/*.mdx`.
-- Shared UI components: `components/**` (use subfolders above).
-- Page-specific sections/blocks: `components/page-sections/**`.
-- Non-UI logic: `lib/**` (server-only in `lib/server/**`).
-- Reusable hooks: `hooks/**`.
-- Feature-specific code: `features/<feature>/**`.
-- Static assets: `public/**`.
-  - MDX setup uses `@next/mdx` + `@mdx-js/loader` + `@mdx-js/react` and requires `mdx-components.tsx` at repo root (same level as `app/`).
-  - Prefer `mdx-components.tsx` for component mapping; do not use `MDXProvider` unless explicitly required.
-  - Static metadata (e.g., `robots.txt`, `favicon.ico`) should use `app/` metadata files, not `public/`.
+- Site pages: `app/**/*.njk`.
+- Content entries: `app/work/*.md` (or additional collection folders under `app/`).
+- Reusable layouts: `app/_includes/layouts/*.njk`.
+- Reusable partials: `app/_includes/partials/*.njk`.
+- Global shared data: `app/_data/*.js`.
+- Styles and front-end assets: `app/assets/**`.
+- Public passthrough assets (images/icons/files): `public/**`.
+- SEO/discovery files:
+  - `app/sitemap.njk`, `app/feed.njk`, `app/robots.njk`, `app/404.njk`.
 
-## Build, Test, and Development Commands
+## Build, Lint, and Development Commands
 
-- `npm run dev`: Start the dev server at `http://localhost:3000`.
-- `npm run build`: Create a production build in `.next/`.
-- `npm run start`: Run the production build locally (requires `npm run build`).
-- `npm run lint`: Run ESLint with Next.js and TypeScript rules.
-- MDX is configured via `next.config.mjs` with `@next/mdx` and `pageExtensions` including `mdx`.
+- `npm run dev`: Start Eleventy dev server.
+- `npm run build`: Production static build to `_site/`.
+- `npm run clean`: Remove `_site/` and Eleventy caches.
+- `npm run lint`: Run ESLint (flat config).
+- `npm run format`: Format repository with Prettier.
+- `npm run format:check`: Validate formatting.
+
+## Technical Requirements
+
+- Runtime: Node `>=20.11`.
+- Templating: Nunjucks + Markdown (Eleventy).
+- Current plugin/tooling baseline (keep aligned unless intentionally changed):
+  - `@11ty/eleventy`
+  - `@11ty/eleventy-img`
+  - `@11ty/eleventy-navigation`
+  - `@11ty/eleventy-plugin-bundle`
+  - `@11ty/eleventy-plugin-rss`
+  - `@11ty/eleventy-plugin-syntaxhighlight`
+  - `@quasibit/eleventy-plugin-sitemap`
+  - `html-minifier-terser` (production HTML minification transform)
+  - `luxon` (date formatting)
+
+## Performance Best Practices (Eleventy)
+
+- Prefer static-first rendering; avoid client-side JavaScript unless necessary.
+- Optimize images with Eleventy Image (`@11ty/eleventy-img`) instead of shipping originals.
+- Keep CSS minimal and route-agnostic; avoid unused large UI frameworks.
+- Ensure production build keeps HTML minification enabled.
+- Maintain `sitemap.xml`, `feed.xml`, and canonical metadata consistency.
+- Keep generated output and caches out of git (`_site`, `.cache`, `.11ty-cache`).
+
+## Dependency Management
+
+- Install new dependencies using latest stable versions.
+- Do not pin to old versions unless there is a compatibility reason documented in PR/commit notes.
+- Commit `package-lock.json` with dependency changes.
 
 ## Coding Style & Naming
 
-- TypeScript + React (Next.js App Router).
-- 2-space indentation in JS/TS/JSON.
-- Components in `PascalCase`, hooks in `useCamelCase`, files in `kebab-case` or `camelCase` to match nearby patterns.
+- 2-space indentation in JS/CSS/JSON and template files.
+- Use `kebab-case` for filenames and folder names.
+- Use clear collection/tag names and keep front matter minimal, explicit, and typed-by-convention.
+- Keep data logic in `_data` files; keep templates focused on presentation.
 
 ## Testing
 
-- No testing framework configured yet.
-- If you add tests, document the framework and command here and co-locate tests or use `tests/`.
+- No formal test framework is configured yet.
+- Minimum validation for every change:
+  - `npm run lint`
+  - `npm run build`
+- If you introduce tests, document the framework and commands in this file.
 
 ## Boundaries
 
-- Always: create new source files under `app/`, `components/`, `lib/`, etc. (not at repo root).
-- Ask first: reorganizing top-level folders or moving existing app routes.
-- Never: commit secrets or build outputs (`.next/`, `.env.local`).
+- Always: create source files under `app/` and `public/` (not random root-level files).
+- Ask first: reorganizing top-level folders or renaming major content collections.
+- Never: commit secrets, `_site/`, `.cache/`, `.11ty-cache/`, or `.env*`.
