@@ -78,7 +78,7 @@ a:focus-visible {
 }
 
 .fm-hero-content {
-  max-width: 44rem;
+  max-width: 47rem;
   text-align: center;
 }
 
@@ -320,7 +320,7 @@ a:focus-visible {
 .fm-timeline-item-right .fm-timeline-dot {
   position: absolute;
   top: 0.45rem;
-  left: -1.4rem;
+  left: -1.825rem;
   width: 0.85rem;
   height: 0.85rem;
   border-radius: 999px;
