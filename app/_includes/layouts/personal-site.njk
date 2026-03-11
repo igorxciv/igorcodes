@@ -3,8 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light" />
-    <meta name="theme-color" content="{{ site.themeColor }}" />
+    <meta name="theme-color" content="#0a0a0a" />
     <title>{% if title %}{{ title }} | {% endif %}{{ site.name }}</title>
     <meta name="description" content="{{ description or site.description }}" />
     <link rel="canonical" href="{{ (site.url + page.url) | url }}" />
@@ -16,7 +15,6 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="{{ title or site.name }}" />
     <meta name="twitter:description" content="{{ description or site.description }}" />
-    <link rel="alternate" href="{{ '/feed.xml' | url }}" type="application/rss+xml" title="{{ site.name }} RSS" />
     <link
       rel="preload"
       href="{{ '/fonts/wotfard/wotfard-regular-webfont.woff2' | url }}"
@@ -25,11 +23,10 @@
       crossorigin
     />
     <link rel="stylesheet" href="{{ '/assets/css/fonts.css' | url }}" />
-    <link rel="stylesheet" href="{{ '/assets/css/site.css' | url }}" />
+    <link rel="stylesheet" href="{{ '/assets/css/personal-site.css' | url }}" />
   </head>
-  <body>
-    {% include "partials/site-header.njk" %}
+  <body class="fm-body">
     <main id="content">{{ content | safe }}</main>
-    {% include "partials/site-footer.njk" %}
+    <script src="{{ '/assets/js/personal-site.js' | url }}" defer></script>
   </body>
 </html>

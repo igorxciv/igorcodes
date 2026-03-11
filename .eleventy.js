@@ -7,6 +7,81 @@ const eleventyPluginBundle = require("@11ty/eleventy-plugin-bundle").default;
 const eleventyPluginSitemap = require("@quasibit/eleventy-plugin-sitemap");
 const Image = require("@11ty/eleventy-img");
 const { minify } = require("html-minifier-terser");
+const {
+  ArrowRight,
+  Calendar,
+  ChevronDown,
+  Github,
+  Globe,
+  Linkedin,
+  Mail,
+  SquareArrowOutUpRight,
+  Twitter,
+} = require("lucide");
+
+const lucideIcons = {
+  arrowRight: ArrowRight,
+  calendar: Calendar,
+  chevronDown: ChevronDown,
+  github: Github,
+  globe: Globe,
+  linkedin: Linkedin,
+  mail: Mail,
+  squareArrowOutUpRight: SquareArrowOutUpRight,
+  twitter: Twitter,
+};
+
+const lucideDefaultAttributes = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "24",
+  height: "24",
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  "stroke-width": "2",
+  "stroke-linecap": "round",
+  "stroke-linejoin": "round",
+};
+
+function escapeAttributeValue(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function renderElement(tag, attributes = {}) {
+  const serializedAttributes = Object.entries(attributes)
+    .filter(([, value]) => value !== undefined && value !== null && value !== false)
+    .map(([key, value]) => {
+      if (value === true) {
+        return key;
+      }
+
+      return `${key}="${escapeAttributeValue(value)}"`;
+    })
+    .join(" ");
+
+  return `<${tag}${serializedAttributes ? ` ${serializedAttributes}` : ""}></${tag}>`;
+}
+
+function renderLucideSvg(iconNode, attributes = {}) {
+  const svgBody = iconNode
+    .map(([tag, elementAttributes]) => renderElement(tag, elementAttributes))
+    .join("");
+
+  return `<svg ${Object.entries({ ...lucideDefaultAttributes, ...attributes })
+    .filter(([, value]) => value !== undefined && value !== null && value !== false)
+    .map(([key, value]) => {
+      if (value === true) {
+        return key;
+      }
+
+      return `${key}="${escapeAttributeValue(value)}"`;
+    })
+    .join(" ")}>${svgBody}</svg>`;
+}
 
 module.exports = function (eleventyConfig) {
   eleventyConfig.setServerPassthroughCopyBehavior("passthrough");
@@ -40,6 +115,27 @@ module.exports = function (eleventyConfig) {
       .getFilteredByTag("work")
       .sort((a, b) => (a.data.order || 0) - (b.data.order || 0))
       .slice(0, 3);
+  });
+
+  eleventyConfig.addNunjucksShortcode("lucide", (name, className = "", label = "") => {
+    const iconNode = lucideIcons[name];
+    if (!iconNode) {
+      throw new Error(`Unknown Lucide icon "${name}"`);
+    }
+
+    const iconAttributes = {
+      class: className || undefined,
+      focusable: "false",
+    };
+
+    if (label) {
+      iconAttributes.role = "img";
+      iconAttributes["aria-label"] = label;
+    } else {
+      iconAttributes["aria-hidden"] = "true";
+    }
+
+    return renderLucideSvg(iconNode, iconAttributes);
   });
 
   eleventyConfig.addNunjucksAsyncShortcode(

@@ -1,0 +1,78 @@
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/wotfard/wotfard-light-webfont.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/wotfard/wotfard-regular-webfont.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/wotfard/wotfard-regularitalic-webfont.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/wotfard/wotfard-medium-webfont.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/wotfard/wotfard-semibold-webfont.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/wotfard/wotfard-bold-webfont.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Dank Mono";
+  src: url("/fonts/dank-mono/DankMono-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Dank Mono";
+  src: url("/fonts/dank-mono/DankMono-Italic.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Dank Mono";
+  src: url("/fonts/dank-mono/DankMono-Bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --font-sans:
+    "Wotfard", "Avenir Next", "Segoe UI Variable", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-display: var(--font-sans);
+  --font-mono: "Dank Mono", "SFMono-Regular", "Menlo", "Consolas", "Liberation Mono", monospace;
+}

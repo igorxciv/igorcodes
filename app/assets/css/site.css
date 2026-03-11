@@ -24,12 +24,19 @@ body {
 }
 
 body {
-  font-family: "Satoshi", "Avenir Next", "Segoe UI Variable", "Helvetica Neue", sans-serif;
+  font-family: var(--font-sans);
   color: var(--text);
   background:
     radial-gradient(circle at 85% 5%, rgba(15, 118, 110, 0.2), transparent 40%),
     radial-gradient(circle at 15% 15%, rgba(249, 115, 22, 0.16), transparent 30%), var(--bg);
   line-height: 1.6;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-mono);
 }
 
 a {
@@ -189,7 +196,7 @@ h1 {
 .stat-value {
   display: block;
   font-size: 1.4rem;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
 }
 
