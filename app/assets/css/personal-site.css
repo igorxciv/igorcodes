@@ -106,23 +106,6 @@ a {
   text-align: center;
 }
 
-.fm-hero-media {
-  margin: 0 auto 1.2rem;
-  width: clamp(6.8rem, 18vw, 8.8rem);
-}
-
-.fm-hero-media img {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 999px;
-  border: 1px solid rgba(0, 217, 255, 0.32);
-  object-fit: cover;
-  background: #121212;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 16px 36px rgba(0, 0, 0, 0.35);
-}
-
 .fm-role {
   margin: 0;
   color: var(--fm-accent);
@@ -147,16 +130,6 @@ a {
   color: var(--fm-muted);
   font-size: clamp(1.02rem, 4.7vw, 1.35rem);
   line-height: 1.5;
-  font-weight: 300;
-  text-wrap: pretty;
-}
-
-.fm-hero-summary {
-  margin: 1rem auto 0;
-  max-width: 40rem;
-  color: #b5b5b5;
-  font-size: clamp(0.95rem, 2.8vw, 1.08rem);
-  line-height: 1.55;
   font-weight: 300;
   text-wrap: pretty;
 }
@@ -993,10 +966,6 @@ a {
 
   .fm-tagline {
     font-size: clamp(1.3rem, 2vw, 1.72rem);
-  }
-
-  .fm-hero-summary {
-    font-size: 1.16rem;
   }
 
   .fm-timeline {
