@@ -4,7 +4,14 @@ import eslintConfigPrettier from "eslint-config-prettier";
 
 export default [
   {
-    ignores: ["_site/**", ".cache/**", ".11ty-cache/**", ".next/**", "node_modules/**"],
+    ignores: [
+      "_site/**",
+      ".cache/**",
+      ".11ty-cache/**",
+      ".next/**",
+      "node_modules/**",
+      "app/assets/build/**",
+    ],
   },
   js.configs.recommended,
   {

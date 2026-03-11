@@ -1,20 +1,57 @@
 <!doctype html>
 <html lang="{{ site.language }}">
   <head>
+    {% set pageTitle = title or site.name %}
+    {% set pageDescription = description or site.description %}
+    {% set canonicalUrl = (site.url + page.url) | url %}
+    {% set socialImagePath = seoImage or site.socialImage %}
+    {% set socialImageUrl = (site.url + socialImagePath) | url %}
+    {% set robotsContent = "noindex, nofollow" if noindex else "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" %}
+    {% set isHomepage = page.url == "/" %}
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0a0a0a" />
-    <title>{% if title %}{{ title }} | {% endif %}{{ site.name }}</title>
-    <meta name="description" content="{{ description or site.description }}" />
-    <link rel="canonical" href="{{ (site.url + page.url) | url }}" />
+    <meta name="theme-color" content="{{ site.themeColor }}" />
+    <meta name="author" content="{{ site.author }}" />
+    <meta name="description" content="{{ pageDescription }}" />
+    <meta name="robots" content="{{ robotsContent }}" />
+    <meta name="googlebot" content="{{ robotsContent }}" />
+    {% if site.googleSiteVerification %}
+      <meta name="google-site-verification" content="{{ site.googleSiteVerification }}" />
+    {% endif %}
+    {% if site.bingSiteVerification %}
+      <meta name="msvalidate.01" content="{{ site.bingSiteVerification }}" />
+    {% endif %}
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>{% if pageTitle == site.name %}{{ site.name }}{% else %}{{ pageTitle }} | {{ site.name }}{% endif %}</title>
+    <link rel="canonical" href="{{ canonicalUrl }}" />
+    <link rel="alternate" hreflang="{{ site.language }}" href="{{ canonicalUrl }}" />
+    <link rel="alternate" hreflang="x-default" href="{{ (site.url + '/') | url }}" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="{{ '/sitemap.xml' | url }}" />
+    <link rel="alternate" type="application/rss+xml" title="{{ site.name }} Feed" href="{{ '/feed.xml' | url }}" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="{{ site.name }}" />
-    <meta property="og:title" content="{{ title or site.name }}" />
-    <meta property="og:description" content="{{ description or site.description }}" />
-    <meta property="og:url" content="{{ (site.url + page.url) | url }}" />
+    <meta property="og:locale" content="{{ site.locale }}" />
+    <meta property="og:title" content="{{ pageTitle }}" />
+    <meta property="og:description" content="{{ pageDescription }}" />
+    <meta property="og:url" content="{{ canonicalUrl }}" />
+    <meta property="og:image" content="{{ socialImageUrl }}" />
+    <meta property="og:image:secure_url" content="{{ socialImageUrl }}" />
+    <meta property="og:image:alt" content="{{ site.socialImageAlt }}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="{{ title or site.name }}" />
-    <meta name="twitter:description" content="{{ description or site.description }}" />
+    <meta name="twitter:title" content="{{ pageTitle }}" />
+    <meta name="twitter:description" content="{{ pageDescription }}" />
+    <meta name="twitter:image" content="{{ socialImageUrl }}" />
+    <meta name="twitter:image:alt" content="{{ site.socialImageAlt }}" />
+    {% if site.twitterHandle %}
+      <meta name="twitter:site" content="{{ site.twitterHandle }}" />
+      <meta name="twitter:creator" content="{{ site.twitterHandle }}" />
+    {% endif %}
+    <link rel="icon" href="{{ site.faviconIco | url }}" sizes="any" />
+    <link rel="icon" type="image/png" href="{{ site.faviconPng | url }}" sizes="32x32" />
+    <link rel="apple-touch-icon" href="{{ site.appleTouchIcon | url }}" sizes="180x180" />
     <link
       rel="preload"
       href="{{ '/fonts/wotfard/wotfard-regular-webfont.woff2' | url }}"
@@ -22,6 +59,73 @@
       type="font/woff2"
       crossorigin
     />
+    {% if not noindex %}
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Person",
+              "@id": "{{ site.url }}#person",
+              "name": "{{ site.author }}",
+              "url": "{{ site.url }}",
+              "jobTitle": "Software Engineer",
+              "image": "{{ (site.url + site.profileImage) | url }}",
+              "worksFor": {
+                "@type": "Organization",
+                "name": "Independent"
+              },
+              "sameAs": [{% for profile in site.sameAs %}"{{ profile }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+            },
+            {
+              "@type": "WebSite",
+              "@id": "{{ site.url }}#website",
+              "url": "{{ site.url }}",
+              "name": "{{ site.name }}",
+              "description": "{{ site.description }}",
+              "publisher": {
+                "@type": "Organization",
+                "name": "{{ site.name }}",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "{{ (site.url + site.logo) | url }}"
+                }
+              },
+              "inLanguage": "{{ site.language }}"
+            },
+            {
+              "@type": "WebPage",
+              "@id": "{{ canonicalUrl }}#webpage",
+              "url": "{{ canonicalUrl }}",
+              "name": "{{ pageTitle }}",
+              "description": "{{ pageDescription }}",
+              "isPartOf": {
+                "@id": "{{ site.url }}#website"
+              },
+              "about": {
+                "@id": "{{ site.url }}#person"
+              },
+              "primaryImageOfPage": {
+                "@type": "ImageObject",
+                "url": "{{ socialImageUrl }}"
+              },
+              "dateModified": "{{ build.isoDateTime }}",
+              "inLanguage": "{{ site.language }}"
+            }{% if isHomepage %},
+            {
+              "@type": "ProfilePage",
+              "@id": "{{ site.url }}#profile",
+              "url": "{{ site.url }}",
+              "name": "{{ site.name }} | Software Engineer Portfolio",
+              "mainEntity": {
+                "@id": "{{ site.url }}#person"
+              },
+              "dateModified": "{{ build.isoDateTime }}"
+            }{% endif %}
+          ]
+        }
+      </script>
+    {% endif %}
     <link rel="stylesheet" href="{{ assets.css | url }}" />
   </head>
   <body class="fm-body">
