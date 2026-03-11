@@ -259,11 +259,16 @@ h1 {
 .meta {
   display: inline-flex;
   margin-top: 0.45rem;
+  font-family: var(--font-mono);
   font-size: 0.82rem;
   color: var(--primary-strong);
   background: color-mix(in oklab, var(--primary) 14%, white);
   border-radius: 999px;
   padding: 0.18rem 0.6rem;
+}
+
+.tech-text {
+  font-family: var(--font-mono);
 }
 
 .card p {
@@ -281,6 +286,7 @@ h1 {
 }
 
 .skill-list li {
+  font-family: var(--font-mono);
   border: 1px solid var(--surface-muted);
   background: var(--surface);
   border-radius: 999px;

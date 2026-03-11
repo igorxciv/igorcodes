@@ -5,7 +5,7 @@ layout: layouts/base.njk
   <p class="eyebrow">Case Study</p>
   <h1>{{ title }}</h1>
   <p class="section-subtitle">{{ summary }}</p>
-  <p><strong>Role:</strong> {{ role }} · <strong>Stack:</strong> {{ stack }}</p>
+  <p><strong>Role:</strong> {{ role }} · <strong>Stack:</strong> <span class="tech-text">{{ stack }}</span></p>
   <div>{{ content | safe }}</div>
   {% if link %}
     <p>

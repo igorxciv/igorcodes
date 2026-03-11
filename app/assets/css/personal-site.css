@@ -365,6 +365,8 @@ a:focus-visible {
   border-radius: 0.75rem;
   padding: 1rem;
   background: var(--fm-surface);
+  display: flex;
+  flex-direction: column;
   transition:
     border-color var(--fm-motion-fast) var(--fm-ease-standard),
     background-color var(--fm-motion-fast) var(--fm-ease-standard),
@@ -453,6 +455,7 @@ a:focus-visible {
 }
 
 .fm-tags li {
+  font-family: var(--font-mono);
   background: #181818;
   border: 1px solid #252525;
   border-radius: 0.3rem;
@@ -560,13 +563,15 @@ a:focus-visible {
 }
 
 .fm-tech {
+  font-family: var(--font-mono);
   color: var(--fm-accent);
   font-size: 0.95rem;
   margin-top: 0.75rem;
 }
 
 .fm-card-links {
-  margin-top: 0.95rem;
+  margin-top: auto;
+  padding-top: 0.95rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
