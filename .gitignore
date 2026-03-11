@@ -6,6 +6,8 @@
 /.cache
 /.11ty-cache
 /build
+/app/assets/build
+/app/_data/assets-manifest.json
 
 # logs
 npm-debug.log*

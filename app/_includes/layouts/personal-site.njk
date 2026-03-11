@@ -22,11 +22,10 @@
       type="font/woff2"
       crossorigin
     />
-    <link rel="stylesheet" href="{{ '/assets/css/fonts.css' | url }}" />
-    <link rel="stylesheet" href="{{ '/assets/css/personal-site.css' | url }}" />
+    <link rel="stylesheet" href="{{ assets.css | url }}" />
   </head>
   <body class="fm-body">
     <main id="content">{{ content | safe }}</main>
-    <script src="{{ '/assets/js/personal-site.js' | url }}" defer></script>
+    <script src="{{ assets.js | url }}" defer></script>
   </body>
 </html>

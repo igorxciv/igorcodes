@@ -1,3 +1,5 @@
+@import "./fonts.css";
+
 :root {
   --fm-bg: #0a0a0a;
   --fm-text: #e5e5e5;
@@ -64,6 +66,13 @@ a {
 
 .fm-section {
   padding: clamp(3.75rem, 8vw, 6.5rem) 0;
+}
+
+@supports (content-visibility: auto) {
+  .fm-section {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 960px;
+  }
 }
 
 .fm-section-head h2 {

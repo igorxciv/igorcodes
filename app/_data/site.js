@@ -11,7 +11,6 @@ module.exports = {
   location: "Playa del Carmen, Mexico",
   nav: [
     { label: "Home", href: "/" },
-    { label: "Work", href: "/work/" },
     { label: "Contact", href: "/#contact" },
   ],
 };

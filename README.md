@@ -1,26 +1,26 @@
 # igorxciv
 
-Performance-first personal landing page + portfolio built with Eleventy.
+Single-page personal website built with Eleventy.
 
 ## Stack
 
 - [Eleventy](https://www.11ty.dev/) static site generator
-- Nunjucks templates + Markdown content collections
-- Performance plugins:
-  - `@11ty/eleventy-plugin-bundle`
-  - `@11ty/eleventy-img`
-  - `@11ty/eleventy-plugin-rss`
-  - `@quasibit/eleventy-plugin-sitemap`
-  - `html-minifier-terser` transform (production)
-- DX tooling: ESLint (flat config), Prettier, Husky + lint-staged
+- Nunjucks templates
+- Production asset pipeline:
+  - `lightningcss` for bundled/minified CSS
+  - `esbuild` for minified JS
+  - fingerprinted asset filenames via manifest (`app/_data/assets-manifest.json`)
+- Production HTML minification with `html-minifier-terser`
+- ESLint + Prettier + Husky/lint-staged
 
 ## Project structure
 
-- `app/` Eleventy input directory
-- `app/_includes/` layouts and partials
-- `app/_data/` global data (`site`, `portfolio`)
-- `app/work/` portfolio case studies (Markdown)
-- `app/assets/css/site.css` global styles
+- `app/index.njk` single site entry page
+- `app/_includes/layouts/personal-site.njk` page layout
+- `app/_includes/partials/personal-site-page.njk` page content sections
+- `app/_data/site.js` global site metadata
+- `app/assets/css/personal-site.css` styles
+- `app/assets/js/personal-site.js` progressive enhancements
 - `public/` passthrough static assets
 - `_site/` generated static output
 
@@ -28,6 +28,7 @@ Performance-first personal landing page + portfolio built with Eleventy.
 
 - `npm run dev` start Eleventy dev server
 - `npm run build` production build (`NODE_ENV=production`)
+- `npm run build:assets` build optimized CSS/JS assets only
 - `npm run clean` remove build/cache folders
 - `npm run lint` run ESLint
 - `npm run format` run Prettier write
@@ -48,13 +49,4 @@ npm run build
 
 ## Environment variables
 
-- `SITE_URL`: canonical site URL used for RSS/sitemap/canonical links.
-
-## Best practices already wired
-
-- Static-first architecture (no runtime framework hydration)
-- Minified HTML in production
-- Sitemap + RSS generation
-- Structured global data files for content maintainability
-- Collection-based portfolio entries for easy scaling
-- Statically served assets via passthrough copy
+- `SITE_URL`: canonical site URL for metadata/canonical links.
