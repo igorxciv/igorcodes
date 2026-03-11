@@ -1,15 +1,15 @@
 ---
 layout: layouts/work-item.njk
-title: Developer Education Platform
-summary: Built a docs-and-course platform with strong information architecture and static-first rendering for global audiences.
-stack: Eleventy, Markdown, Cloudflare
-role: Senior Frontend Engineer
+title: Electives Membership Platform
+summary: Contributed to a membership and learning platform focused on helping professionals level up practical skills and career growth.
+stack: React, TypeScript, Product Engineering
+role: Frontend Engineer
 order: 3
-link: https://example.com
+link: https://www.electives.io/
 tags:
   - work
 ---
 
-- Introduced content collections and taxonomy pages to improve discoverability for tutorials and API references.
-- Delivered a deploy model with deterministic builds, link checks, and feed/sitemap automation.
-- Added event tracking and search analytics to prioritize documentation updates.
+- Built and iterated user-facing experiences that balanced product velocity with long-term maintainability.
+- Partnered across product, design, and engineering to turn business goals into clear technical delivery.
+- Focused on reliability, performance, and predictable behavior in high-impact user journeys.

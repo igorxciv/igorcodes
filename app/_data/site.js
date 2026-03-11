@@ -1,14 +1,14 @@
 module.exports = {
-  name: "Igor Xciv",
+  name: "Igor Cheliadinski",
   description:
-    "Product-focused frontend engineer crafting performant interfaces and practical digital products.",
-  url: process.env.SITE_URL || "https://example.com",
+    "Software engineer with frontend roots and a systems mindset. Building maintainable, performant digital products and developer workflows.",
+  url: process.env.SITE_URL || "https://igorcodes.dev",
   language: "en",
   locale: "en_US",
   themeColor: "#0f172a",
-  author: "Igor Xciv",
-  email: "hello@example.com",
-  location: "San Francisco, CA",
+  author: "Igor Cheliadinski",
+  email: "hi@igorcodes.dev",
+  location: "Playa del Carmen, Mexico",
   nav: [
     { label: "Home", href: "/" },
     { label: "Work", href: "/work/" },

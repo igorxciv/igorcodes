@@ -1,24 +1,25 @@
 module.exports = {
-  role: "Frontend Engineer & Product Builder",
-  tagline: "I design and ship fast, accessible web experiences that convert.",
+  role: "Software Engineer | Frontend-Focused Full-Stack",
+  tagline: "I turn product intent into maintainable, performant web experiences.",
   intro:
-    "I specialize in performance-first interfaces, design systems, and pragmatic product delivery for startups and growth-stage teams.",
+    "Engineer since 2014 with roots in frontend and a systems mindset. I focus on architecture choices, performance, observability, and developer experience.",
   stats: [
-    { value: "95+", label: "Lighthouse scores delivered" },
-    { value: "20+", label: "Products shipped" },
-    { value: "7y", label: "Frontend experience" },
+    { value: "2014", label: "Started building products" },
+    { value: "11+", label: "Years of engineering experience" },
+    { value: "∞", label: "Iterations to improve systems" },
   ],
   skills: [
     "JavaScript/TypeScript",
     "React & Next.js",
-    "Eleventy",
-    "Design Systems",
-    "Core Web Vitals",
-    "Conversion UX",
+    "Frontend Architecture",
+    "Performance & Accessibility",
+    "Observability",
+    "Developer Workflows",
   ],
   socialLinks: [
-    { label: "GitHub", href: "https://github.com/" },
-    { label: "LinkedIn", href: "https://www.linkedin.com/" },
-    { label: "X", href: "https://x.com/" },
+    { label: "GitHub", href: "https://github.com/igorxciv" },
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/igorxciv" },
+    { label: "Blog", href: "https://igorcodes.dev" },
+    { label: "Telegram", href: "https://t.me/igorxciv" },
   ],
 };

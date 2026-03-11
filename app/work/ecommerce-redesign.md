@@ -1,15 +1,14 @@
 ---
 layout: layouts/work-item.njk
-title: Ecommerce Conversion Redesign
-summary: Designed and shipped a modular storefront refresh focused on faster first paint and tighter purchase funnel UX.
-stack: Eleventy, Alpine.js, Shopify APIs
-role: Product Engineer
+title: Pulpo WMS App
+summary: Built and improved an optimization and process-control app for warehouse operations with a focus on usability and operational flow.
+stack: Frontend Engineering, Product UX, Operations Workflow
+role: Frontend Engineer
 order: 2
-link: https://example.com
 tags:
   - work
 ---
 
-- Implemented reusable pricing, reviews, and recommendation modules with strict performance budgets.
-- Improved Core Web Vitals through image policy, critical CSS hygiene, and route-level payload reduction.
-- Partnered with design and marketing to iterate quickly on A/B-tested section variants.
+- Helped shape workflows that made complex warehouse processes clearer and easier to execute.
+- Improved interface consistency and interaction reliability for day-to-day operational tasks.
+- Prioritized fast feedback loops between product assumptions and real usage behavior.

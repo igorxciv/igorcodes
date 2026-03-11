@@ -1,15 +1,14 @@
 ---
 layout: layouts/work-item.njk
-title: SaaS Analytics Dashboard
-summary: Rebuilt analytics surfaces with lightweight charting and split rendering to improve conversion tracking workflows.
-stack: Eleventy, TypeScript, Chart.js
-role: Lead Frontend Engineer
+title: QI Tech Partner Shop
+summary: Worked on a digital storefront experience for a financial partner ecosystem, emphasizing performance, clarity, and business outcomes.
+stack: Frontend Engineering, Fintech Product, Scalable UI
+role: Frontend Engineer
 order: 1
-link: https://example.com
 tags:
   - work
 ---
 
-- Consolidated navigation and report generation flows into one dashboard with keyboard-first controls.
-- Reduced total JavaScript shipped by replacing multiple heavy widgets with focused components.
-- Achieved consistent 95+ performance scores across desktop and mobile landing routes.
+- Built and refined key partner-facing flows with strong attention to conversion and usability.
+- Collaborated with cross-functional teams to align technical decisions with product and business constraints.
+- Improved maintainability by keeping implementation patterns consistent and predictable across features.
