@@ -12,14 +12,18 @@
   --fm-motion-slow: 320ms;
   --fm-ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --fm-ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: dark;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body.fm-body {
@@ -32,13 +36,23 @@ body.fm-body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+img {
+  display: block;
+  max-inline-size: 100%;
+  block-size: auto;
+}
+
 a {
   color: inherit;
 }
 
-a:focus-visible {
+:where(a, button, input, textarea, select, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
   outline: 2px solid var(--fm-focus-ring);
   outline-offset: 3px;
+}
+
+:target {
+  scroll-margin-block-start: 1.5rem;
 }
 
 .fm-container,
@@ -59,6 +73,7 @@ a:focus-visible {
   line-height: 1.12;
   letter-spacing: 0.01em;
   font-weight: 500;
+  text-wrap: balance;
 }
 
 .fm-section-head p {
@@ -97,6 +112,7 @@ a:focus-visible {
   font-size: clamp(2.35rem, 13vw, 4.2rem);
   line-height: 1.05;
   font-weight: 500;
+  text-wrap: balance;
 }
 
 .fm-tagline {
@@ -106,6 +122,7 @@ a:focus-visible {
   font-size: clamp(1.02rem, 4.7vw, 1.35rem);
   line-height: 1.5;
   font-weight: 300;
+  text-wrap: pretty;
 }
 
 .fm-hero-links {
@@ -434,6 +451,7 @@ a:focus-visible {
   font-size: 1.28rem;
   font-weight: 500;
   line-height: 1.35;
+  text-wrap: balance;
 }
 
 .fm-project-card p,
@@ -443,6 +461,7 @@ a:focus-visible {
   font-size: 0.96rem;
   line-height: 1.48;
   font-weight: 300;
+  text-wrap: pretty;
 }
 
 .fm-tags {
@@ -490,6 +509,7 @@ a:focus-visible {
   font-size: 1.25rem;
   line-height: 1.35;
   font-weight: 500;
+  text-wrap: balance;
 }
 
 .fm-writing-list small {
@@ -739,6 +759,19 @@ a:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
   .fm-scroll-down,
   .fm-scroll-down svg,
   .fm-hero-links a,

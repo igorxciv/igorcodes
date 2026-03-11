@@ -10,9 +10,15 @@
   --ring: rgba(15, 118, 110, 0.3);
   --radius: 1rem;
   --shadow-soft: 0 20px 60px -30px rgba(15, 23, 42, 0.22);
+  --motion-fast: 160ms;
+  --motion-base: 220ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  color-scheme: light;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -23,6 +29,10 @@ body {
   min-height: 100%;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   font-family: var(--font-sans);
   color: var(--text);
@@ -30,6 +40,12 @@ body {
     radial-gradient(circle at 85% 5%, rgba(15, 118, 110, 0.2), transparent 40%),
     radial-gradient(circle at 15% 15%, rgba(249, 115, 22, 0.16), transparent 30%), var(--bg);
   line-height: 1.6;
+}
+
+img {
+  display: block;
+  max-inline-size: 100%;
+  block-size: auto;
 }
 
 code,
@@ -45,8 +61,7 @@ a {
   text-underline-offset: 0.15em;
 }
 
-a:focus-visible,
-button:focus-visible {
+:where(a, button, input, textarea, select, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
   outline: 3px solid var(--ring);
   outline-offset: 3px;
 }
@@ -130,6 +145,7 @@ h1 {
   margin: 0.8rem 0 1rem;
   font-size: clamp(2.1rem, 4vw, 3.7rem);
   line-height: 1.1;
+  text-wrap: balance;
 }
 
 .lead {
@@ -137,6 +153,7 @@ h1 {
   font-size: clamp(1rem, 2vw, 1.18rem);
   color: var(--text-muted);
   max-width: 62ch;
+  text-wrap: pretty;
 }
 
 .hero-actions {
@@ -156,8 +173,8 @@ h1 {
   font-weight: 600;
   text-decoration: none;
   transition:
-    transform 0.2s ease,
-    background-color 0.2s ease;
+    transform var(--motion-base) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard);
 }
 
 .btn:hover {
@@ -229,11 +246,13 @@ h1 {
 .section-title {
   font-size: clamp(1.4rem, 2vw, 2rem);
   margin: 0;
+  text-wrap: balance;
 }
 
 .section-subtitle {
   margin-top: 0.5rem;
   color: var(--text-muted);
+  text-wrap: pretty;
 }
 
 .work-grid {
@@ -274,6 +293,7 @@ h1 {
 .card p {
   color: var(--text-muted);
   margin-bottom: 0;
+  text-wrap: pretty;
 }
 
 .skill-list {
@@ -347,5 +367,20 @@ h1 {
   .footer-inner {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .btn:hover {
+    transform: none;
   }
 }
