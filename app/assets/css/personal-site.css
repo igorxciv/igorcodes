@@ -38,6 +38,140 @@ body.fm-body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  @supports (view-transition-name: fm-page) {
+    @view-transition {
+      navigation: auto;
+    }
+
+    :root {
+      view-transition-name: fm-root;
+    }
+
+    .fm-page {
+      view-transition-name: fm-page;
+    }
+
+    .fm-name,
+    .fm-page-title {
+      view-transition-name: fm-title;
+    }
+
+    ::view-transition-group(fm-root) {
+      animation-duration: 420ms;
+      animation-timing-function: var(--fm-ease-standard);
+    }
+
+    ::view-transition-group(fm-page),
+    ::view-transition-group(fm-title) {
+      animation-duration: 520ms;
+      animation-timing-function: var(--fm-ease-emphasized);
+    }
+
+    ::view-transition-old(fm-root) {
+      animation: fm-view-root-out 320ms var(--fm-ease-standard) both;
+    }
+
+    ::view-transition-new(fm-root) {
+      animation: fm-view-root-in 420ms var(--fm-ease-emphasized) both;
+    }
+
+    ::view-transition-old(fm-page) {
+      animation: fm-view-page-out 360ms var(--fm-ease-standard) both;
+    }
+
+    ::view-transition-new(fm-page) {
+      animation: fm-view-page-in 520ms var(--fm-ease-emphasized) both;
+    }
+
+    ::view-transition-old(fm-title) {
+      animation: fm-view-title-out 320ms var(--fm-ease-standard) both;
+      transform-origin: 50% 50%;
+    }
+
+    ::view-transition-new(fm-title) {
+      animation: fm-view-title-in 540ms var(--fm-ease-emphasized) both;
+      transform-origin: 50% 50%;
+    }
+  }
+}
+
+@keyframes fm-view-root-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.85;
+  }
+}
+
+@keyframes fm-view-root-in {
+  from {
+    opacity: 0.82;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fm-view-page-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.985);
+    filter: blur(8px);
+  }
+}
+
+@keyframes fm-view-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.985);
+    filter: blur(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes fm-view-title-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-22px) scale(0.92);
+    filter: blur(6px);
+  }
+}
+
+@keyframes fm-view-title-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.92);
+    filter: blur(7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
 img {
   display: block;
   max-inline-size: 100%;
