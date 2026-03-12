@@ -906,41 +906,31 @@ a {
     scroll-behavior: auto;
   }
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  .fm-scroll-down,
-  .fm-scroll-down svg,
+  .fm-reveal,
   .fm-hero-links a,
+  .fm-scroll-down,
   .fm-card,
   .fm-project-link,
   .fm-arrow,
   .fm-card-links a,
   .fm-contact-list a,
-  .fm-contact-icon {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
+  .fm-contact-icon,
+  .fm-timeline-progress::after,
+  .fm-timeline-item.fm-reveal .fm-timeline-copy,
+  .fm-timeline-item.fm-reveal .fm-timeline-dot {
+    transition: none;
   }
 
   .fm-reveal,
-  .fm-timeline-copy,
-  .fm-timeline-dot,
-  .fm-timeline-progress {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-  }
-
-  .fm-reveal,
-  .fm-timeline-copy,
-  .fm-timeline-dot {
+  .fm-timeline-item.fm-reveal .fm-timeline-copy,
+  .fm-timeline-item.fm-reveal .fm-timeline-dot {
     opacity: 1;
     transform: none;
+  }
+
+  .fm-timeline-item.fm-reveal.is-visible .fm-timeline-copy,
+  .fm-timeline-item.fm-reveal.is-visible .fm-timeline-dot {
+    transition-delay: 0s;
   }
 
   .fm-timeline-progress.is-active::after {

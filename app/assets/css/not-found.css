@@ -315,8 +315,7 @@
 
   .fm-404-btn,
   .fm-404-suggestions a {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
+    transition: none;
   }
 }
 
