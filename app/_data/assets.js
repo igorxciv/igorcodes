@@ -4,6 +4,8 @@ const path = require("node:path");
 const defaultAssets = {
   css: "/assets/css/personal-site.css",
   js: "/assets/js/personal-site.js",
+  notFoundCss: "/assets/css/not-found.css",
+  notFoundJs: "/assets/js/not-found.js",
 };
 
 module.exports = () => {

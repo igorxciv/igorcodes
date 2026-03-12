@@ -15,6 +15,8 @@ const manifestPath = path.join(appDir, "_data", "assets-manifest.json");
 
 const cssEntryPath = path.join(appDir, "assets", "css", "personal-site.css");
 const jsEntryPath = path.join(appDir, "assets", "js", "personal-site.js");
+const notFoundCssEntryPath = path.join(appDir, "assets", "css", "not-found.css");
+const notFoundJsEntryPath = path.join(appDir, "assets", "js", "not-found.js");
 
 const packVersion = (major, minor = 0, patch = 0) => (major << 16) | (minor << 8) | patch;
 
@@ -27,21 +29,21 @@ const browserTargets = {
 
 const hashContent = (content) => createHash("sha256").update(content).digest("hex").slice(0, 10);
 
-async function buildCss() {
+async function buildCss(entryPath, outputPrefix = "site") {
   const { code } = bundleCss({
-    filename: cssEntryPath,
+    filename: entryPath,
     minify: true,
     sourceMap: false,
     targets: browserTargets,
   });
 
-  const fileName = `site-${hashContent(code)}.css`;
+  const fileName = `${outputPrefix}-${hashContent(code)}.css`;
   await writeFile(path.join(buildDir, fileName), code);
   return `/assets/build/${fileName}`;
 }
 
-async function buildJs() {
-  const jsSource = await readFile(jsEntryPath, "utf8");
+async function buildJs(entryPath, outputPrefix = "site") {
+  const jsSource = await readFile(entryPath, "utf8");
 
   const { code } = await transformJs(jsSource, {
     loader: "js",
@@ -52,7 +54,7 @@ async function buildJs() {
   });
 
   const jsBuffer = Buffer.from(code);
-  const fileName = `site-${hashContent(jsBuffer)}.js`;
+  const fileName = `${outputPrefix}-${hashContent(jsBuffer)}.js`;
   await writeFile(path.join(buildDir, fileName), jsBuffer);
   return `/assets/build/${fileName}`;
 }
@@ -65,11 +67,18 @@ async function main() {
   await rm(buildDir, { recursive: true, force: true });
   await mkdir(buildDir, { recursive: true });
 
-  const [css, js] = await Promise.all([buildCss(), buildJs()]);
+  const [css, js, notFoundCss, notFoundJs] = await Promise.all([
+    buildCss(cssEntryPath, "site"),
+    buildJs(jsEntryPath, "site"),
+    buildCss(notFoundCssEntryPath, "not-found"),
+    buildJs(notFoundJsEntryPath, "not-found"),
+  ]);
 
   await writeManifest({
     css,
     js,
+    notFoundCss,
+    notFoundJs,
   });
 }
 

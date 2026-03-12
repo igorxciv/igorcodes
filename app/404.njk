@@ -5,21 +5,69 @@ title: Page Not Found
 description: The requested page could not be found.
 noindex: true
 eleventyExcludeFromCollections: true
+notFoundPage: true
+skipDefaultJs: true
 ---
-<div class="fm-page">
-  <section class="fm-section">
-    <div class="fm-container fm-narrow">
-      <header class="fm-section-head">
-        <h1 class="fm-page-title">404: Page Not Found</h1>
-        <p>The page you requested does not exist or may have moved.</p>
+<div class="fm-page fm-404-page" data-404>
+  <section
+    class="fm-404"
+    aria-labelledby="page-not-found-title"
+    aria-describedby="page-not-found-description"
+  >
+    <span class="fm-404-grid" aria-hidden="true"></span>
+
+    <div class="fm-404-inner">
+      <div class="fm-404-terminal" aria-hidden="true">
+        <div class="fm-404-terminal-head">
+          <span class="fm-404-dots">
+            <span class="fm-404-dot fm-404-dot-red"></span>
+            <span class="fm-404-dot fm-404-dot-yellow"></span>
+            <span class="fm-404-dot fm-404-dot-green"></span>
+          </span>
+          <span class="fm-404-terminal-title">
+            {% lucide "terminal" %}
+            terminal
+          </span>
+        </div>
+
+        <div class="fm-404-terminal-body">
+          <p class="fm-404-command">
+            <span data-404-command data-command="$ page not found">$ page not found</span>
+            <span class="fm-404-cursor"></span>
+          </p>
+          <p class="fm-404-log">Error: ENOENT: no such file or directory.</p>
+          <p class="fm-404-log fm-404-log-critical">The requested page could not be found.</p>
+        </div>
+      </div>
+
+      <p class="fm-404-code" aria-hidden="true">
+        <span class="fm-404-code-shadow" data-404-code-shadow>404</span>
+        <span class="fm-404-code-current" data-404-code data-static-value="404">404</span>
+      </p>
+
+      <header class="fm-404-content">
+        <h1 id="page-not-found-title" class="fm-page-title fm-404-title">Page Not Found</h1>
+        <p id="page-not-found-description" class="fm-404-description">
+          The page you&apos;re looking for doesn&apos;t exist, was moved, or the URL is incorrect.
+        </p>
       </header>
-      <p class="fm-contact-intro">
-        Return to the homepage to view projects, writing, and contact links.
-      </p>
-      <p class="fm-card-links">
-        <a href="/">Back to Home</a>
-        <a href="/#contact">Go to Contact</a>
-      </p>
+
+      <div class="fm-404-actions">
+        <a href="/" class="fm-404-btn fm-404-btn-primary">
+          {% lucide "house" %}
+          Back to Home
+        </a>
+        <a href="/" class="fm-404-btn fm-404-btn-secondary" data-404-back-link>
+          {% lucide "arrowLeft" %}
+          Go Back
+        </a>
+      </div>
+
+      <nav class="fm-404-suggestions" aria-label="Suggested destinations">
+        <a href="/">Home</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#contact">Contact</a>
+      </nav>
     </div>
   </section>
 </div>

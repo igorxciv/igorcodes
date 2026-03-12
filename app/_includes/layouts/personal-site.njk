@@ -8,6 +8,7 @@
     {% set socialImageUrl = (site.url + socialImagePath) | url %}
     {% set robotsContent = "noindex, nofollow" if noindex else "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" %}
     {% set isHomepage = page.url == "/" %}
+    {% set includeDefaultJs = not skipDefaultJs %}
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -127,9 +128,17 @@
       </script>
     {% endif %}
     <link rel="stylesheet" href="{{ assets.css | url }}" />
+    {% if notFoundPage and assets.notFoundCss %}
+      <link rel="stylesheet" href="{{ assets.notFoundCss | url }}" />
+    {% endif %}
   </head>
   <body class="fm-body">
     <main id="content">{{ content | safe }}</main>
-    <script src="{{ assets.js | url }}" defer></script>
+    {% if includeDefaultJs %}
+      <script src="{{ assets.js | url }}" defer></script>
+    {% endif %}
+    {% if notFoundPage and assets.notFoundJs %}
+      <script src="{{ assets.notFoundJs | url }}" defer></script>
+    {% endif %}
   </body>
 </html>

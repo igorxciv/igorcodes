@@ -3,25 +3,31 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { minify } = require("html-minifier-terser");
 const {
+  ArrowLeft,
   ArrowRight,
   Calendar,
   ChevronDown,
   Github,
   Globe,
+  House,
   Linkedin,
   Mail,
   SquareArrowOutUpRight,
+  Terminal,
 } = require("lucide");
 
 const lucideIcons = {
+  arrowLeft: ArrowLeft,
   arrowRight: ArrowRight,
   calendar: Calendar,
   chevronDown: ChevronDown,
   github: Github,
   globe: Globe,
+  house: House,
   linkedin: Linkedin,
   mail: Mail,
   squareArrowOutUpRight: SquareArrowOutUpRight,
+  terminal: Terminal,
 };
 
 const lucideDefaultAttributes = {
