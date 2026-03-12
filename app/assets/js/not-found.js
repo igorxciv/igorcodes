@@ -10,7 +10,7 @@
   const codeElement = notFoundPage.querySelector("[data-404-code]");
   const codeShadowElement = notFoundPage.querySelector("[data-404-code-shadow]");
   const commandElement = notFoundPage.querySelector("[data-404-command]");
-  const backLink = notFoundPage.querySelector("[data-404-back-link]");
+  const backButton = notFoundPage.querySelector("[data-404-back-link]");
   const prefersReducedMotion =
     "matchMedia" in window && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const prefersDataSaving =
@@ -39,8 +39,8 @@
     }
   };
 
-  if (backLink) {
-    backLink.addEventListener("click", (event) => {
+  if (backButton) {
+    backButton.addEventListener("click", () => {
       const hasReferrer = Boolean(document.referrer);
       const referrerUrl = hasReferrer ? new URL(document.referrer, window.location.href) : null;
       const isSameOriginReferrer =
@@ -49,15 +49,16 @@
         referrerUrl.href !== window.location.href;
 
       if (isSameOriginReferrer) {
-        event.preventDefault();
         window.location.assign(`${referrerUrl.pathname}${referrerUrl.search}${referrerUrl.hash}`);
         return;
       }
 
       if (window.history.length > 1) {
-        event.preventDefault();
         window.history.back();
+        return;
       }
+
+      window.location.assign("/");
     });
   }
 
