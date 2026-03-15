@@ -1,8 +1,8 @@
 <div class="fm-page">
-  <section id="hero" class="fm-hero">
+  <section id="hero" class="fm-hero" aria-labelledby="hero-title">
     <div class="fm-hero-content">
       <p class="fm-role">SOFTWARE ENGINEER</p>
-      <h1 class="fm-name">Igor Cheliadinski</h1>
+      <h1 id="hero-title" class="fm-name">Igor Cheliadinski</h1>
       <p class="fm-tagline">Frontend-focused full-stack engineer with a systems and architecture mindset.</p>
       <nav class="fm-hero-links" aria-label="Hero links">
         <a href="#projects">View Work</a>
@@ -10,72 +10,76 @@
         <a href="#contact">Get in Touch</a>
       </nav>
     </div>
-    <a href="#timeline" class="fm-scroll-down" aria-label="Scroll down">
+    <a href="#timeline" class="fm-scroll-down">
       {% lucide "chevronDown" %}
+      <span class="fm-visually-hidden">Scroll to career journey</span>
     </a>
   </section>
 
-  <section id="timeline" class="fm-section">
+  <section id="timeline" class="fm-section" aria-labelledby="timeline-title">
     <div class="fm-container">
       <header class="fm-section-head fm-reveal">
-        <h2>Career Journey</h2>
+        <h2 id="timeline-title">Career Journey</h2>
         <p>Building digital products and engineering systems since 2014</p>
       </header>
 
-      <ol class="fm-timeline" data-timeline>
+      <div class="fm-timeline-shell">
         <span class="fm-timeline-line" aria-hidden="true"></span>
         <span class="fm-timeline-progress" data-timeline-progress aria-hidden="true"></span>
+        <ol class="fm-timeline" data-timeline>
+          <li class="fm-timeline-item fm-timeline-item-left fm-reveal">
+            <div class="fm-timeline-copy">
+              <p class="fm-year">2023</p>
+              <h3>Principal Engineer</h3>
+              <p>Contributing to a membership and learning platform by shipping product improvements with strong maintainability and delivery quality.</p>
+            </div>
+            <span class="fm-timeline-dot" aria-hidden="true"></span>
+          </li>
 
-        <li class="fm-timeline-item fm-timeline-item-left fm-reveal">
-          <div class="fm-timeline-copy">
-            <p class="fm-year">2023</p>
-            <h3>Principal Engineer</h3>
-            <p>Contributing to a membership and learning platform by shipping product improvements with strong maintainability and delivery quality.</p>
-          </div>
-          <span class="fm-timeline-dot" aria-hidden="true"></span>
-        </li>
+          <li class="fm-timeline-item fm-timeline-item-right fm-reveal">
+            <div class="fm-timeline-copy">
+              <p class="fm-year">2021</p>
+              <h3>Lead Software Engineer</h3>
+              <p>Delivered frontend and full-stack solutions for Fortune 500 clients, with emphasis on architecture decisions and long-term product stability.</p>
+            </div>
+            <span class="fm-timeline-dot" aria-hidden="true"></span>
+          </li>
 
-        <li class="fm-timeline-item fm-timeline-item-right fm-reveal">
-          <div class="fm-timeline-copy">
-            <p class="fm-year">2021</p>
-            <h3>Lead Software Engineer</h3>
-            <p>Delivered frontend and full-stack solutions for Fortune 500 clients, with emphasis on architecture decisions and long-term product stability.</p>
-          </div>
-          <span class="fm-timeline-dot" aria-hidden="true"></span>
-        </li>
+          <li class="fm-timeline-item fm-timeline-item-left fm-reveal">
+            <div class="fm-timeline-copy">
+              <p class="fm-year">2017</p>
+              <h3>Senior Software Engineer</h3>
+              <p>Worked on user-facing web products in a high-scale digital entertainment context with focus on responsiveness and UX quality.</p>
+            </div>
+            <span class="fm-timeline-dot" aria-hidden="true"></span>
+          </li>
 
-        <li class="fm-timeline-item fm-timeline-item-left fm-reveal">
-          <div class="fm-timeline-copy">
-            <p class="fm-year">2017</p>
-            <h3>Senior Software Engineer</h3>
-            <p>Worked on user-facing web products in a high-scale digital entertainment context with focus on responsiveness and UX quality.</p>
-          </div>
-          <span class="fm-timeline-dot" aria-hidden="true"></span>
-        </li>
-
-        <li class="fm-timeline-item fm-timeline-item-right fm-reveal">
-          <div class="fm-timeline-copy">
-            <p class="fm-year">2014</p>
-            <h3>Software Engineer</h3>
-            <p>Started engineering career building robust web interfaces and learning how to balance product goals with technical constraints.</p>
-          </div>
-          <span class="fm-timeline-dot" aria-hidden="true"></span>
-        </li>
-      </ol>
+          <li class="fm-timeline-item fm-timeline-item-right fm-reveal">
+            <div class="fm-timeline-copy">
+              <p class="fm-year">2014</p>
+              <h3>Software Engineer</h3>
+              <p>Started engineering career building robust web interfaces and learning how to balance product goals with technical constraints.</p>
+            </div>
+            <span class="fm-timeline-dot" aria-hidden="true"></span>
+          </li>
+        </ol>
+      </div>
     </div>
   </section>
 
-  <section id="projects" class="fm-section">
+  <section id="projects" class="fm-section" aria-labelledby="projects-title">
     <div class="fm-container">
       <header class="fm-section-head fm-reveal">
-        <h2>Selected Work</h2>
+        <h2 id="projects-title">Selected Work</h2>
         <p>Projects spanning product engineering, frontend architecture, and systems thinking</p>
       </header>
 
       <div class="fm-grid fm-grid-two">
         <article class="fm-card fm-project-card fm-reveal">
-          <a href="https://www.electives.io/" target="_blank" rel="noopener noreferrer" class="fm-project-link" aria-label="Open Electives (opens in a new tab)">
-            {% lucide "squareArrowOutUpRight" %}
+          <a href="https://www.electives.io/" target="_blank" rel="noopener noreferrer" class="fm-project-link">
+            <span class="fm-project-link-text">Visit site</span>
+            <span class="fm-project-link-icon" aria-hidden="true">{% lucide "squareArrowOutUpRight" %}</span>
+            <span class="fm-visually-hidden"> for Electives Membership Platform (opens in a new tab)</span>
           </a>
           <h3>Electives Membership Platform</h3>
           <p>Membership and learning platform work focused on helping professionals level up practical skills and career outcomes.</p>
@@ -88,8 +92,10 @@
         </article>
 
         <article class="fm-card fm-project-card fm-reveal">
-          <a href="https://www.epam.com/" target="_blank" rel="noopener noreferrer" class="fm-project-link" aria-label="Open EPAM website (opens in a new tab)">
-            {% lucide "squareArrowOutUpRight" %}
+          <a href="https://www.epam.com/" target="_blank" rel="noopener noreferrer" class="fm-project-link">
+            <span class="fm-project-link-text">Visit site</span>
+            <span class="fm-project-link-icon" aria-hidden="true">{% lucide "squareArrowOutUpRight" %}</span>
+            <span class="fm-visually-hidden"> for Fortune 500 Product Delivery (opens in a new tab)</span>
           </a>
           <h3>Fortune 500 Product Delivery</h3>
           <p>Led and shipped frontend and full-stack initiatives at EPAM for enterprise clients across multiple product domains.</p>
@@ -102,8 +108,10 @@
         </article>
 
         <article class="fm-card fm-project-card fm-reveal">
-          <a href="#contact" class="fm-project-link" aria-label="Contact about AR virtual try-on work">
-            {% lucide "squareArrowOutUpRight" %}
+          <a href="#contact" class="fm-project-link">
+            <span class="fm-project-link-text">Ask about it</span>
+            <span class="fm-project-link-icon" aria-hidden="true">{% lucide "squareArrowOutUpRight" %}</span>
+            <span class="fm-visually-hidden"> for AR Virtual Try-On (Web)</span>
           </a>
           <h3>AR Virtual Try-On (Web)</h3>
           <p>Built and improved browser-based virtual try-on experiences with strong UX focus, performance constraints, and measurable business impact.</p>
@@ -116,8 +124,10 @@
         </article>
 
         <article class="fm-card fm-project-card fm-reveal">
-          <a href="#contact" class="fm-project-link" aria-label="Contact about engineering systems work">
-            {% lucide "squareArrowOutUpRight" %}
+          <a href="#contact" class="fm-project-link">
+            <span class="fm-project-link-text">Ask about it</span>
+            <span class="fm-project-link-icon" aria-hidden="true">{% lucide "squareArrowOutUpRight" %}</span>
+            <span class="fm-visually-hidden"> for Engineering Systems and DX</span>
           </a>
           <h3>Engineering Systems &amp; DX</h3>
           <p>Focused on maintainability, observability, and developer workflows that keep products predictable, reliable, and easier to evolve.</p>
@@ -132,10 +142,10 @@
     </div>
   </section>
 
-  <section id="writing" class="fm-section">
+  <section id="writing" class="fm-section" aria-labelledby="writing-title">
     <div class="fm-container fm-narrow">
       <header class="fm-section-head fm-reveal">
-        <h2>Writing &amp; Notes</h2>
+        <h2 id="writing-title">Writing &amp; Notes</h2>
         <p>Ideas on systems, product engineering, and practical frontend work</p>
       </header>
 
@@ -145,7 +155,7 @@
             <span>
               <strong>360 Code</strong>
               <small>
-                {% lucide "calendar" %}
+                <span aria-hidden="true">{% lucide "calendar" %}</span>
                 Ongoing
                 <i aria-hidden="true">•</i>
                 Engineering notes
@@ -161,7 +171,7 @@
             <span>
               <strong>About Me</strong>
               <small>
-                {% lucide "calendar" %}
+                <span aria-hidden="true">{% lucide "calendar" %}</span>
                 Updated regularly
                 <i aria-hidden="true">•</i>
                 Profile &amp; background
@@ -177,7 +187,7 @@
             <span>
               <strong>Architecture Choices in Product Teams</strong>
               <small>
-                {% lucide "calendar" %}
+                <span aria-hidden="true">{% lucide "calendar" %}</span>
                 Placeholder
                 <i aria-hidden="true">•</i>
                 Article coming soon
@@ -192,7 +202,7 @@
             <span>
               <strong>More Long-Form Writing Coming Soon</strong>
               <small>
-                {% lucide "calendar" %}
+                <span aria-hidden="true">{% lucide "calendar" %}</span>
                 Placeholder
                 <i aria-hidden="true">•</i>
                 Under preparation
@@ -205,10 +215,10 @@
     </div>
   </section>
 
-  <section id="experiments" class="fm-section">
+  <section id="experiments" class="fm-section" aria-labelledby="experiments-title">
     <div class="fm-container fm-narrow">
       <header class="fm-section-head fm-reveal">
-        <h2>Experiments</h2>
+        <h2 id="experiments-title">Experiments</h2>
         <p>Side projects and explorations in product and engineering craft</p>
       </header>
 
@@ -218,7 +228,7 @@
           <p>Project planning app focused on clear structure and practical team execution.</p>
           <p class="fm-tech">Productivity, UX, App Design</p>
           <div class="fm-card-links">
-            <a href="https://lunari-app.com/" target="_blank" rel="noopener noreferrer">{% lucide "globe" %}Demo<span class="fm-visually-hidden"> (opens in a new tab)</span></a>
+            <a href="https://lunari-app.com/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">{% lucide "globe" %}</span>Demo<span class="fm-visually-hidden"> (opens in a new tab)</span></a>
           </div>
         </article>
 
@@ -227,7 +237,7 @@
           <p>Personal portfolio iteration built to communicate work clearly with strong visual rhythm and performance awareness.</p>
           <p class="fm-tech">React, Tailwind CSS, Motion</p>
           <div class="fm-card-links">
-            <a href="https://igorcodes.dev/" target="_blank" rel="noopener noreferrer">{% lucide "globe" %}Demo<span class="fm-visually-hidden"> (opens in a new tab)</span></a>
+            <a href="https://igorcodes.dev/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">{% lucide "globe" %}</span>Demo<span class="fm-visually-hidden"> (opens in a new tab)</span></a>
           </div>
         </article>
 
@@ -236,7 +246,7 @@
           <p>Workout app exploration for planning training routines and tracking progress over time.</p>
           <p class="fm-tech">Mobile UX, Product Thinking</p>
           <div class="fm-card-links">
-            <a href="#contact" rel="noopener noreferrer">{% lucide "arrowRight" %}Details Soon</a>
+            <a href="#contact"><span aria-hidden="true">{% lucide "arrowRight" %}</span>Details Soon</a>
           </div>
         </article>
 
@@ -245,17 +255,17 @@
           <p>Interactive map and content experience exploring cacao production regions and related stories.</p>
           <p class="fm-tech">Interactive UI, Data Storytelling</p>
           <div class="fm-card-links">
-            <a href="#contact" rel="noopener noreferrer">{% lucide "arrowRight" %}Details Soon</a>
+            <a href="#contact"><span aria-hidden="true">{% lucide "arrowRight" %}</span>Details Soon</a>
           </div>
         </article>
       </div>
     </div>
   </section>
 
-  <section id="contact" class="fm-section fm-contact-section">
+  <section id="contact" class="fm-section fm-contact-section" aria-labelledby="contact-title">
     <div class="fm-container fm-contact-wrap">
       <header class="fm-section-head fm-reveal">
-        <h2>Get in Touch</h2>
+        <h2 id="contact-title">Get in Touch</h2>
         <p>Open to interesting product and engineering conversations</p>
       </header>
 

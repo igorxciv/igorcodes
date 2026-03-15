@@ -1,6 +1,8 @@
 /* global window, document, IntersectionObserver */
 
 (function initPersonalSitePage() {
+  document.body.classList.add("fm-enhanced");
+
   const revealItems = Array.from(document.querySelectorAll(".fm-reveal"));
   const heroSection = document.querySelector("#hero");
   const scrollDownIndicator = document.querySelector(".fm-scroll-down");

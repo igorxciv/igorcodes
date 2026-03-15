@@ -133,7 +133,8 @@
     {% endif %}
   </head>
   <body class="fm-body">
-    <main id="content">{{ content | safe }}</main>
+    <a class="fm-skip-link" href="#content">Skip to content</a>
+    <main id="content" tabindex="-1">{{ content | safe }}</main>
     {% if includeDefaultJs %}
       <script src="{{ assets.js | url }}" defer></script>
     {% endif %}
