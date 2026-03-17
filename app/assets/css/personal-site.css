@@ -119,14 +119,9 @@ h4,
 small,
 strong,
 li,
-span,
-svg,
-path,
-circle {
+span {
   transition:
     color var(--fm-motion-theme) var(--fm-ease-standard),
-    fill var(--fm-motion-theme) var(--fm-ease-standard),
-    stroke var(--fm-motion-theme) var(--fm-ease-standard),
     border-color var(--fm-motion-theme) var(--fm-ease-standard),
     background-color var(--fm-motion-theme) var(--fm-ease-standard);
 }
@@ -236,6 +231,7 @@ circle {
     color var(--fm-motion-base) var(--fm-ease-standard),
     transform 520ms var(--fm-ease-emphasized);
   z-index: 1;
+  visibility: visible;
 }
 
 .fm-theme-toggle:hover .fm-theme-toggle-icon,
@@ -261,6 +257,7 @@ circle {
 .fm-theme-toggle-icon-moon {
   opacity: 0;
   transform: scale(0.4) rotate(-160deg);
+  visibility: hidden;
 }
 
 .fm-theme-toggle:hover .fm-theme-toggle-icon-sun,
@@ -273,22 +270,16 @@ circle {
   transform: scale(0.46) rotate(-148deg);
 }
 
-.fm-theme-toggle:active .fm-theme-toggle-icon-sun {
-  transform: scale(0.9) rotate(-10deg);
-}
-
-.fm-theme-toggle:active .fm-theme-toggle-icon-moon {
-  transform: scale(0.32) rotate(-172deg);
-}
-
 :root[data-theme="light"] .fm-theme-toggle-icon-sun {
   opacity: 0;
   transform: scale(0.38) rotate(150deg);
+  visibility: hidden;
 }
 
 :root[data-theme="light"] .fm-theme-toggle-icon-moon {
   opacity: 1;
   transform: scale(1) rotate(0deg);
+  visibility: visible;
 }
 
 :root[data-theme="light"] .fm-theme-toggle:hover .fm-theme-toggle-icon-sun,
@@ -299,14 +290,6 @@ circle {
 :root[data-theme="light"] .fm-theme-toggle:hover .fm-theme-toggle-icon-moon,
 :root[data-theme="light"] .fm-theme-toggle:focus-visible .fm-theme-toggle-icon-moon {
   transform: scale(1.08) rotate(10deg);
-}
-
-:root[data-theme="light"] .fm-theme-toggle:active .fm-theme-toggle-icon-sun {
-  transform: scale(0.3) rotate(138deg);
-}
-
-:root[data-theme="light"] .fm-theme-toggle:active .fm-theme-toggle-icon-moon {
-  transform: scale(0.92) rotate(-10deg);
 }
 
 :target {
