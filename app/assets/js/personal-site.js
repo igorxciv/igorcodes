@@ -7,7 +7,7 @@
 
   const root = document.documentElement;
   const themeToggle = document.querySelector("[data-theme-toggle]");
-  const themeToggleLabel = document.querySelector("[data-theme-toggle-label]");
+  const themeToggleStatus = document.querySelector("[data-theme-toggle-status]");
   const themeColorMeta = document.querySelector('meta[name="theme-color"]');
   const revealItems = Array.from(document.querySelectorAll(".fm-reveal"));
   const heroSection = document.querySelector("#hero");
@@ -38,17 +38,16 @@
   };
 
   const updateThemeToggleState = (theme) => {
-    if (!themeToggle || !themeToggleLabel) {
+    if (!themeToggle || !themeToggleStatus) {
       return;
     }
 
     const nextTheme = theme === "light" ? "dark" : "light";
-    const label = `Switch to ${nextTheme} theme`;
+    const status = `${theme === "light" ? "Light" : "Dark"} theme active. Activate to switch to ${nextTheme} theme.`;
 
-    themeToggle.setAttribute("aria-label", label);
-    themeToggle.setAttribute("aria-pressed", String(theme === "light"));
+    themeToggle.setAttribute("aria-checked", String(theme === "light"));
     themeToggle.dataset.theme = theme;
-    themeToggleLabel.textContent = label;
+    themeToggleStatus.textContent = status;
   };
 
   const applyTheme = (theme) => {
