@@ -1,0 +1,383 @@
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/wotfard/wotfard-light-webfont.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/wotfard/wotfard-regular-webfont.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Wotfard";
+  src: url("/fonts/wotfard/wotfard-medium-webfont.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+:root {
+  --font-sans:
+    "Wotfard", "Avenir Next", "Segoe UI Variable", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-display: var(--font-sans);
+  --font-mono: "Dank Mono", "SFMono-Regular", "Menlo", "Consolas", "Liberation Mono", monospace;
+  --fm-accent-rgb: 0, 217, 255;
+  --fm-bg: #0a0a0a;
+  --fm-text: #e5e5e5;
+  --fm-muted: #9d9d9d;
+  --fm-muted-strong: #c9c9c9;
+  --fm-muted-soft: #5a5a5a;
+  --fm-border: #2f2f2f;
+  --fm-border-soft: #1b1b1b;
+  --fm-border-strong: #3a3a3a;
+  --fm-accent: #00d9ff;
+  --fm-accent-soft: rgba(0, 217, 255, 0.12);
+  --fm-accent-soft-strong: rgba(0, 217, 255, 0.16);
+  --fm-accent-line: rgba(0, 217, 255, 0.45);
+  --fm-surface: #121212;
+  --fm-surface-hover: #171717;
+  --fm-surface-raised: #161616;
+  --fm-surface-strong: #181818;
+  --fm-surface-inset: #141414;
+  --fm-shadow-elevated: 0 12px 24px rgba(0, 0, 0, 0.28);
+  --fm-theme-button-bg: #242424;
+  --fm-theme-button-border: #646464;
+  --fm-theme-button-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  --fm-theme-button-icon: #b5b5b5;
+  --fm-theme-button-icon-muted: #b5b5b5;
+  --fm-theme-button-highlight: rgba(255, 255, 255, 0.06);
+  --fm-theme-button-glow: rgba(255, 255, 255, 0.08);
+  --fm-theme-button-focus-ring: #8aefff;
+  --fm-focus-ring: rgba(0, 217, 255, 0.38);
+  --fm-motion-fast: 160ms;
+  --fm-motion-base: 220ms;
+  --fm-motion-slow: 320ms;
+  --fm-motion-theme: 280ms;
+  --fm-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --fm-ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --fm-accent-rgb: 0, 106, 128;
+  --fm-bg: #f6f1e8;
+  --fm-text: #16130f;
+  --fm-muted: #6e6558;
+  --fm-muted-strong: #423b32;
+  --fm-muted-soft: #796c5b;
+  --fm-accent: #006a80;
+  --fm-border: #d8cfc3;
+  --fm-border-soft: #ebe1d5;
+  --fm-border-strong: #c8bdae;
+  --fm-accent-soft: rgba(var(--fm-accent-rgb), 0.1);
+  --fm-accent-soft-strong: rgba(var(--fm-accent-rgb), 0.14);
+  --fm-accent-line: rgba(var(--fm-accent-rgb), 0.34);
+  --fm-surface: rgba(255, 251, 244, 0.84);
+  --fm-surface-hover: #f4ebdf;
+  --fm-surface-raised: #fffaf2;
+  --fm-surface-strong: #f1e8dc;
+  --fm-surface-inset: #efe5d8;
+  --fm-shadow-elevated: 0 18px 36px rgba(77, 56, 27, 0.1);
+  --fm-theme-button-bg: #ece4d8;
+  --fm-theme-button-border: #8a7760;
+  --fm-theme-button-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  --fm-theme-button-icon: #5f5648;
+  --fm-theme-button-icon-muted: #5f5648;
+  --fm-theme-button-highlight: rgba(255, 255, 255, 0.45);
+  --fm-theme-button-glow: rgba(95, 86, 72, 0.08);
+  --fm-theme-button-focus-ring: #005f75;
+  --fm-focus-ring: rgba(var(--fm-accent-rgb), 0.34);
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  background: var(--fm-bg);
+}
+
+body.fm-body {
+  position: relative;
+  margin: 0;
+  background: var(--fm-bg);
+  color: var(--fm-text);
+  font-family: var(--font-sans);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition:
+    background-color var(--fm-motion-theme) var(--fm-ease-standard),
+    color var(--fm-motion-theme) var(--fm-ease-standard);
+}
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+a {
+  color: inherit;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+small,
+strong,
+li,
+span {
+  margin-block-start: 0;
+}
+
+:where(a, button, input, textarea, select, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid var(--fm-accent);
+  outline-offset: 3px;
+}
+
+.fm-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.fm-skip-link {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--fm-accent) 14%, var(--fm-surface-raised));
+  color: var(--fm-text);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-140%);
+  transition: transform var(--fm-motion-fast) var(--fm-ease-standard);
+}
+
+.fm-skip-link:focus {
+  transform: translateY(0);
+}
+
+.fm-theme-toggle {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--fm-theme-button-icon);
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fm-theme-toggle-shell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  block-size: 100%;
+  border-radius: inherit;
+  border: 1px solid var(--fm-theme-button-border);
+  background: var(--fm-theme-button-bg);
+  box-shadow: var(--fm-theme-button-shadow);
+  overflow: hidden;
+}
+
+.fm-theme-toggle-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 32% 28%, var(--fm-theme-button-highlight), transparent 44%);
+  opacity: 0;
+  transform: scale(0.88);
+}
+
+.fm-theme-toggle-icon {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.55rem;
+  block-size: 1.55rem;
+  color: var(--fm-theme-button-icon-muted);
+  transform-origin: 50% 50%;
+  z-index: 1;
+  visibility: visible;
+}
+
+.fm-theme-toggle-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fm-theme-toggle-icon-sun {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+.fm-theme-toggle-icon-moon {
+  opacity: 0;
+  transform: scale(0.4) rotate(-160deg);
+  visibility: hidden;
+}
+
+:root[data-theme="light"] .fm-theme-toggle-icon-sun {
+  opacity: 0;
+  transform: scale(0.38) rotate(150deg);
+  visibility: hidden;
+}
+
+:root[data-theme="light"] .fm-theme-toggle-icon-moon {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  visibility: visible;
+}
+
+.fm-hero {
+  min-height: 100svh;
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1rem 4rem;
+}
+
+.fm-hero-content {
+  max-width: 48rem;
+  text-align: center;
+}
+
+.fm-role {
+  margin-bottom: 0;
+  color: var(--fm-accent);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  font-weight: 500;
+}
+
+.fm-name {
+  margin: 0.8rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.35rem, 13vw, 4.2rem);
+  line-height: 1.05;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.fm-tagline {
+  margin: 1.2rem auto 0;
+  max-width: 36rem;
+  color: var(--fm-muted);
+  font-size: clamp(1.02rem, 4.7vw, 1.35rem);
+  line-height: 1.5;
+  font-weight: 300;
+  text-wrap: pretty;
+}
+
+.fm-hero-links {
+  margin-top: 1.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.95rem;
+  color: var(--fm-muted-strong);
+}
+
+.fm-hero-links a {
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 0.3rem 0.55rem;
+}
+
+.fm-hero-links span {
+  color: var(--fm-muted-soft);
+}
+
+.fm-scroll-down {
+  position: absolute;
+  left: 50%;
+  bottom: 1.15rem;
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  opacity: 0.78;
+  color: var(--fm-muted);
+  text-decoration: none;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+}
+
+.fm-scroll-down svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (min-width: 640px) {
+  .fm-theme-toggle {
+    right: 1.5rem;
+    bottom: 1.5rem;
+  }
+}
+
+@media (min-width: 821px) {
+  .fm-hero-links {
+    gap: 1.1rem;
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .fm-name {
+    font-size: clamp(3.2rem, 8vw, 6.1rem);
+  }
+
+  .fm-tagline {
+    font-size: clamp(1.3rem, 2vw, 1.72rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

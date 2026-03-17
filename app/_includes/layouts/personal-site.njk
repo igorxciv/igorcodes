@@ -158,7 +158,14 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="{{ assets.css | url }}" />
+    <style>
+      {{ criticalCss | safe }}
+    </style>
+    <link rel="preload" href="{{ assets.css | url }}" as="style" />
+    <link rel="stylesheet" href="{{ assets.css | url }}" media="print" onload="this.media='all'" />
+    <noscript>
+      <link rel="stylesheet" href="{{ assets.css | url }}" />
+    </noscript>
     {% if notFoundPage and assets.notFoundCss %}
       <link rel="stylesheet" href="{{ assets.notFoundCss | url }}" />
     {% endif %}

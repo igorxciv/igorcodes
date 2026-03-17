@@ -1,4 +1,4 @@
-@import "./fonts.css";
+@import "./noncritical-fonts.css";
 
 :root {
   --fm-accent-rgb: 0, 217, 255;
