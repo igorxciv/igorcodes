@@ -1,8 +1,14 @@
 /* global window, document, IntersectionObserver */
 
 (function initPersonalSitePage() {
+  const THEME_STORAGE_KEY = "fm-theme";
+
   document.body.classList.add("fm-enhanced");
 
+  const root = document.documentElement;
+  const themeToggle = document.querySelector("[data-theme-toggle]");
+  const themeToggleLabel = document.querySelector("[data-theme-toggle-label]");
+  const themeColorMeta = document.querySelector('meta[name="theme-color"]');
   const revealItems = Array.from(document.querySelectorAll(".fm-reveal"));
   const heroSection = document.querySelector("#hero");
   const scrollDownIndicator = document.querySelector(".fm-scroll-down");
@@ -10,6 +16,93 @@
   const timelineProgress = document.querySelector("[data-timeline-progress]");
   const prefersReducedMotion =
     "matchMedia" in window && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const systemThemeQuery =
+    "matchMedia" in window ? window.matchMedia("(prefers-color-scheme: light)") : null;
+
+  const getStoredTheme = () => {
+    try {
+      const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+      return storedTheme === "light" || storedTheme === "dark" ? storedTheme : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const getPreferredTheme = () => {
+    const storedTheme = getStoredTheme();
+    if (storedTheme) {
+      return storedTheme;
+    }
+
+    return systemThemeQuery?.matches ? "light" : "dark";
+  };
+
+  const updateThemeToggleState = (theme) => {
+    if (!themeToggle || !themeToggleLabel) {
+      return;
+    }
+
+    const nextTheme = theme === "light" ? "dark" : "light";
+    const label = `Switch to ${nextTheme} theme`;
+
+    themeToggle.setAttribute("aria-label", label);
+    themeToggle.setAttribute("aria-pressed", String(theme === "light"));
+    themeToggle.dataset.theme = theme;
+    themeToggleLabel.textContent = label;
+  };
+
+  const applyTheme = (theme) => {
+    root.dataset.theme = theme;
+    root.style.colorScheme = theme;
+
+    if (themeColorMeta) {
+      themeColorMeta.setAttribute("content", theme === "light" ? "#f6f1e8" : "#0a0a0a");
+    }
+
+    updateThemeToggleState(theme);
+  };
+
+  const persistTheme = (theme) => {
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch {
+      // Ignore storage failures and keep the selected theme active.
+    }
+  };
+
+  const commitTheme = (theme) => {
+    applyTheme(theme);
+    persistTheme(theme);
+  };
+
+  const toggleTheme = () => {
+    const currentTheme = root.dataset.theme === "light" ? "light" : "dark";
+    const nextTheme = currentTheme === "light" ? "dark" : "light";
+    commitTheme(nextTheme);
+  };
+
+  applyTheme(getPreferredTheme());
+
+  if (themeToggle) {
+    themeToggle.addEventListener("click", toggleTheme);
+  }
+
+  if (systemThemeQuery) {
+    systemThemeQuery.addEventListener("change", (event) => {
+      if (getStoredTheme()) {
+        return;
+      }
+
+      applyTheme(event.matches ? "light" : "dark");
+    });
+  }
+
+  window.addEventListener("keydown", (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "t") {
+      event.preventDefault();
+      toggleTheme();
+    }
+  });
 
   const setScrollIndicatorActive = (isActive) => {
     if (!scrollDownIndicator) {

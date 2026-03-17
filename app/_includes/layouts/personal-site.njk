@@ -12,7 +12,7 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="{{ site.themeColor }}" />
+    <meta name="theme-color" content="{{ site.themeColorDark }}" />
     <meta name="author" content="{{ site.author }}" />
     <meta name="description" content="{{ pageDescription }}" />
     <meta name="robots" content="{{ robotsContent }}" />
@@ -127,6 +127,37 @@
         }
       </script>
     {% endif %}
+    <script>
+      (() => {
+        const storageKey = "fm-theme";
+        const root = document.documentElement;
+        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+        const lightColor = "{{ site.themeColorLight }}";
+        const darkColor = "{{ site.themeColorDark }}";
+
+        const getPreferredTheme = () => {
+          let storedTheme = null;
+
+          try {
+            storedTheme = window.localStorage.getItem(storageKey);
+          } catch {}
+
+          if (storedTheme === "light" || storedTheme === "dark") {
+            return storedTheme;
+          }
+
+          return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        };
+
+        const theme = getPreferredTheme();
+        root.dataset.theme = theme;
+        root.style.colorScheme = theme;
+
+        if (themeColorMeta) {
+          themeColorMeta.setAttribute("content", theme === "light" ? lightColor : darkColor);
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="{{ assets.css | url }}" />
     {% if notFoundPage and assets.notFoundCss %}
       <link rel="stylesheet" href="{{ assets.notFoundCss | url }}" />
@@ -135,6 +166,35 @@
   <body class="fm-body">
     <a class="fm-skip-link" href="#content">Skip to content</a>
     <main id="content" tabindex="-1">{{ content | safe }}</main>
+    <button
+      class="fm-theme-toggle"
+      type="button"
+      data-theme-toggle
+      aria-label="Switch to light theme"
+      aria-pressed="false"
+    >
+      <span class="fm-theme-toggle-shell" aria-hidden="true">
+        <span class="fm-theme-toggle-icon fm-theme-toggle-icon-sun">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2"></path>
+            <path d="M12 20v2"></path>
+            <path d="m4.93 4.93 1.41 1.41"></path>
+            <path d="m17.66 17.66 1.41 1.41"></path>
+            <path d="M2 12h2"></path>
+            <path d="M20 12h2"></path>
+            <path d="m6.34 17.66-1.41 1.41"></path>
+            <path d="m19.07 4.93-1.41 1.41"></path>
+          </svg>
+        </span>
+        <span class="fm-theme-toggle-icon fm-theme-toggle-icon-moon">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+        </span>
+      </span>
+      <span class="fm-visually-hidden" data-theme-toggle-label>Switch to light theme</span>
+    </button>
     {% if includeDefaultJs %}
       <script src="{{ assets.js | url }}" defer></script>
     {% endif %}
