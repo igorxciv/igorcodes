@@ -21,6 +21,14 @@ module.exports = {
   faviconPng: "/images/seo/favicon-32x32.png",
   appleTouchIcon: "/images/seo/apple-touch-icon-180x180.png",
   twitterHandle: "@igorxciv",
+  writing: {
+    feedUrl:
+      process.env.WRITING_FEED_URL ||
+      (process.env.NODE_ENV === "production"
+        ? "https://blog.igorcodes.dev/feed.json"
+        : "http://localhost:3000/feed.json"),
+    fallbackUrl: "https://blog.igorcodes.dev/",
+  },
   sameAs: [
     "https://github.com/igorxciv",
     "https://www.linkedin.com/in/igorxciv",

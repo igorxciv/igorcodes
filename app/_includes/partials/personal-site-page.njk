@@ -169,67 +169,41 @@
       </header>
 
       <ul class="fm-writing-list">
-        <li class="fm-reveal">
-          <a href="https://360code.dev/" target="_blank" rel="noopener noreferrer">
-            <span>
-              <strong>360 Code</strong>
-              <small>
-                <span aria-hidden="true">{% lucide "calendar" %}</span>
-                Ongoing
-                <i aria-hidden="true">•</i>
-                Engineering notes
-              </small>
-            </span>
-            <span class="fm-visually-hidden"> (opens in a new tab)</span>
-            <span class="fm-arrow" aria-hidden="true">{% lucide "arrowRight" %}</span>
-          </a>
-        </li>
-
-        <li class="fm-reveal">
-          <a href="https://igorcodes.dev/" target="_blank" rel="noopener noreferrer">
-            <span>
-              <strong>About Me</strong>
-              <small>
-                <span aria-hidden="true">{% lucide "calendar" %}</span>
-                Updated regularly
-                <i aria-hidden="true">•</i>
-                Profile &amp; background
-              </small>
-            </span>
-            <span class="fm-visually-hidden"> (opens in a new tab)</span>
-            <span class="fm-arrow" aria-hidden="true">{% lucide "arrowRight" %}</span>
-          </a>
-        </li>
-
-        <li class="fm-reveal">
-          <a href="#contact">
-            <span>
-              <strong>Architecture Choices in Product Teams</strong>
-              <small>
-                <span aria-hidden="true">{% lucide "calendar" %}</span>
-                Placeholder
-                <i aria-hidden="true">•</i>
-                Article coming soon
-              </small>
-            </span>
-            <span class="fm-arrow" aria-hidden="true">{% lucide "arrowRight" %}</span>
-          </a>
-        </li>
-
-        <li class="fm-reveal">
-          <a href="#contact">
-            <span>
-              <strong>More Long-Form Writing Coming Soon</strong>
-              <small>
-                <span aria-hidden="true">{% lucide "calendar" %}</span>
-                Placeholder
-                <i aria-hidden="true">•</i>
-                Under preparation
-              </small>
-            </span>
-            <span class="fm-arrow" aria-hidden="true">{% lucide "arrowRight" %}</span>
-          </a>
-        </li>
+        {% for article in writing.articles %}
+          <li class="fm-reveal">
+            <a href="{{ article.url }}" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>{{ article.title }}</strong>
+                <small>
+                  <span aria-hidden="true">{% lucide "calendar" %}</span>
+                  {{ article.dateLabel }}
+                  {% if article.detail %}
+                    <i aria-hidden="true">•</i>
+                    {{ article.detail }}
+                  {% endif %}
+                </small>
+              </span>
+              <span class="fm-visually-hidden"> (opens in a new tab)</span>
+              <span class="fm-arrow" aria-hidden="true">{% lucide "arrowRight" %}</span>
+            </a>
+          </li>
+        {% else %}
+          <li class="fm-reveal">
+            <a href="{{ site.writing.fallbackUrl }}" target="_blank" rel="noopener noreferrer">
+              <span>
+                <strong>Latest writing on the blog</strong>
+                <small>
+                  <span aria-hidden="true">{% lucide "calendar" %}</span>
+                  Updated regularly
+                  <i aria-hidden="true">•</i>
+                  Notes and articles
+                </small>
+              </span>
+              <span class="fm-visually-hidden"> (opens in a new tab)</span>
+              <span class="fm-arrow" aria-hidden="true">{% lucide "arrowRight" %}</span>
+            </a>
+          </li>
+        {% endfor %}
       </ul>
     </div>
   </section>
