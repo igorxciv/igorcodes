@@ -169,6 +169,15 @@
     {% if notFoundPage and assets.notFoundCss %}
       <link rel="stylesheet" href="{{ assets.notFoundCss | url }}" />
     {% endif %}
+    {% if site.umami and site.umami.websiteId %}
+      <script
+        defer
+        src="{{ site.umami.scriptUrl }}"
+        data-website-id="{{ site.umami.websiteId }}"
+        data-domains="{{ site.umami.domains }}"
+        data-do-not-track="{{ 'true' if site.umami.respectDoNotTrack else 'false' }}"
+      ></script>
+    {% endif %}
   </head>
   <body class="fm-body">
     <a class="fm-skip-link" href="#content">Skip to content</a>

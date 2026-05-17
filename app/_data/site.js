@@ -12,6 +12,12 @@ module.exports = {
   location: "Playa del Carmen, Mexico",
   googleSiteVerification: process.env.GOOGLE_SITE_VERIFICATION || "",
   bingSiteVerification: process.env.BING_SITE_VERIFICATION || "",
+  umami: {
+    scriptUrl: "https://cloud.umami.is/script.js",
+    websiteId: "c0171970-08a8-4053-be96-b746fba9baf4",
+    domains: "igorcodes.dev,www.igorcodes.dev",
+    respectDoNotTrack: true,
+  },
   socialImage: "/images/seo/igorcodes-og-1200x630.jpg",
   socialImageAlt:
     "Igor Cheliadinski, software engineer focused on frontend architecture, systems thinking, and product engineering.",
