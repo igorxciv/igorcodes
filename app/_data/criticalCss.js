@@ -1,19 +1,16 @@
-const fs = require("node:fs");
 const path = require("node:path");
-const { transform } = require("lightningcss");
+const { bundle } = require("lightningcss");
 
 module.exports = () => {
   const filePath = path.join(__dirname, "..", "assets", "css", "personal-site-critical.css");
-  const css = fs.readFileSync(filePath);
 
-  if (process.env.NODE_ENV !== "production") {
-    return css.toString("utf8");
-  }
-
-  return transform({
+  // bundle() (not transform()) so the @import of tokens.css is inlined into the
+  // critical <style>. Dev keeps it readable; production minifies.
+  const { code } = bundle({
     filename: filePath,
-    code: css,
-    minify: true,
+    minify: process.env.NODE_ENV === "production",
     sourceMap: false,
-  }).code.toString();
+  });
+
+  return code.toString();
 };

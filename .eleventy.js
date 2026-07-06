@@ -1,6 +1,4 @@
 const { EleventyHtmlBasePlugin } = require("@11ty/eleventy");
-const fs = require("node:fs");
-const path = require("node:path");
 const { minify } = require("html-minifier-terser");
 const {
   ArrowLeft,
@@ -16,6 +14,10 @@ const {
   Terminal,
 } = require("lucide");
 
+// Lucide v1 removed its brand glyphs, so the brand names below deliberately map
+// to the closest generic icon (github → GitBranch, linkedin → BriefcaseBusiness,
+// telegram/globe → Globe). If exact brand marks are needed, add `simple-icons`
+// as a devDependency and render its paths for those names.
 const lucideIcons = {
   arrowLeft: ArrowLeft,
   arrowRight: ArrowRight,
@@ -50,17 +52,15 @@ function escapeAttributeValue(value) {
     .replaceAll(">", "&gt;");
 }
 
-function renderElement(tag, attributes = {}) {
-  const serializedAttributes = Object.entries(attributes)
+function serializeAttributes(attributes) {
+  return Object.entries(attributes)
     .filter(([, value]) => value !== undefined && value !== null && value !== false)
-    .map(([key, value]) => {
-      if (value === true) {
-        return key;
-      }
-
-      return `${key}="${escapeAttributeValue(value)}"`;
-    })
+    .map(([key, value]) => (value === true ? key : `${key}="${escapeAttributeValue(value)}"`))
     .join(" ");
+}
+
+function renderElement(tag, attributes = {}) {
+  const serializedAttributes = serializeAttributes(attributes);
 
   return `<${tag}${serializedAttributes ? ` ${serializedAttributes}` : ""}></${tag}>`;
 }
@@ -70,23 +70,11 @@ function renderLucideSvg(iconNode, attributes = {}) {
     .map(([tag, elementAttributes]) => renderElement(tag, elementAttributes))
     .join("");
 
-  return `<svg ${Object.entries({ ...lucideDefaultAttributes, ...attributes })
-    .filter(([, value]) => value !== undefined && value !== null && value !== false)
-    .map(([key, value]) => {
-      if (value === true) {
-        return key;
-      }
-
-      return `${key}="${escapeAttributeValue(value)}"`;
-    })
-    .join(" ")}>${svgBody}</svg>`;
+  return `<svg ${serializeAttributes({ ...lucideDefaultAttributes, ...attributes })}>${svgBody}</svg>`;
 }
 
 module.exports = function (eleventyConfig) {
   const isProduction = process.env.NODE_ENV === "production";
-  const hasAssetManifest = fs.existsSync(
-    path.join(__dirname, "app", "_data", "assets-manifest.json"),
-  );
 
   eleventyConfig.setServerPassthroughCopyBehavior("passthrough");
   eleventyConfig.setDataDeepMerge(true);
@@ -94,7 +82,7 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPlugin(EleventyHtmlBasePlugin);
 
   eleventyConfig.addPassthroughCopy({ "public/": "/" });
-  if (isProduction && hasAssetManifest) {
+  if (isProduction) {
     eleventyConfig.addPassthroughCopy({ "app/assets/build/": "/assets/build/" });
   } else {
     eleventyConfig.addPassthroughCopy({ "app/assets/": "/assets/" });
@@ -124,7 +112,7 @@ module.exports = function (eleventyConfig) {
   });
 
   eleventyConfig.addTransform("htmlmin", async function (content, outputPath) {
-    if (!outputPath || !outputPath.endsWith(".html") || process.env.NODE_ENV !== "production") {
+    if (!outputPath || !outputPath.endsWith(".html") || !isProduction) {
       return content;
     }
 

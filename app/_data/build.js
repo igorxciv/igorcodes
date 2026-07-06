@@ -1,8 +1,5 @@
-const now = new Date();
-
 module.exports = {
-  year: now.getUTCFullYear(),
-  isoDate: now.toISOString().slice(0, 10),
-  isoDateTime: now.toISOString(),
-  rfc822Date: now.toUTCString(),
+  // Footer copyright year only. Content dates come from site.contentUpdated so
+  // builds stay reproducible and crawlers can trust <lastmod>/dateModified.
+  year: new Date().getUTCFullYear(),
 };

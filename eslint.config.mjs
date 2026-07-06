@@ -4,14 +4,7 @@ import eslintConfigPrettier from "eslint-config-prettier";
 
 export default [
   {
-    ignores: [
-      "_site/**",
-      ".cache/**",
-      ".11ty-cache/**",
-      ".next/**",
-      "node_modules/**",
-      "app/assets/build/**",
-    ],
+    ignores: ["_site/**", ".cache/**", ".11ty-cache/**", "node_modules/**", "app/assets/build/**"],
   },
   js.configs.recommended,
   {
@@ -42,6 +35,15 @@ export default [
           varsIgnorePattern: "^_",
         },
       ],
+    },
+  },
+  {
+    files: ["app/assets/js/**/*.js"],
+    languageOptions: {
+      sourceType: "script",
+      globals: {
+        ...globals.browser,
+      },
     },
   },
   eslintConfigPrettier,

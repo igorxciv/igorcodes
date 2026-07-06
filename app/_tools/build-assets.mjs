@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { transform as transformJs } from "esbuild";
+import { build as esbuild } from "esbuild";
 import { bundle as bundleCss } from "lightningcss";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -29,7 +29,11 @@ const browserTargets = {
 
 const hashContent = (content) => createHash("sha256").update(content).digest("hex").slice(0, 10);
 
-async function buildCss(entryPath, outputPrefix = "site") {
+function logAsset(label, url, byteLength) {
+  console.log(`${label} → ${url} (${byteLength} bytes)`);
+}
+
+async function buildCss(label, entryPath, outputPrefix) {
   const { code } = bundleCss({
     filename: entryPath,
     minify: true,
@@ -39,28 +43,39 @@ async function buildCss(entryPath, outputPrefix = "site") {
 
   const fileName = `${outputPrefix}-${hashContent(code)}.css`;
   await writeFile(path.join(buildDir, fileName), code);
-  return `/assets/build/${fileName}`;
+  const url = `/assets/build/${fileName}`;
+  logAsset(label, url, code.length);
+  return url;
 }
 
-async function buildJs(entryPath, outputPrefix = "site") {
-  const jsSource = await readFile(entryPath, "utf8");
-
-  const { code } = await transformJs(jsSource, {
-    loader: "js",
+async function buildJs(label, entryPath, outputPrefix) {
+  // bundle: true resolves imports, so the scripts can gain `import`s later
+  // without silently shipping an unresolved reference inside the IIFE.
+  const result = await esbuild({
+    entryPoints: [entryPath],
+    bundle: true,
+    write: false,
     minify: true,
     target: ["es2020"],
     format: "iife",
     legalComments: "none",
   });
 
-  const jsBuffer = Buffer.from(code);
-  const fileName = `${outputPrefix}-${hashContent(jsBuffer)}.js`;
-  await writeFile(path.join(buildDir, fileName), jsBuffer);
-  return `/assets/build/${fileName}`;
+  const code = result.outputFiles[0].contents;
+  const fileName = `${outputPrefix}-${hashContent(code)}.js`;
+  await writeFile(path.join(buildDir, fileName), code);
+  const url = `/assets/build/${fileName}`;
+  logAsset(label, url, code.length);
+  return url;
 }
 
-async function writeManifest(assets) {
-  await writeFile(manifestPath, `${JSON.stringify(assets, null, 2)}\n`, "utf8");
+async function runBuild(label, fn) {
+  try {
+    return await fn();
+  } catch (error) {
+    console.error(`Failed to build "${label}":`);
+    throw error;
+  }
 }
 
 async function main() {
@@ -68,10 +83,10 @@ async function main() {
   await mkdir(buildDir, { recursive: true });
 
   const [css, js, notFoundCss, notFoundJs] = await Promise.all([
-    buildCss(cssEntryPath, "site"),
-    buildJs(jsEntryPath, "site"),
-    buildCss(notFoundCssEntryPath, "not-found"),
-    buildJs(notFoundJsEntryPath, "not-found"),
+    runBuild("css", () => buildCss("css", cssEntryPath, "site")),
+    runBuild("js", () => buildJs("js", jsEntryPath, "site")),
+    runBuild("notFoundCss", () => buildCss("notFoundCss", notFoundCssEntryPath, "not-found")),
+    runBuild("notFoundJs", () => buildJs("notFoundJs", notFoundJsEntryPath, "not-found")),
   ]);
 
   await writeManifest({
@@ -80,6 +95,10 @@ async function main() {
     notFoundCss,
     notFoundJs,
   });
+}
+
+async function writeManifest(assets) {
+  await writeFile(manifestPath, `${JSON.stringify(assets, null, 2)}\n`, "utf8");
 }
 
 main().catch((error) => {

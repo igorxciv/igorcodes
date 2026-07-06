@@ -1,12 +1,9 @@
-const fs = require("node:fs/promises");
-const path = require("node:path");
+const EleventyFetch = require("@11ty/eleventy-fetch");
 const site = require("./site");
 
 const ARTICLE_LIMIT = 4;
 const FEED_URL = site.writing.feedUrl;
 const FALLBACK_URL = site.writing.fallbackUrl;
-const REQUEST_TIMEOUT_MS = 4000;
-const CACHE_FILE = path.join(process.cwd(), ".cache", "writing-feed.json");
 
 const fallbackArticles = [
   {
@@ -78,6 +75,12 @@ function normalizeArticle(article) {
     return null;
   }
 
+  // Reject non-http(s) schemes (e.g. javascript:) even though the feed is
+  // owner-controlled; the template renders `url` directly into an href.
+  if (!/^https?:\/\//i.test(url)) {
+    return null;
+  }
+
   return {
     title,
     url,
@@ -110,49 +113,23 @@ function emitFeedWarning(message) {
   process.stderr.write(`[writing] ${message}\n`);
 }
 
-async function readCache() {
+module.exports = async function () {
   try {
-    const cachedFeed = JSON.parse(await fs.readFile(CACHE_FILE, "utf8"));
-    return normalizeFeed(cachedFeed);
-  } catch {
-    return [];
-  }
-}
-
-async function writeCache(feed) {
-  await fs.mkdir(path.dirname(CACHE_FILE), { recursive: true });
-  await fs.writeFile(CACHE_FILE, JSON.stringify(feed, null, 2));
-}
-
-async function fetchFeed() {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
-  try {
-    const response = await fetch(FEED_URL, {
-      signal: controller.signal,
-      headers: {
-        Accept: "application/feed+json, application/json",
+    // eleventy-fetch caches to .cache/ for a day, so dev reloads and repeat
+    // builds do not hit the network on every pass.
+    const feed = await EleventyFetch(FEED_URL, {
+      duration: "1d",
+      type: "json",
+      fetchOptions: {
+        headers: {
+          Accept: "application/feed+json, application/json",
+        },
       },
     });
 
-    if (!response.ok) {
-      throw new Error(`Feed request failed with ${response.status}`);
-    }
-
-    return response.json();
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
-module.exports = async function () {
-  try {
-    const feed = await fetchFeed();
     const articles = normalizeFeed(feed);
 
     if (articles.length > 0) {
-      await writeCache(feed);
       return {
         articles,
         sourceUrl: cleanText(feed.home_page_url) || FALLBACK_URL,
@@ -161,16 +138,6 @@ module.exports = async function () {
 
     throw new Error("Feed did not include any valid articles");
   } catch (error) {
-    const cachedArticles = await readCache();
-
-    if (cachedArticles.length > 0) {
-      emitFeedWarning(`Using cached writing feed: ${error.message}`);
-      return {
-        articles: cachedArticles,
-        sourceUrl: FALLBACK_URL,
-      };
-    }
-
     emitFeedWarning(`Using fallback writing content: ${error.message}`);
     return {
       articles: fallbackArticles,
