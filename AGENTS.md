@@ -2,86 +2,108 @@
 
 ## Project Structure (Eleventy Static Site)
 
-- `app/`: Eleventy input directory (templates, pages, content).
+- `app/`: Eleventy input directory (templates, pages, data, source assets).
 - `app/_includes/`: Shared layouts and partials.
-  - `layouts/` for page/item layouts.
-  - `partials/` for reusable fragments (header, footer, etc.).
-- `app/_data/`: Global data files (`*.js`) shared across templates.
-- `app/assets/`: Source assets copied to output (e.g. `app/assets/css/site.css`).
-- `app/work/`: Portfolio case studies (Markdown content + index template).
-- `public/`: Static passthrough assets served as-is.
+  - `layouts/personal-site.njk`: the single page/document layout.
+  - `partials/personal-site-page.njk`: the home page content sections.
+- `app/_data/`: Global data files (`*.js`) shared across templates
+  (`site.js`, `writing.js`, `assets.js`, `criticalCss.js`, `build.js`,
+  `timeline.js`, `projects.js`, `contacts.js`).
+- `app/assets/`: Source CSS/JS. In production these are built (see asset
+  pipeline below); in dev they are served as-is.
+- `app/_tools/build-assets.mjs`: the production asset builder.
+- `public/`: Static passthrough assets served as-is (fonts, images).
 - `_site/`: Generated static output (build artifact, never committed).
-- Config at repo root:
-  - `.eleventy.js`, `eslint.config.mjs`, `prettier.config.mjs`, `package.json`.
+- Hand-authored SEO/discovery templates: `app/sitemap.njk`, `app/robots.njk`,
+  `app/404.njk` (there is no feed template — the layout links to the blog's
+  JSON feed at `blog.igorcodes.dev/feed.json`).
+- Config at repo root: `.eleventy.js`, `eslint.config.mjs`,
+  `prettier.config.mjs`, `vercel.json`, `package.json`.
 
 ## Default File Placement (When Creating New Files)
 
 - Site pages: `app/**/*.njk`.
-- Content entries: `app/work/*.md` (or additional collection folders under `app/`).
 - Reusable layouts: `app/_includes/layouts/*.njk`.
 - Reusable partials: `app/_includes/partials/*.njk`.
 - Global shared data: `app/_data/*.js`.
 - Styles and front-end assets: `app/assets/**`.
-- Public passthrough assets (images/icons/files): `public/**`.
-- SEO/discovery files:
-  - `app/sitemap.njk`, `app/feed.njk`, `app/robots.njk`, `app/404.njk`.
+- Public passthrough assets (images/icons/fonts): `public/**`.
 
 ## Build, Lint, and Development Commands
 
-- `npm run dev`: Start Eleventy dev server.
-- `npm run build`: Production static build to `_site/`.
-- `npm run clean`: Remove `_site/` and Eleventy caches.
+- `npm run dev`: Start Eleventy dev server (serves raw assets, no manifest).
+- `npm run build`: `build:assets` then a production Eleventy build to `_site/`.
+- `npm run build:assets`: Build hashed/minified CSS+JS and write the manifest.
+- `npm run clean`: Remove `_site/`, caches, and built assets/manifest.
 - `npm run lint`: Run ESLint (flat config).
-- `npm run format`: Format repository with Prettier.
-- `npm run format:check`: Validate formatting.
+- `npm run format` / `npm run format:check`: Prettier write / check.
 
 ## Technical Requirements
 
-- Runtime: Node `>=20.11`.
-- Templating: Nunjucks + Markdown (Eleventy).
-- Current plugin/tooling baseline (keep aligned unless intentionally changed):
-  - `@11ty/eleventy`
-  - `@11ty/eleventy-img`
-  - `@11ty/eleventy-navigation`
-  - `@11ty/eleventy-plugin-bundle`
-  - `@11ty/eleventy-plugin-rss`
-  - `@11ty/eleventy-plugin-syntaxhighlight`
-  - `@quasibit/eleventy-plugin-sitemap`
-  - `html-minifier-terser` (production HTML minification transform)
-  - `luxon` (date formatting)
+- Runtime: Node `^20.19.0 || >=22.13.0` (see `package.json` engines; `mise.toml`
+  pins `22.13.0`).
+- Templating: Nunjucks (Eleventy 3). Markdown is enabled but unused today.
+- Actual dependencies (all devDependencies — nothing ships a JS runtime):
+  - `@11ty/eleventy` — static site generator.
+  - `@11ty/eleventy-fetch` — cached fetch of the blog's JSON feed in `writing.js`.
+  - `esbuild` — JS bundling/minification in `build-assets.mjs`.
+  - `lightningcss` — CSS bundling/minification (`build-assets.mjs`,
+    `criticalCss.js`).
+  - `html-minifier-terser` — production HTML minification transform in
+    `.eleventy.js`.
+  - `lucide` — icon nodes rendered to inline SVG at build time via the custom
+    `lucide` Nunjucks shortcode in `.eleventy.js` (no client runtime).
+
+## Asset Pipeline
+
+- `app/_tools/build-assets.mjs` bundles and content-hashes
+  `personal-site.{css,js}` and `not-found.{css,js}`, writes them to
+  `app/assets/build/`, and records the hashed paths in
+  `app/_data/assets-manifest.json`.
+- `app/_data/assets.js` reads that manifest to emit hashed URLs in production
+  (and throws if the manifest is missing/invalid); in dev it returns raw paths.
+- `app/assets/css/tokens.css` is the single source of truth for design tokens,
+  imported by both `personal-site.css` and `personal-site-critical.css`.
+- `app/_data/criticalCss.js` bundles `personal-site-critical.css` (inlining its
+  `@import`s) and the layout inlines it in `<head>` for first paint; the full
+  stylesheet loads via a normal `<link>`.
 
 ## Performance Best Practices (Eleventy)
 
 - Prefer static-first rendering; avoid client-side JavaScript unless necessary.
-- Optimize images with Eleventy Image (`@11ty/eleventy-img`) instead of shipping originals.
-- Keep CSS minimal and route-agnostic; avoid unused large UI frameworks.
-- Ensure production build keeps HTML minification enabled.
-- Maintain `sitemap.xml`, `feed.xml`, and canonical metadata consistency.
-- Keep generated output and caches out of git (`_site`, `.cache`, `.11ty-cache`).
+- No images are shipped today. If images are ever added, use `@11ty/eleventy-img`
+  (add it as a devDependency first) rather than shipping originals.
+- Keep CSS minimal and token-driven; avoid unused large UI frameworks.
+- Keep production HTML minification enabled.
+- Keep `sitemap.xml`, `robots.txt`, and canonical metadata consistent. Content
+  dates come from `site.contentUpdated`, not the build clock (keep it accurate).
+- Keep generated output and caches out of git (`_site`, `.cache`,
+  `app/assets/build`, `app/_data/assets-manifest.json`).
 
 ## Dependency Management
 
-- Install new dependencies using latest stable versions.
-- Do not pin to old versions unless there is a compatibility reason documented in PR/commit notes.
+- Install new dependencies using latest stable versions unless a compatibility
+  reason is documented in PR/commit notes.
 - Commit `package-lock.json` with dependency changes.
 
 ## Coding Style & Naming
 
 - 2-space indentation in JS/CSS/JSON and template files.
-- Use `kebab-case` for filenames and folder names.
-- Use clear collection/tag names and keep front matter minimal, explicit, and typed-by-convention.
-- Keep data logic in `_data` files; keep templates focused on presentation.
+- Use `kebab-case` for filenames and folder names. The `fm-` class prefix and
+  `personal-site-*` filenames are load-bearing (shared with the blog via
+  `docs/THEME-TRANSFER.md` and the `fm-theme` localStorage key) — do not rename.
+- Keep data/content in `_data` files; keep templates focused on presentation.
 
 ## Testing
 
-- No formal test framework is configured yet.
-- Minimum validation for every change:
-  - `npm run lint`
-  - `npm run build`
-- If you introduce tests, document the framework and commands in this file.
+- No formal test framework is configured. CI (`.github/workflows/ci.yml`) runs
+  lint + format:check + build + linkinator (internal link/asset check) as the
+  practical test suite.
+- Minimum local validation for every change: `npm run lint` and `npm run build`.
 
 ## Boundaries
 
-- Always: create source files under `app/` and `public/` (not random root-level files).
-- Ask first: reorganizing top-level folders or renaming major content collections.
+- Always: create source files under `app/` and `public/` (not random root-level
+  files).
+- Ask first: reorganizing top-level folders or renaming major files.
 - Never: commit secrets, `_site/`, `.cache/`, `.11ty-cache/`, or `.env*`.

@@ -1,9 +1,10 @@
 node_modules
-.next
-out
+_site
+app/assets/build
+app/_data/assets-manifest.json
 build
 coverage
-.turbo
 .vercel
 .cache
+.omc
 .DS_Store
