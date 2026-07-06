@@ -10,6 +10,36 @@ This runbook rewrites history to remove them. It is **destructive** and requires
 a **force-push** — coordinate with anyone else who has a clone before running it,
 and take a backup first.
 
+## How builds get the fonts now (already wired up)
+
+The fonts are no longer tracked in git. Instead:
+
+- `public/fonts/` is in `.gitignore`; keep your own licensed `.woff2` copies
+  there for local dev (they are used as-is and never committed).
+- The licensed files live in a **private Vercel Blob store**. `app/_tools/`
+  holds the machinery, driven by `app/_tools/fonts-manifest.mjs` (the single
+  list of expected files):
+  - `pnpm fonts:upload` — one-time (or on font change) push of the local
+    `public/fonts/*.woff2` into the Blob store.
+  - `pnpm fonts:fetch` — runs first in `pnpm build`; idempotent. If the files
+    are already on disk it does nothing; otherwise it downloads them from Blob
+    using `BLOB_READ_WRITE_TOKEN`.
+- On Vercel, connect a Blob store to the project so `BLOB_READ_WRITE_TOKEN` is
+  injected into the build automatically. `app/assets/css/*.css` already expects
+  the fonts at `/fonts/...` and Eleventy passthrough-copies `public/` → `/`.
+
+So before rewriting history, make sure the fonts are in Blob:
+
+```bash
+vercel env pull          # writes BLOB_READ_WRITE_TOKEN into .env.local
+pnpm fonts:upload        # uploads the 6 woff2 from public/fonts/
+```
+
+> Alternative to the whole approach: switch to open-licensed fonts you *can*
+> commit (Wotfard → a libre grotesque, Dank Mono → JetBrains Mono in
+> `noncritical-fonts.css` / `personal-site-critical.css`). That is a visual
+> change but removes the licensing constraint entirely.
+
 ## 1. Back up
 
 ```bash
@@ -26,26 +56,23 @@ binaries and the already-deleted root `__fonts/` directory from all history:
 git filter-repo --path public/fonts --path __fonts --invert-paths
 ```
 
-## 3. Re-supply the fonts for builds (they are no longer in git)
+`git filter-repo` strips the `origin` remote as a safety measure; re-add it:
 
-After the purge, the build has no fonts. Choose one:
+```bash
+git remote add origin git@github.com:igorxciv/igorcodes.git
+```
 
-- **Serve from a non-tracked deployment artifact.** Fetch the licensed `.woff2`
-  files into `public/fonts/` during the deploy/build step (e.g. from a private
-  bucket or a Vercel-stored artifact), and add `public/fonts/` to `.gitignore`
-  so they are never re-committed. `app/assets/css/*.css` already expects them at
-  `/fonts/...`.
-- **Replace with open-licensed fonts.** Swap Wotfard → a libre grotesque and
-  Dank Mono → JetBrains Mono in `noncritical-fonts.css` /
-  `personal-site-critical.css`. This is a visual change.
-
-## 4. Force-push
+## 3. Force-push
 
 ```bash
 git push --force-with-lease origin main
 ```
 
 Everyone else must then re-clone (their old clones still contain the binaries).
+If the repo was ever cloned/forked by others while the fonts were tracked,
+consider the binaries already exposed — rotating is not possible for fonts, so
+the practical mitigation is the rewrite plus keeping the repo's future history
+clean.
 
 > Alternative to all of the above: make the repository private. Then serving and
 > tracking the fonts is fine and no history rewrite is needed.

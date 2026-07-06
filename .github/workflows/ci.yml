@@ -15,6 +15,12 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm run check
+      # Licensed fonts are not in the repo; `pnpm build` fetches them from the
+      # Vercel Blob store. Add BLOB_READ_WRITE_TOKEN as a repository secret
+      # (Settings → Secrets → Actions). Note: it is unavailable to pull requests
+      # from forks, so builds on forked PRs will fail the font fetch by design.
       - run: pnpm run build
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
       - name: Check internal links and assets
         run: pnpm dlx linkinator ./_site --recurse --silent --skip "^https?://"

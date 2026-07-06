@@ -72,6 +72,11 @@ All are optional; sensible defaults apply.
   verification tokens (emitted as meta tags when set).
 - `NODE_ENV`: set to `production` by the build scripts. In production the asset
   manifest is required (the build fails loudly if it is missing/invalid).
+- `BLOB_READ_WRITE_TOKEN`: token for the Vercel Blob store that holds the
+  licensed fonts. Injected automatically on Vercel when a Blob store is connected
+  to the project. Only needed where `public/fonts/` is empty (a fresh clone or
+  the Vercel build) — see **Fonts** below. Locally, keep your licensed `.woff2`
+  files in `public/fonts/` and no token is required.
 
 ## Content updates
 
@@ -96,9 +101,32 @@ same filenames and dimensions:
 | `favicon-32x32.png`                     | 32×32                  |
 | `apple-touch-icon-180x180.png`          | 180×180                |
 
+## Fonts
+
+Wotfard (Atipo Foundry) and Dank Mono are **commercial, non-redistributable**
+fonts, so their `.woff2` binaries are **not** committed (`public/fonts/` is
+gitignored). They are stored in a private **Vercel Blob** store and supplied to
+the build:
+
+- `pnpm fonts:upload` — one-time (or when a font changes) upload of the local
+  `public/fonts/*.woff2` into Blob. Needs `BLOB_READ_WRITE_TOKEN`
+  (`vercel env pull` first).
+- `pnpm fonts:fetch` — runs automatically at the start of `pnpm build`. It is
+  idempotent: if the files are already on disk (local dev) it does nothing;
+  otherwise it downloads them from Blob. The list of expected files lives in
+  `app/_tools/fonts-manifest.mjs`.
+
+For local development, just keep your licensed `.woff2` copies in
+`public/fonts/`. See [`docs/purge-fonts-from-history.md`](docs/purge-fonts-from-history.md)
+for removing the binaries from existing git history.
+
 ## Deployment
 
 - Platform: Vercel. Build command `pnpm build`, output directory `_site/`.
+- Connect a **Vercel Blob** store to the project so `BLOB_READ_WRITE_TOKEN` is
+  present at build time; `pnpm build` fetches the fonts into `public/fonts/`
+  before Eleventy runs (see **Fonts** above). The build fails loudly if the
+  fonts are neither on disk nor reachable via Blob.
 - Security headers and long-lived caching for hashed assets are defined in
   `vercel.json`. If you deploy elsewhere, translate those headers to that
   platform's config (e.g. a `_headers` / `netlify.toml` file).

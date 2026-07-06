@@ -22,6 +22,11 @@ yarn-error.log*
 .DS_Store
 *.pem
 
+# licensed fonts — commercial, non-redistributable; supplied at build time from
+# Vercel Blob (see app/_tools/fetch-fonts.mjs). Keep your local licensed copies
+# here; they are just never committed.
+/public/fonts/
+
 # coverage
 /coverage
 .vercel
