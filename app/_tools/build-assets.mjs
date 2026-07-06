@@ -1,14 +1,11 @@
 import { createHash } from "node:crypto";
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { bundle as bundleCss } from "lightningcss";
 import { rolldown } from "rolldown";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const rootDir = path.resolve(__dirname, "../..");
+const rootDir = path.resolve(import.meta.dirname, "../..");
 const appDir = path.join(rootDir, "app");
 const buildDir = path.join(appDir, "assets", "build");
 const manifestPath = path.join(appDir, "_data", "assets-manifest.json");

@@ -121,7 +121,7 @@ module.exports = (eleventyConfig) => {
       return content;
     }
 
-    return minify(content, {
+    return await minify(content, {
       collapseWhitespace: true,
       removeComments: true,
       useShortDoctype: true,

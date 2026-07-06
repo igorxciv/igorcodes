@@ -73,9 +73,7 @@
     const fullCommand =
       commandElement.dataset.command || commandElement.textContent || "";
 
-    if (!allowAnimatedEffects) {
-      commandElement.textContent = fullCommand;
-    } else {
+    if (allowAnimatedEffects) {
       let commandIndex = 0;
       commandElement.textContent = "";
 
@@ -91,12 +89,12 @@
       addCleanup(() => {
         window.clearInterval(typingInterval);
       });
+    } else {
+      commandElement.textContent = fullCommand;
     }
   }
 
-  if (!allowAnimatedEffects) {
-    setCode(staticCode);
-  } else {
+  if (allowAnimatedEffects) {
     const glitchChars = ["404", "4Ø4", "4□4", "404", "4o4", "404"];
     const glitchInterval = window.setInterval(() => {
       const randomIndex = Math.floor(Math.random() * glitchChars.length);
@@ -105,7 +103,7 @@
     const glitchStopTimeout = window.setTimeout(() => {
       window.clearInterval(glitchInterval);
       setCode(staticCode);
-    }, 12000);
+    }, 12_000);
 
     addCleanup(() => {
       window.clearInterval(glitchInterval);
@@ -113,6 +111,8 @@
     addCleanup(() => {
       window.clearTimeout(glitchStopTimeout);
     });
+  } else {
+    setCode(staticCode);
   }
 
   window.addEventListener(

@@ -5,6 +5,9 @@ const ARTICLE_LIMIT = 4;
 const FEED_URL = site.writing.feedUrl;
 const FALLBACK_URL = site.writing.fallbackUrl;
 
+// Reject non-http(s) schemes (e.g. javascript:) — url is rendered into an href.
+const HTTP_URL_PATTERN = /^https?:\/\//i;
+
 const fallbackArticles = [
   {
     title: "Latest writing on the blog",
@@ -79,8 +82,7 @@ function normalizeArticle(article) {
     return null;
   }
 
-  // Reject non-http(s) schemes (e.g. javascript:) — url is rendered into an href.
-  if (!/^https?:\/\//i.test(url)) {
+  if (!HTTP_URL_PATTERN.test(url)) {
     return null;
   }
 

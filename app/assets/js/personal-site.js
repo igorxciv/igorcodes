@@ -69,7 +69,9 @@
   const persistTheme = (theme) => {
     try {
       window.localStorage.setItem(THEME_STORAGE_KEY, theme);
-    } catch {}
+    } catch {
+      // Ignore storage failures (private mode, quota, disabled cookies).
+    }
   };
 
   const commitTheme = (theme) => {
