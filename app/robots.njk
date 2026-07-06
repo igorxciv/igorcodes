@@ -2,7 +2,23 @@
 permalink: /robots.txt
 eleventyExcludeFromCollections: true
 ---
+# Personal site — the goal is to be discovered and cited, so all crawlers,
+# including AI answer engines, are explicitly welcome.
 User-agent: *
+Allow: /
+
+# AI answer-engine and assistant crawlers (explicit allow)
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: DuckAssistBot
 Allow: /
 
 Sitemap: {{ (site.url + '/sitemap.xml') | url }}

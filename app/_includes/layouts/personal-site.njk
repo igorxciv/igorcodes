@@ -73,8 +73,20 @@
               "@id": "{{ site.url }}#person",
               "name": {{ site.author | dump | safe }},
               "url": "{{ site.url }}",
-              "jobTitle": "Software Engineer",
+              "jobTitle": {{ site.person.jobTitle | dump | safe }},
+              "description": {{ site.person.description | dump | safe }},
               "image": "{{ (site.url + site.profileImage) | url }}",
+              "email": {{ ("mailto:" + site.email) | dump | safe }},
+              "knowsAbout": {{ site.person.knowsAbout | dump | safe }},
+              "homeLocation": {
+                "@type": "Place",
+                "address": {
+                  "@type": "PostalAddress",
+                  "addressLocality": {{ site.person.addressLocality | dump | safe }},
+                  "addressRegion": {{ site.person.addressRegion | dump | safe }},
+                  "addressCountry": {{ site.person.addressCountry | dump | safe }}
+                }
+              },
               "worksFor": {
                 "@type": "Organization",
                 "name": "Independent"

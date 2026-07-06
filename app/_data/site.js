@@ -11,6 +11,27 @@ module.exports = {
   author: "Igor Cheliadinski",
   email: "hi@igorcodes.dev",
   location: "Playa del Carmen, Mexico",
+  person: {
+    jobTitle: "Software Engineer",
+    description:
+      "Frontend-focused full-stack software engineer with a systems and architecture mindset, building maintainable, performant digital products and developer workflows.",
+    knowsAbout: [
+      "Frontend Engineering",
+      "Frontend Architecture",
+      "TypeScript",
+      "JavaScript",
+      "React",
+      "Node.js",
+      "Web Performance",
+      "Web Accessibility",
+      "Systems Thinking",
+      "Product Engineering",
+      "AI Engineering",
+    ],
+    addressLocality: "Playa del Carmen",
+    addressRegion: "Quintana Roo",
+    addressCountry: "MX",
+  },
   googleSiteVerification: process.env.GOOGLE_SITE_VERIFICATION || "",
   bingSiteVerification: process.env.BING_SITE_VERIFICATION || "",
   umami: {

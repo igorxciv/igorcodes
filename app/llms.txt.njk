@@ -1,0 +1,23 @@
+---
+permalink: /llms.txt
+eleventyExcludeFromCollections: true
+---
+# {{ site.author }}
+
+> {{ site.person.description }} This is the personal website and portfolio of {{ site.author }}, a {{ site.person.jobTitle }} based in {{ site.location }}.
+
+{{ site.author }} works across frontend architecture, full-stack engineering, and product-focused AI. Areas of expertise: {{ site.person.knowsAbout | join(", ") }}.
+
+## Site
+- [Home / Career journey]({{ site.url }}/): Role history since 2014 and current work.
+- [Selected work]({{ site.url }}/#projects): Notable engineering projects and the stacks behind them.
+- [Writing]({{ site.writing.fallbackUrl }}): Articles and notes on systems, product engineering, and frontend work.
+- [Contact]({{ site.url }}/#contact): How to reach {{ site.author }}.
+
+## Profiles
+{%- for link in site.sameAs %}
+- {{ link }}
+{%- endfor %}
+
+## Optional
+- [Sitemap]({{ site.url }}/sitemap.xml): Full list of indexable pages.
