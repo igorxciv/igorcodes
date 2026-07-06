@@ -96,8 +96,9 @@
 
 - 2-space indentation in JS/CSS/JSON and template files.
 - Use `kebab-case` for filenames and folder names. The `fm-` class prefix and
-  `personal-site-*` filenames are load-bearing (shared with the blog via
-  `docs/THEME-TRANSFER.md` and the `fm-theme` localStorage key) — do not rename.
+  `personal-site-*` filenames are load-bearing (shared with the blog via the
+  `fm-theme` localStorage key and the tokens in `app/assets/css/tokens.css`) —
+  do not rename.
 - Keep data/content in `_data` files; keep templates focused on presentation.
 
 ## Testing
