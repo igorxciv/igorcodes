@@ -3,8 +3,8 @@ import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { build as esbuild } from "esbuild";
 import { bundle as bundleCss } from "lightningcss";
+import { rolldown } from "rolldown";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,10 +15,16 @@ const manifestPath = path.join(appDir, "_data", "assets-manifest.json");
 
 const cssEntryPath = path.join(appDir, "assets", "css", "personal-site.css");
 const jsEntryPath = path.join(appDir, "assets", "js", "personal-site.js");
-const notFoundCssEntryPath = path.join(appDir, "assets", "css", "not-found.css");
+const notFoundCssEntryPath = path.join(
+  appDir,
+  "assets",
+  "css",
+  "not-found.css",
+);
 const notFoundJsEntryPath = path.join(appDir, "assets", "js", "not-found.js");
 
-const packVersion = (major, minor = 0, patch = 0) => (major << 16) | (minor << 8) | patch;
+const packVersion = (major, minor = 0, patch = 0) =>
+  (major << 16) | (minor << 8) | patch;
 
 const browserTargets = {
   chrome: packVersion(111),
@@ -27,7 +33,8 @@ const browserTargets = {
   safari: packVersion(16, 4),
 };
 
-const hashContent = (content) => createHash("sha256").update(content).digest("hex").slice(0, 10);
+const hashContent = (content) =>
+  createHash("sha256").update(content).digest("hex").slice(0, 10);
 
 function logAsset(label, url, byteLength) {
   console.log(`${label} → ${url} (${byteLength} bytes)`);
@@ -49,19 +56,17 @@ async function buildCss(label, entryPath, outputPrefix) {
 }
 
 async function buildJs(label, entryPath, outputPrefix) {
-  // bundle: true resolves imports, so the scripts can gain `import`s later
-  // without silently shipping an unresolved reference inside the IIFE.
-  const result = await esbuild({
-    entryPoints: [entryPath],
-    bundle: true,
-    write: false,
-    minify: true,
-    target: ["es2020"],
-    format: "iife",
-    legalComments: "none",
+  const bundle = await rolldown({
+    input: entryPath,
+    logLevel: "silent",
   });
+  const { output } = await bundle.generate({
+    format: "iife",
+    minify: true,
+  });
+  await bundle.close();
 
-  const code = result.outputFiles[0].contents;
+  const code = output[0].code;
   const fileName = `${outputPrefix}-${hashContent(code)}.js`;
   await writeFile(path.join(buildDir, fileName), code);
   const url = `/assets/build/${fileName}`;
@@ -85,8 +90,12 @@ async function main() {
   const [css, js, notFoundCss, notFoundJs] = await Promise.all([
     runBuild("css", () => buildCss("css", cssEntryPath, "site")),
     runBuild("js", () => buildJs("js", jsEntryPath, "site")),
-    runBuild("notFoundCss", () => buildCss("notFoundCss", notFoundCssEntryPath, "not-found")),
-    runBuild("notFoundJs", () => buildJs("notFoundJs", notFoundJsEntryPath, "not-found")),
+    runBuild("notFoundCss", () =>
+      buildCss("notFoundCss", notFoundCssEntryPath, "not-found"),
+    ),
+    runBuild("notFoundJs", () =>
+      buildJs("notFoundJs", notFoundJsEntryPath, "not-found"),
+    ),
   ]);
 
   await writeManifest({

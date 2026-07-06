@@ -1,0 +1,9 @@
+# Git hooks managed by lefthook. Run `pnpm run prepare` (or `lefthook install`)
+# to (re)install the hooks after cloning.
+pre-commit:
+  parallel: true
+  commands:
+    biome:
+      glob: "*.{js,cjs,mjs,json,jsonc,css}"
+      run: pnpm exec biome check --write --no-errors-on-unmatched {staged_files}
+      stage_fixed: true

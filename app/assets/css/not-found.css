@@ -301,8 +301,6 @@
   box-shadow: var(--fm-404-btn-primary-shadow);
 }
 
-/* The "Go Back" button only works with JS (history navigation), so hide it
-   until personal-site.js / not-found.js mark the page enhanced. */
 .fm-404-btn-secondary {
   display: none;
   border-color: var(--fm-404-btn-secondary-border);

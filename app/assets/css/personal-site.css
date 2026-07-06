@@ -1,8 +1,6 @@
-/* ===== Tokens ===== */
 @import "./tokens.css";
 @import "./noncritical-fonts.css";
 
-/* ===== Reset / base ===== */
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
@@ -57,7 +55,15 @@ span {
     background-color var(--fm-motion-theme) var(--fm-ease-standard);
 }
 
-:where(a, button, input, textarea, select, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+:where(
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  summary,
+  [tabindex]:not([tabindex="-1"])
+):focus-visible {
   outline: 2px solid var(--fm-accent);
   outline-offset: 3px;
 }
@@ -67,7 +73,6 @@ span {
   color: var(--fm-text);
 }
 
-/* ===== Skip link ===== */
 .fm-skip-link {
   position: absolute;
   top: 0.75rem;
@@ -75,7 +80,11 @@ span {
   z-index: 100;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
-  background: color-mix(in srgb, var(--fm-accent) 14%, var(--fm-surface-raised));
+  background: color-mix(
+    in srgb,
+    var(--fm-accent) 14%,
+    var(--fm-surface-raised)
+  );
   color: var(--fm-text);
   font-weight: 600;
   text-decoration: none;
@@ -87,8 +96,6 @@ span {
   transform: translateY(0);
 }
 
-/* ===== Theme toggle ===== */
-/* Hidden until JS marks the page enhanced — the toggle only works with JS. */
 .fm-theme-toggle {
   position: fixed;
   right: 1rem;
@@ -136,7 +143,11 @@ span {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(circle at 32% 28%, var(--fm-theme-button-highlight), transparent 44%);
+  background: radial-gradient(
+    circle at 32% 28%,
+    var(--fm-theme-button-highlight),
+    transparent 44%
+  );
   opacity: 0;
   transform: scale(0.88);
   transition:
@@ -232,12 +243,16 @@ span {
 }
 
 :root[data-theme="light"] .fm-theme-toggle:hover .fm-theme-toggle-icon-sun,
-:root[data-theme="light"] .fm-theme-toggle:focus-visible .fm-theme-toggle-icon-sun {
+:root[data-theme="light"]
+  .fm-theme-toggle:focus-visible
+  .fm-theme-toggle-icon-sun {
   transform: scale(0.44) rotate(162deg);
 }
 
 :root[data-theme="light"] .fm-theme-toggle:hover .fm-theme-toggle-icon-moon,
-:root[data-theme="light"] .fm-theme-toggle:focus-visible .fm-theme-toggle-icon-moon {
+:root[data-theme="light"]
+  .fm-theme-toggle:focus-visible
+  .fm-theme-toggle-icon-moon {
   transform: scale(1.08) rotate(10deg);
 }
 
@@ -281,7 +296,6 @@ span {
   line-height: 1.45;
 }
 
-/* ===== Hero ===== */
 .fm-hero {
   min-height: 100svh;
   position: relative;
@@ -413,7 +427,6 @@ span {
   transform: translateX(-50%) translateY(1px);
 }
 
-/* ===== Timeline ===== */
 .fm-timeline-shell {
   position: relative;
 }
@@ -586,7 +599,6 @@ span {
   transition-delay: 0.14s;
 }
 
-/* ===== Cards ===== */
 .fm-grid {
   display: grid;
   gap: 0.9rem;
@@ -729,7 +741,6 @@ span {
     color var(--fm-motion-theme) var(--fm-ease-standard);
 }
 
-/* ===== Writing ===== */
 .fm-writing-list {
   list-style: none;
   margin: 1.6rem 0 0;
@@ -870,7 +881,6 @@ span {
   stroke-linejoin: round;
 }
 
-/* ===== Contact ===== */
 .fm-contact-section {
   padding-bottom: 0;
 }
@@ -963,7 +973,6 @@ span {
   line-height: 1.3;
 }
 
-/* ===== Footer ===== */
 .fm-footer {
   margin-top: 3rem;
   border-top: 1px solid var(--fm-border-soft);
@@ -983,7 +992,6 @@ span {
   font-size: 0.9rem;
 }
 
-/* ===== Reveal ===== */
 .fm-enhanced .fm-reveal {
   opacity: 0;
   transform: translateY(16px);

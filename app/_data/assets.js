@@ -8,7 +8,8 @@ const defaultAssets = {
   notFoundJs: "/assets/js/not-found.js",
 };
 
-const MANIFEST_ERROR = "assets-manifest.json missing or invalid — run npm run build:assets first";
+const MANIFEST_ERROR =
+  "assets-manifest.json missing or invalid — run npm run build:assets first";
 
 module.exports = () => {
   if (process.env.NODE_ENV !== "production") {

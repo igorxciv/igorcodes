@@ -1,14 +1,11 @@
-/* ===== Design tokens (single source of truth) =====
-   Imported by BOTH personal-site.css and personal-site-critical.css so the two
-   bundles cannot drift. Contains the theme token blocks (dark + light), the
-   font-family custom properties, and the reset rules both bundles rely on.
-   Transitions and component styles live in the bundles, not here. */
-
 :root {
   --font-sans:
-    "Wotfard", "Avenir Next", "Segoe UI Variable", "Segoe UI", "Helvetica Neue", sans-serif;
+    "Wotfard", "Avenir Next", "Segoe UI Variable", "Segoe UI", "Helvetica Neue",
+    sans-serif;
   --font-display: var(--font-sans);
-  --font-mono: "Dank Mono", "SFMono-Regular", "Menlo", "Consolas", "Liberation Mono", monospace;
+  --font-mono:
+    "Dank Mono", "SFMono-Regular", "Menlo", "Consolas", "Liberation Mono",
+    monospace;
   --fm-accent-rgb: 0, 217, 255;
   --fm-bg: #0a0a0a;
   --fm-text: #e5e5e5;

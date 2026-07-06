@@ -5,16 +5,17 @@
     return;
   }
 
-  // personal-site.js also runs on the 404 page and adds "fm-enhanced", but guard
-  // against it being absent so JS-only controls are revealed even in isolation.
   document.body.classList.add("fm-enhanced");
 
   const codeElement = notFoundPage.querySelector("[data-404-code]");
-  const codeShadowElement = notFoundPage.querySelector("[data-404-code-shadow]");
+  const codeShadowElement = notFoundPage.querySelector(
+    "[data-404-code-shadow]",
+  );
   const commandElement = notFoundPage.querySelector("[data-404-command]");
   const backButton = notFoundPage.querySelector("[data-404-back-link]");
   const prefersReducedMotion =
-    "matchMedia" in window && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    "matchMedia" in window &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const prefersDataSaving =
     "connection" in navigator &&
     navigator.connection &&
@@ -44,14 +45,18 @@
   if (backButton) {
     backButton.addEventListener("click", () => {
       const hasReferrer = Boolean(document.referrer);
-      const referrerUrl = hasReferrer ? new URL(document.referrer, window.location.href) : null;
+      const referrerUrl = hasReferrer
+        ? new URL(document.referrer, window.location.href)
+        : null;
       const isSameOriginReferrer =
         referrerUrl &&
         referrerUrl.origin === window.location.origin &&
         referrerUrl.href !== window.location.href;
 
       if (isSameOriginReferrer) {
-        window.location.assign(`${referrerUrl.pathname}${referrerUrl.search}${referrerUrl.hash}`);
+        window.location.assign(
+          `${referrerUrl.pathname}${referrerUrl.search}${referrerUrl.hash}`,
+        );
         return;
       }
 
@@ -65,7 +70,8 @@
   }
 
   if (commandElement) {
-    const fullCommand = commandElement.dataset.command || commandElement.textContent || "";
+    const fullCommand =
+      commandElement.dataset.command || commandElement.textContent || "";
 
     if (!allowAnimatedEffects) {
       commandElement.textContent = fullCommand;

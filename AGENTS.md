@@ -17,8 +17,8 @@
 - Hand-authored SEO/discovery templates: `app/sitemap.njk`, `app/robots.njk`,
   `app/404.njk` (there is no feed template — the layout links to the blog's
   JSON feed at `blog.igorcodes.dev/feed.json`).
-- Config at repo root: `.eleventy.js`, `eslint.config.mjs`,
-  `prettier.config.mjs`, `vercel.json`, `package.json`.
+- Config at repo root: `.eleventy.js`, `biome.json`, `lefthook.yml`,
+  `pnpm-workspace.yaml`, `mise.toml`, `vercel.json`, `package.json`.
 
 ## Default File Placement (When Creating New Files)
 
@@ -31,28 +31,34 @@
 
 ## Build, Lint, and Development Commands
 
-- `npm run dev`: Start Eleventy dev server (serves raw assets, no manifest).
-- `npm run build`: `build:assets` then a production Eleventy build to `_site/`.
-- `npm run build:assets`: Build hashed/minified CSS+JS and write the manifest.
-- `npm run clean`: Remove `_site/`, caches, and built assets/manifest.
-- `npm run lint`: Run ESLint (flat config).
-- `npm run format` / `npm run format:check`: Prettier write / check.
+- Package manager is `pnpm` (pinned via `packageManager` + `mise.toml`). Use
+  `pnpm install`, not `npm install`.
+- `pnpm dev`: Start Eleventy dev server (serves raw assets, no manifest).
+- `pnpm build`: `build:assets` then a production Eleventy build to `_site/`.
+- `pnpm build:assets`: Build hashed/minified CSS+JS and write the manifest.
+- `pnpm clean`: Remove `_site/`, caches, and built assets/manifest.
+- `pnpm lint`: Run the Biome linter.
+- `pnpm format`: Format with Biome (`--write`).
+- `pnpm check` / `pnpm check:fix`: Biome lint + format check (CI runs `check`).
 
 ## Technical Requirements
 
-- Runtime: Node `^20.19.0 || >=22.13.0` (see `package.json` engines; `mise.toml`
-  pins `22.13.0`).
+- Runtime: Node `>=26.0.0` (see `package.json` engines; `mise.toml` and CI pin
+  `26.4.0`).
 - Templating: Nunjucks (Eleventy 3). Markdown is enabled but unused today.
 - Actual dependencies (all devDependencies — nothing ships a JS runtime):
   - `@11ty/eleventy` — static site generator.
   - `@11ty/eleventy-fetch` — cached fetch of the blog's JSON feed in `writing.js`.
-  - `esbuild` — JS bundling/minification in `build-assets.mjs`.
+  - `rolldown` — JS bundling/minification in `build-assets.mjs`.
   - `lightningcss` — CSS bundling/minification (`build-assets.mjs`,
     `criticalCss.js`).
   - `html-minifier-terser` — production HTML minification transform in
     `.eleventy.js`.
   - `lucide` — icon nodes rendered to inline SVG at build time via the custom
     `lucide` Nunjucks shortcode in `.eleventy.js` (no client runtime).
+  - `@biomejs/biome` — linter + formatter (config in `biome.json`).
+  - `lefthook` — git hooks runner (config in `lefthook.yml`); runs Biome on
+    staged files pre-commit.
 
 ## Asset Pipeline
 
@@ -97,9 +103,9 @@
 ## Testing
 
 - No formal test framework is configured. CI (`.github/workflows/ci.yml`) runs
-  lint + format:check + build + linkinator (internal link/asset check) as the
-  practical test suite.
-- Minimum local validation for every change: `npm run lint` and `npm run build`.
+  `pnpm check` (Biome lint + format) + build + linkinator (internal link/asset
+  check) as the practical test suite.
+- Minimum local validation for every change: `pnpm check` and `pnpm build`.
 
 ## Boundaries
 

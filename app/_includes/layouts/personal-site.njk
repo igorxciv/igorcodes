@@ -158,7 +158,6 @@
         root.dataset.theme = theme;
         root.style.colorScheme = theme;
 
-        // Neutralize the media-scoped theme-color metas so the resolved theme wins.
         const color = theme === "light" ? lightColor : darkColor;
         document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
           meta.removeAttribute("media");

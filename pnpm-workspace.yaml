@@ -1,0 +1,4 @@
+# pnpm blocks dependency build scripts by default (security). Explicitly allow
+# lefthook's postinstall, which sets up its git-hook binary.
+allowBuilds:
+  lefthook: true

@@ -63,7 +63,11 @@ function formatDate(value) {
 
 function getArticleDateValue(article) {
   return (
-    article.date_published || article.date_modified || article.published || article.updated || ""
+    article.date_published ||
+    article.date_modified ||
+    article.published ||
+    article.updated ||
+    ""
   );
 }
 
@@ -75,8 +79,7 @@ function normalizeArticle(article) {
     return null;
   }
 
-  // Reject non-http(s) schemes (e.g. javascript:) even though the feed is
-  // owner-controlled; the template renders `url` directly into an href.
+  // Reject non-http(s) schemes (e.g. javascript:) — url is rendered into an href.
   if (!/^https?:\/\//i.test(url)) {
     return null;
   }
@@ -85,7 +88,9 @@ function normalizeArticle(article) {
     title,
     url,
     dateLabel: formatDate(getArticleDateValue(article)),
-    detail: truncateText(article.summary || article.content_text || article.description),
+    detail: truncateText(
+      article.summary || article.content_text || article.description,
+    ),
   };
 }
 
@@ -113,10 +118,8 @@ function emitFeedWarning(message) {
   process.stderr.write(`[writing] ${message}\n`);
 }
 
-module.exports = async function () {
+module.exports = async () => {
   try {
-    // eleventy-fetch caches to .cache/ for a day, so dev reloads and repeat
-    // builds do not hit the network on every pass.
     const feed = await EleventyFetch(FEED_URL, {
       duration: "1d",
       type: "json",

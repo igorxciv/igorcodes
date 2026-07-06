@@ -7,8 +7,6 @@ module.exports = {
   locale: "en_US",
   themeColorDark: "#0a0a0a",
   themeColorLight: "#f6f1e8",
-  // Bump when page content meaningfully changes (feeds sitemap <lastmod> and
-  // JSON-LD dateModified). See README.
   contentUpdated: "2026-07-05",
   author: "Igor Cheliadinski",
   email: "hi@igorcodes.dev",
@@ -31,10 +29,8 @@ module.exports = {
   appleTouchIcon: "/images/seo/apple-touch-icon-180x180.png",
   twitterHandle: "@igorxciv",
   writing: {
-    // Defaults to the production feed in all environments; the cache (see
-    // writing.js) keeps this to ~one request per day. Set WRITING_FEED_URL to
-    // point at a locally running blog during development.
-    feedUrl: process.env.WRITING_FEED_URL || "https://blog.igorcodes.dev/feed.json",
+    feedUrl:
+      process.env.WRITING_FEED_URL || "https://blog.igorcodes.dev/feed.json",
     fallbackUrl: "https://blog.igorcodes.dev/",
   },
   sameAs: [

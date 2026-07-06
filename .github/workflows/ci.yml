@@ -8,13 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "22.13.0"
-          cache: npm
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run format:check
-      - run: npm run build
+          node-version: "26.4.0"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run check
+      - run: pnpm run build
       - name: Check internal links and assets
-        run: npx linkinator ./_site --recurse --silent --skip "^https?://"
+        run: pnpm dlx linkinator ./_site --recurse --silent --skip "^https?://"

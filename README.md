@@ -9,12 +9,13 @@ Eleventy.
 - Nunjucks templates
 - Production asset pipeline:
   - `lightningcss` for bundled/minified CSS (and inlined critical CSS)
-  - `esbuild` for bundled/minified JS
+  - `rolldown` for bundled/minified JS
   - content-hashed asset filenames via a manifest (`app/_data/assets-manifest.json`)
 - Production HTML minification with `html-minifier-terser`
 - Build-time icons via `lucide` (rendered to inline SVG, no client runtime)
 - Blog "Writing" list fetched from `blog.igorcodes.dev` via `@11ty/eleventy-fetch`
-- ESLint + Prettier + Husky/lint-staged
+- [Biome](https://biomejs.dev/) for linting + formatting, [lefthook](https://lefthook.dev/) git hooks
+- `pnpm` package manager, Node `>=26` (both pinned in `mise.toml`)
 
 ## Project structure
 
@@ -33,24 +34,28 @@ Eleventy.
 
 ## Scripts
 
-- `npm run dev` start Eleventy dev server
-- `npm run build` production build (`build:assets` + `NODE_ENV=production eleventy`)
-- `npm run build:assets` build optimized CSS/JS assets and manifest only
-- `npm run clean` remove build/cache folders
-- `npm run lint` run ESLint
-- `npm run format` / `npm run format:check` run Prettier write / check
+- `pnpm dev` start Eleventy dev server
+- `pnpm build` production build (`build:assets` + `NODE_ENV=production eleventy`)
+- `pnpm build:assets` build optimized CSS/JS assets and manifest only
+- `pnpm clean` remove build/cache folders
+- `pnpm lint` run Biome linter
+- `pnpm format` format with Biome (`--write`)
+- `pnpm check` Biome lint + format check (what CI runs); `pnpm check:fix` to autofix
 
 ## Setup
 
+Node and pnpm versions are pinned in `mise.toml` — run `mise install` first (or
+match the versions manually), then:
+
 ```bash
-npm ci
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Production build:
 
 ```bash
-npm run build
+pnpm build
 ```
 
 ## Environment variables
@@ -93,7 +98,7 @@ same filenames and dimensions:
 
 ## Deployment
 
-- Platform: Vercel. Build command `npm run build`, output directory `_site/`.
+- Platform: Vercel. Build command `pnpm build`, output directory `_site/`.
 - Security headers and long-lived caching for hashed assets are defined in
   `vercel.json`. If you deploy elsewhere, translate those headers to that
   platform's config (e.g. a `_headers` / `netlify.toml` file).

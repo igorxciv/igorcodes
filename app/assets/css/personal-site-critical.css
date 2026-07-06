@@ -1,6 +1,5 @@
-/* Above-the-fold subset of personal-site.css WITHOUT transitions/hover.
-   Tokens live in tokens.css. If you edit hero/toggle styles in
-   personal-site.css, mirror the edit here. */
+/* Mirror any hero/toggle style edits from personal-site.css here —
+   the two are kept in sync by hand. */
 @import "./tokens.css";
 
 @font-face {
@@ -56,7 +55,15 @@ a {
   color: inherit;
 }
 
-:where(a, button, input, textarea, select, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+:where(
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  summary,
+  [tabindex]:not([tabindex="-1"])
+):focus-visible {
   outline: 2px solid var(--fm-accent);
   outline-offset: 3px;
 }
@@ -80,7 +87,11 @@ a {
   z-index: 100;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
-  background: color-mix(in srgb, var(--fm-accent) 14%, var(--fm-surface-raised));
+  background: color-mix(
+    in srgb,
+    var(--fm-accent) 14%,
+    var(--fm-surface-raised)
+  );
   color: var(--fm-text);
   font-weight: 600;
   text-decoration: none;
@@ -92,7 +103,6 @@ a {
   transform: translateY(0);
 }
 
-/* Hidden until JS marks the page enhanced — the toggle only works with JS. */
 .fm-theme-toggle {
   position: fixed;
   right: 1rem;
@@ -135,7 +145,11 @@ a {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(circle at 32% 28%, var(--fm-theme-button-highlight), transparent 44%);
+  background: radial-gradient(
+    circle at 32% 28%,
+    var(--fm-theme-button-highlight),
+    transparent 44%
+  );
   opacity: 0;
   transform: scale(0.88);
 }

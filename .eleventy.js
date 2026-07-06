@@ -14,10 +14,6 @@ const {
   Terminal,
 } = require("lucide");
 
-// Lucide v1 removed its brand glyphs, so the brand names below deliberately map
-// to the closest generic icon (github → GitBranch, linkedin → BriefcaseBusiness,
-// telegram/globe → Globe). If exact brand marks are needed, add `simple-icons`
-// as a devDependency and render its paths for those names.
 const lucideIcons = {
   arrowLeft: ArrowLeft,
   arrowRight: ArrowRight,
@@ -54,8 +50,12 @@ function escapeAttributeValue(value) {
 
 function serializeAttributes(attributes) {
   return Object.entries(attributes)
-    .filter(([, value]) => value !== undefined && value !== null && value !== false)
-    .map(([key, value]) => (value === true ? key : `${key}="${escapeAttributeValue(value)}"`))
+    .filter(
+      ([, value]) => value !== undefined && value !== null && value !== false,
+    )
+    .map(([key, value]) =>
+      value === true ? key : `${key}="${escapeAttributeValue(value)}"`,
+    )
     .join(" ");
 }
 
@@ -73,7 +73,7 @@ function renderLucideSvg(iconNode, attributes = {}) {
   return `<svg ${serializeAttributes({ ...lucideDefaultAttributes, ...attributes })}>${svgBody}</svg>`;
 }
 
-module.exports = function (eleventyConfig) {
+module.exports = (eleventyConfig) => {
   const isProduction = process.env.NODE_ENV === "production";
 
   eleventyConfig.setServerPassthroughCopyBehavior("passthrough");
@@ -83,36 +83,41 @@ module.exports = function (eleventyConfig) {
 
   eleventyConfig.addPassthroughCopy({ "public/": "/" });
   if (isProduction) {
-    eleventyConfig.addPassthroughCopy({ "app/assets/build/": "/assets/build/" });
+    eleventyConfig.addPassthroughCopy({
+      "app/assets/build/": "/assets/build/",
+    });
   } else {
     eleventyConfig.addPassthroughCopy({ "app/assets/": "/assets/" });
   }
   eleventyConfig.addWatchTarget("./app/assets/css/");
   eleventyConfig.addWatchTarget("./app/assets/js/");
 
-  eleventyConfig.addNunjucksShortcode("lucide", (name, className = "", label = "") => {
-    const iconNode = lucideIcons[name];
-    if (!iconNode) {
-      throw new Error(`Unknown Lucide icon "${name}"`);
-    }
+  eleventyConfig.addNunjucksShortcode(
+    "lucide",
+    (name, className = "", label = "") => {
+      const iconNode = lucideIcons[name];
+      if (!iconNode) {
+        throw new Error(`Unknown Lucide icon "${name}"`);
+      }
 
-    const iconAttributes = {
-      class: className || undefined,
-      focusable: "false",
-    };
+      const iconAttributes = {
+        class: className || undefined,
+        focusable: "false",
+      };
 
-    if (label) {
-      iconAttributes.role = "img";
-      iconAttributes["aria-label"] = label;
-    } else {
-      iconAttributes["aria-hidden"] = "true";
-    }
+      if (label) {
+        iconAttributes.role = "img";
+        iconAttributes["aria-label"] = label;
+      } else {
+        iconAttributes["aria-hidden"] = "true";
+      }
 
-    return renderLucideSvg(iconNode, iconAttributes);
-  });
+      return renderLucideSvg(iconNode, iconAttributes);
+    },
+  );
 
-  eleventyConfig.addTransform("htmlmin", async function (content, outputPath) {
-    if (!outputPath || !outputPath.endsWith(".html") || !isProduction) {
+  eleventyConfig.addTransform("htmlmin", async (content, outputPath) => {
+    if (!outputPath?.endsWith(".html") || !isProduction) {
       return content;
     }
 

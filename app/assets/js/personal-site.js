@@ -15,14 +15,19 @@
   const timeline = document.querySelector("[data-timeline]");
   const timelineProgress = document.querySelector("[data-timeline-progress]");
   const prefersReducedMotion =
-    "matchMedia" in window && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    "matchMedia" in window &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const systemThemeQuery =
-    "matchMedia" in window ? window.matchMedia("(prefers-color-scheme: light)") : null;
+    "matchMedia" in window
+      ? window.matchMedia("(prefers-color-scheme: light)")
+      : null;
 
   const getStoredTheme = () => {
     try {
       const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-      return storedTheme === "light" || storedTheme === "dark" ? storedTheme : null;
+      return storedTheme === "light" || storedTheme === "dark"
+        ? storedTheme
+        : null;
     } catch {
       return null;
     }
@@ -64,9 +69,7 @@
   const persistTheme = (theme) => {
     try {
       window.localStorage.setItem(THEME_STORAGE_KEY, theme);
-    } catch {
-      // Ignore storage failures and keep the selected theme active.
-    }
+    } catch {}
   };
 
   const commitTheme = (theme) => {
@@ -101,14 +104,19 @@
       return;
     }
 
-    scrollDownIndicator.classList.toggle("is-hero-active", isActive && !prefersReducedMotion);
+    scrollDownIndicator.classList.toggle(
+      "is-hero-active",
+      isActive && !prefersReducedMotion,
+    );
   };
 
   if ("IntersectionObserver" in window && heroSection && scrollDownIndicator) {
     const heroObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          setScrollIndicatorActive(entry.isIntersecting && entry.intersectionRatio > 0.56);
+          setScrollIndicatorActive(
+            entry.isIntersecting && entry.intersectionRatio > 0.56,
+          );
         });
       },
       {
@@ -136,9 +144,13 @@
       },
     );
 
-    revealItems.forEach((item) => observer.observe(item));
+    revealItems.forEach((item) => {
+      observer.observe(item);
+    });
   } else {
-    revealItems.forEach((item) => item.classList.add("is-visible"));
+    revealItems.forEach((item) => {
+      item.classList.add("is-visible");
+    });
   }
 
   let timelineTargetProgress = 0;
@@ -151,7 +163,10 @@
     }
 
     timelineProgress.style.height = `${progress * 100}%`;
-    timelineProgress.classList.toggle("is-active", progress > 0.015 && progress < 0.999);
+    timelineProgress.classList.toggle(
+      "is-active",
+      progress > 0.015 && progress < 0.999,
+    );
   };
 
   const animateTimelineProgress = () => {
@@ -179,7 +194,8 @@
       return;
     }
 
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const viewportHeight =
+      window.innerHeight || document.documentElement.clientHeight;
     const position = viewportHeight - rect.top;
     const progress = Math.max(0, Math.min(position / rect.height, 1));
     timelineTargetProgress = progress;
