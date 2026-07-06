@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Eleventy static single-page personal site",
+  "license": "UNLICENSED",
   "scripts": {
     "dev": "eleventy --serve",
     "build": "pnpm run fonts:fetch && pnpm run build:assets && NODE_ENV=production eleventy",

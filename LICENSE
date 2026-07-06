@@ -1,0 +1,25 @@
+Copyright (c) 2026 Igor Cheliadinski. All Rights Reserved.
+
+This repository and all of its contents — including but not limited to the
+source code, build tooling, configuration, HTML/CSS/JavaScript, design,
+written content (biography, career history, project descriptions, and other
+copy), and brand assets (logos, icons, and images) — are the proprietary
+property of Igor Cheliadinski.
+
+No permission is granted to any person or entity to use, copy, modify, merge,
+publish, distribute, sublicense, or sell any part of this repository, in whole
+or in part, without the express prior written permission of the copyright
+holder. Viewing the public source for reference is permitted; reuse is not.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Third-party components are excluded from the above and remain governed by their
+own licenses. In particular, the Wotfard (Atipo Foundry) and Dank Mono fonts
+are commercial, non-redistributable fonts licensed separately to the copyright
+holder; they are not committed to this repository and are not covered by these
+terms. Third-party npm dependencies are governed by their respective licenses.

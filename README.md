@@ -135,9 +135,10 @@ for removing the binaries from existing git history.
 
 ## Licensing
 
-The site code is © Igor Cheliadinski. **No license is granted yet** — add a
-`LICENSE` file (all-rights-reserved or a chosen open license) to clarify reuse
-terms.
+© Igor Cheliadinski. **All rights reserved** — see [`LICENSE`](LICENSE). The
+source code, content, and brand assets are proprietary; viewing the public
+source for reference is fine, but no reuse, copying, or redistribution is
+granted without written permission.
 
 The fonts under `public/fonts/` (Wotfard by Atipo Foundry, and Dank Mono) are
 **third-party commercial fonts** licensed to the site owner. They are **not**
