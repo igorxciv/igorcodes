@@ -1,11 +1,13 @@
-/* global window, document */
-
 (function initNotFoundPage() {
   const notFoundPage = document.querySelector("[data-404]");
 
   if (!notFoundPage) {
     return;
   }
+
+  // personal-site.js also runs on the 404 page and adds "fm-enhanced", but guard
+  // against it being absent so JS-only controls are revealed even in isolation.
+  document.body.classList.add("fm-enhanced");
 
   const codeElement = notFoundPage.querySelector("[data-404-code]");
   const codeShadowElement = notFoundPage.querySelector("[data-404-code-shadow]");

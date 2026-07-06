@@ -1,5 +1,6 @@
-/* global window, document, IntersectionObserver */
-
+// This theme logic is a deliberately duplicated pair with the inline pre-paint
+// script in personal-site.njk (which runs before paint to avoid a theme flash).
+// Both must agree on the storage key "fm-theme" and the default-dark behavior.
 (function initPersonalSitePage() {
   const THEME_STORAGE_KEY = "fm-theme";
 
@@ -7,8 +8,7 @@
 
   const root = document.documentElement;
   const themeToggle = document.querySelector("[data-theme-toggle]");
-  const themeToggleStatus = document.querySelector("[data-theme-toggle-status]");
-  const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+  const themeColorMetas = document.querySelectorAll('meta[name="theme-color"]');
   const revealItems = Array.from(document.querySelectorAll(".fm-reveal"));
   const heroSection = document.querySelector("#hero");
   const scrollDownIndicator = document.querySelector(".fm-scroll-down");
@@ -38,25 +38,25 @@
   };
 
   const updateThemeToggleState = (theme) => {
-    if (!themeToggle || !themeToggleStatus) {
+    if (!themeToggle) {
       return;
     }
 
-    const nextTheme = theme === "light" ? "dark" : "light";
-    const status = `${theme === "light" ? "Light" : "Dark"} theme active. Activate to switch to ${nextTheme} theme.`;
-
     themeToggle.setAttribute("aria-checked", String(theme === "light"));
     themeToggle.dataset.theme = theme;
-    themeToggleStatus.textContent = status;
   };
 
   const applyTheme = (theme) => {
     root.dataset.theme = theme;
     root.style.colorScheme = theme;
 
-    if (themeColorMeta) {
-      themeColorMeta.setAttribute("content", theme === "light" ? "#f6f1e8" : "#0a0a0a");
-    }
+    const { themeColorLight, themeColorDark } = root.dataset;
+    const color = theme === "light" ? themeColorLight : themeColorDark;
+
+    themeColorMetas.forEach((meta) => {
+      meta.removeAttribute("media");
+      meta.setAttribute("content", color);
+    });
 
     updateThemeToggleState(theme);
   };
@@ -95,13 +95,6 @@
       applyTheme(event.matches ? "light" : "dark");
     });
   }
-
-  window.addEventListener("keydown", (event) => {
-    if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "t") {
-      event.preventDefault();
-      toggleTheme();
-    }
-  });
 
   const setScrollIndicatorActive = (isActive) => {
     if (!scrollDownIndicator) {

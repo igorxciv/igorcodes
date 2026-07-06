@@ -5,10 +5,10 @@ eleventyExcludeFromCollections: true
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 {% for entry in collections.all %}
-{% if entry.url and not entry.data.noindex and not entry.data.eleventyExcludeFromCollections %}
+{% if entry.url and not entry.data.noindex %}
   <url>
     <loc>{{ (site.url + entry.url) | url }}</loc>
-    <lastmod>{{ entry.data.updated or build.isoDate }}</lastmod>
+    <lastmod>{{ entry.data.updated or site.contentUpdated }}</lastmod>
 {% if entry.data.changefreq %}
     <changefreq>{{ entry.data.changefreq }}</changefreq>
 {% endif %}

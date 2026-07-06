@@ -1,7 +1,7 @@
 <div class="fm-page">
   <section id="hero" class="fm-hero" aria-labelledby="hero-title">
     <div class="fm-hero-content">
-      <p class="fm-role">SOFTWARE ENGINEER</p>
+      <p class="fm-role">Software Engineer</p>
       <h1 id="hero-title" class="fm-name">Igor Cheliadinski</h1>
       <p class="fm-tagline">Frontend-focused full-stack engineer with a systems and architecture mindset.</p>
       <nav class="fm-hero-links" aria-label="Hero links">
@@ -27,41 +27,16 @@
         <span class="fm-timeline-line" aria-hidden="true"></span>
         <span class="fm-timeline-progress" data-timeline-progress aria-hidden="true"></span>
         <ol class="fm-timeline" data-timeline>
-          <li class="fm-timeline-item fm-timeline-item-left fm-reveal">
+          {% for item in timeline %}
+          <li class="fm-timeline-item {% if loop.index0 % 2 == 0 %}fm-timeline-item-left{% else %}fm-timeline-item-right{% endif %} fm-reveal">
             <div class="fm-timeline-copy">
-              <p class="fm-year">2023</p>
-              <h3>Principal Engineer</h3>
-              <p>Contributing to a membership and learning platform by shipping product improvements with strong maintainability and delivery quality.</p>
+              <p class="fm-year">{{ item.year }}</p>
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.description }}</p>
             </div>
             <span class="fm-timeline-dot" aria-hidden="true"></span>
           </li>
-
-          <li class="fm-timeline-item fm-timeline-item-right fm-reveal">
-            <div class="fm-timeline-copy">
-              <p class="fm-year">2021</p>
-              <h3>Lead Software Engineer</h3>
-              <p>Delivered frontend and full-stack solutions for Fortune 500 clients, with emphasis on architecture decisions and long-term product stability.</p>
-            </div>
-            <span class="fm-timeline-dot" aria-hidden="true"></span>
-          </li>
-
-          <li class="fm-timeline-item fm-timeline-item-left fm-reveal">
-            <div class="fm-timeline-copy">
-              <p class="fm-year">2017</p>
-              <h3>Senior Software Engineer</h3>
-              <p>Worked on user-facing web products in a high-scale digital entertainment context with focus on responsiveness and UX quality.</p>
-            </div>
-            <span class="fm-timeline-dot" aria-hidden="true"></span>
-          </li>
-
-          <li class="fm-timeline-item fm-timeline-item-right fm-reveal">
-            <div class="fm-timeline-copy">
-              <p class="fm-year">2014</p>
-              <h3>Software Engineer</h3>
-              <p>Started engineering career building robust web interfaces and learning how to balance product goals with technical constraints.</p>
-            </div>
-            <span class="fm-timeline-dot" aria-hidden="true"></span>
-          </li>
+          {% endfor %}
         </ol>
       </div>
     </div>
@@ -75,88 +50,24 @@
       </header>
 
       <div class="fm-grid fm-grid-two">
+        {% for project in projects %}
         <article class="fm-card fm-project-card fm-reveal">
           <div class="fm-project-card-head">
-            <h3>Electives AI Simulations</h3>
-            <a href="https://www.electives.io/ai-simulations" target="_blank" rel="noopener noreferrer" class="fm-project-link">
-              <span class="fm-project-link-text">Visit site</span>
+            <h3>{{ project.title }}</h3>
+            <a href="{{ project.url }}"{% if project.external %} target="_blank" rel="noopener noreferrer"{% endif %} class="fm-project-link">
+              <span class="fm-project-link-text">{{ project.linkText }}</span>
               <span class="fm-project-link-icon" aria-hidden="true">{% lucide "squareArrowOutUpRight" %}</span>
-              <span class="fm-visually-hidden"> for Electives AI Simulations (opens in a new tab)</span>
+              <span class="fm-visually-hidden"> for {{ project.title }}{% if project.external %} (opens in a new tab){% endif %}</span>
             </a>
           </div>
-          <p>Built AI-powered workplace simulations that let learners practice realistic conversations, get live coaching, and repeat tailored scenarios for stronger on-the-job performance.</p>
+          <p>{{ project.description }}</p>
           <ul class="fm-tags">
-            <li>React</li>
-            <li>TypeScript</li>
-            <li>Product Engineering</li>
-            <li>Voice AI</li>
-            <li>Conversational UX</li>
-            <li>Realtime Systems</li>
+            {% for tag in project.tags %}
+            <li>{{ tag }}</li>
+            {% endfor %}
           </ul>
         </article>
-
-        <article class="fm-card fm-project-card fm-reveal">
-          <div class="fm-project-card-head">
-            <h3>AR Virtual Try-On (Web)</h3>
-            <a href="#contact" class="fm-project-link">
-              <span class="fm-project-link-text">Ask about it</span>
-              <span class="fm-project-link-icon" aria-hidden="true">{% lucide "squareArrowOutUpRight" %}</span>
-              <span class="fm-visually-hidden"> for AR Virtual Try-On (Web)</span>
-            </a>
-          </div>
-          <p>Built web-based AR try-on experiences for a global beauty brand, including eyeshadow and lipstick features that used the device camera for responsive, realistic cosmetic previews.</p>
-          <ul class="fm-tags">
-            <li>Three.js</li>
-            <li>TensorFlow.js</li>
-            <li>MediaPipe</li>
-            <li>WebAssembly</li>
-            <li>WebGL</li>
-            <li>Vector Graphics</li>
-            <li>Computer Vision</li>
-            <li>TypeScript</li>
-          </ul>
-        </article>
-
-        <article class="fm-card fm-project-card fm-reveal">
-          <div class="fm-project-card-head">
-            <h3>Enterprise Web Platforms</h3>
-            <a href="https://www.epam.com/" target="_blank" rel="noopener noreferrer" class="fm-project-link">
-              <span class="fm-project-link-text">Visit site</span>
-              <span class="fm-project-link-icon" aria-hidden="true">{% lucide "squareArrowOutUpRight" %}</span>
-              <span class="fm-visually-hidden"> for Enterprise Web Platforms (opens in a new tab)</span>
-            </a>
-          </div>
-          <p>Built and optimized large-scale web platforms for Fortune 500 teams in finance and e-commerce, while leading distributed engineering teams and partnering with stakeholders to deliver reliable production systems.</p>
-          <ul class="fm-tags">
-            <li>React</li>
-            <li>Angular</li>
-            <li>Node.js</li>
-            <li>Performance Optimization</li>
-            <li>Web Accessibility</li>
-            <li>CI/CD</li>
-            <li>Frontend Architecture</li>
-          </ul>
-        </article>
-
-        <article class="fm-card fm-project-card fm-reveal">
-          <div class="fm-project-card-head">
-            <h3>Accessible E-Commerce Checkout</h3>
-            <a href="#contact" class="fm-project-link">
-              <span class="fm-project-link-text">Ask about it</span>
-              <span class="fm-project-link-icon" aria-hidden="true">{% lucide "squareArrowOutUpRight" %}</span>
-              <span class="fm-visually-hidden"> for Accessible E-Commerce Checkout</span>
-            </a>
-          </div>
-          <p>Built advanced accessibility improvements for a high-traffic e-commerce checkout, targeting WCAG AAA with robust external keyboard support on mobile and tablet devices, screen reader compatibility, and accessible validation.</p>
-          <ul class="fm-tags">
-            <li>React</li>
-            <li>TypeScript</li>
-            <li>Web Accessibility</li>
-            <li>Semantic HTML</li>
-            <li>ARIA</li>
-            <li>Performance Optimization</li>
-          </ul>
-        </article>
+        {% endfor %}
       </div>
     </div>
   </section>
@@ -178,7 +89,7 @@
                   <span aria-hidden="true">{% lucide "calendar" %}</span>
                   {{ article.dateLabel }}
                   {% if article.detail %}
-                    <i aria-hidden="true">•</i>
+                    <span class="fm-dot-sep" aria-hidden="true">•</span>
                     {{ article.detail }}
                   {% endif %}
                 </small>
@@ -195,7 +106,7 @@
                 <small>
                   <span aria-hidden="true">{% lucide "calendar" %}</span>
                   Updated regularly
-                  <i aria-hidden="true">•</i>
+                  <span class="fm-dot-sep" aria-hidden="true">•</span>
                   Notes and articles
                 </small>
               </span>
@@ -236,45 +147,17 @@
       </p>
 
       <ul class="fm-contact-list">
+        {% for contact in contacts %}
         <li class="fm-reveal">
-          <a href="mailto:hi@igorcodes.dev">
+          <a href="{{ contact.href }}"{% if contact.external %} target="_blank" rel="noopener noreferrer"{% endif %}>
             <span class="fm-contact-icon" aria-hidden="true">
-              {% lucide "mail" %}
+              {% lucide contact.icon %}
             </span>
-            <span><small>Email</small><strong>hi@igorcodes.dev</strong></span>
+            <span><small>{{ contact.label }}</small><strong>{{ contact.value }}</strong>{% if contact.external %}<span class="fm-visually-hidden"> (opens in a new tab)</span>{% endif %}</span>
           </a>
         </li>
-        <li class="fm-reveal">
-          <a href="https://github.com/igorxciv" target="_blank" rel="noopener noreferrer">
-            <span class="fm-contact-icon" aria-hidden="true">
-              {% lucide "github" %}
-            </span>
-            <span><small>GitHub</small><strong>github.com/igorxciv</strong><span class="fm-visually-hidden"> (opens in a new tab)</span></span>
-          </a>
-        </li>
-        <li class="fm-reveal">
-          <a href="https://linkedin.com/in/igorxciv" target="_blank" rel="noopener noreferrer">
-            <span class="fm-contact-icon" aria-hidden="true">
-              {% lucide "linkedin" %}
-            </span>
-            <span><small>LinkedIn</small><strong>linkedin.com/in/igorxciv</strong><span class="fm-visually-hidden"> (opens in a new tab)</span></span>
-          </a>
-        </li>
-        <li class="fm-reveal">
-          <a href="https://t.me/igorxciv" target="_blank" rel="noopener noreferrer">
-            <span class="fm-contact-icon" aria-hidden="true">
-              {% lucide "globe" %}
-            </span>
-            <span><small>Telegram</small><strong>t.me/igorxciv</strong><span class="fm-visually-hidden"> (opens in a new tab)</span></span>
-          </a>
-        </li>
+        {% endfor %}
       </ul>
     </div>
   </section>
-
-  <footer class="fm-footer">
-    <div class="fm-container fm-footer-inner">
-      <p>© {{ build.year }} {{ site.name }}. All rights reserved.</p>
-    </div>
-  </footer>
 </div>
