@@ -1,10 +1,19 @@
 # Purge commercial fonts from git history
 
-The fonts under `public/fonts/` (Wotfard by Atipo Foundry, and Dank Mono) are
-**commercial, non-redistributable** fonts. Because this repository is public,
-their binaries are downloadable from the raw git history — which is
-redistribution and likely violates both licenses. Deleting the files in a normal
-commit is **not** enough; they remain in every earlier commit.
+> **Status: completed.** History was rewritten and force-pushed; `main` no longer
+> contains any font binaries in any commit. This document is kept as the record
+> of what was done and how to redo it if fonts are ever re-committed.
+
+The Wotfard (Atipo Foundry) and Dank Mono fonts are **commercial,
+non-redistributable** fonts. Because this repository is public, their binaries
+were downloadable from the raw git history — which is redistribution and likely
+violates both licenses. Deleting the files in a normal commit is **not** enough;
+they remain in every earlier commit. Over the repo's life the binaries lived in
+**three** locations, all of which had to be purged:
+
+- `app/fonts/` — the original location (a full family: many weights + italics)
+- `public/fonts/` — the later, trimmed set actually served
+- `__fonts/` — a short-lived root directory
 
 This runbook rewrites history to remove them. It is **destructive** and requires
 a **force-push** — coordinate with anyone else who has a clone before running it,
@@ -48,12 +57,29 @@ git clone --mirror . ../igorcodes-backup.git
 
 ## 2. Rewrite history
 
-Uses [git-filter-repo](https://github.com/newren/git-filter-repo)
-(`brew install git-filter-repo`). This removes both the live `public/fonts/`
-binaries and the already-deleted root `__fonts/` directory from all history:
+Preferred: [git-filter-repo](https://github.com/newren/git-filter-repo)
+(`brew install git-filter-repo`). This removes all three historical font
+locations from every commit:
 
 ```bash
-git filter-repo --path public/fonts --path __fonts --invert-paths
+git filter-repo --path app/fonts --path public/fonts --path __fonts --invert-paths
+```
+
+If `git-filter-repo` is unavailable, git's built-in `filter-branch` does the same
+(this is what was actually used):
+
+```bash
+FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --force --index-filter \
+  'git rm -r --cached --ignore-unmatch app/fonts public/fonts __fonts' \
+  --prune-empty --tag-name-filter cat -- --all
+git for-each-ref --format='delete %(refname)' refs/original | git update-ref --stdin
+git reflog expire --expire=now --all && git gc --prune=now
+```
+
+Verify nothing remains before pushing:
+
+```bash
+git rev-list --all --objects | grep -iE 'woff|\.otf|\.ttf'   # expect no output
 ```
 
 `git filter-repo` strips the `origin` remote as a safety measure; re-add it:
