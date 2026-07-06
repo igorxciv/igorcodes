@@ -1,5 +1,21 @@
 module.exports = [
   {
+    title: "Span — iOS Healthspan App",
+    url: "#contact",
+    linkText: "Ask about it",
+    external: false,
+    description:
+      "Building an iOS healthspan app powered by an LLM personalization engine that models real eating behavior and proposes one budget-aware food upgrade per week, adapting to observed habits. My first iOS project — owning architecture, code review, and product decisions while leaning on Claude for implementation velocity in an unfamiliar stack.",
+    tags: [
+      "SwiftUI",
+      "Supabase",
+      "iOS",
+      "LLM Personalization",
+      "Product Engineering",
+      "AI Engineering",
+    ],
+  },
+  {
     title: "Electives AI Simulations",
     url: "https://www.electives.io/ai-simulations",
     linkText: "Visit site",

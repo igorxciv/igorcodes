@@ -3,7 +3,7 @@ module.exports = [
     year: "2023",
     title: "Principal Engineer",
     description:
-      "Contributing to a membership and learning platform by shipping product improvements with strong maintainability and delivery quality.",
+      "Contributing to a membership and learning platform by shipping product improvements with strong maintainability and delivery quality, while driving company-wide AI adoption across engineering, sales, and customer success.",
   },
   {
     year: "2021",
