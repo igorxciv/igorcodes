@@ -27,7 +27,7 @@
     "@biomejs/biome": "2.5.2",
     "@vercel/blob": "^2.5.0",
     "html-minifier-terser": "7.2.0",
-    "lefthook": "2.1.9",
+    "lefthook": "2.1.10",
     "lightningcss": "1.32.0",
     "lucide": "1.23.0",
     "rolldown": "1.1.4"
