@@ -15,7 +15,7 @@ Eleventy.
 - Build-time icons via `lucide` (rendered to inline SVG, no client runtime)
 - Blog "Writing" list fetched from `blog.igorcodes.dev` via `@11ty/eleventy-fetch`
 - [Biome](https://biomejs.dev/) for linting + formatting, [lefthook](https://lefthook.dev/) git hooks
-- `pnpm` package manager, Node `>=26` (both pinned in `mise.toml`)
+- `pnpm` 12 package manager, Node 26 LTS (both pinned in `mise.toml`)
 
 ## Project structure
 
@@ -35,7 +35,7 @@ Eleventy.
 ## Scripts
 
 - `pnpm dev` start Eleventy dev server
-- `pnpm build` production build (`build:assets` + `NODE_ENV=production eleventy`)
+- `pnpm build` production build (`fonts:fetch` + `build:assets` + `NODE_ENV=production eleventy`)
 - `pnpm build:assets` build optimized CSS/JS assets and manifest only
 - `pnpm clean` remove build/cache folders
 - `pnpm lint` run Biome linter
