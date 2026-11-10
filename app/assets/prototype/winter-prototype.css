@@ -1,0 +1,253 @@
+/*
+ * PROTOTYPE, throwaway. Winter scene look, three variants on the home page,
+ * switchable via ?variant=A|B|C. Not production code.
+ */
+:root {
+  --proto-snow: light-dark(#ffffff, #dcf0fb);
+  --proto-snow-shade: light-dark(#6e8296, #6fa5c4);
+  --proto-cap: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 22' preserveAspectRatio='none'%3E%3Cpath d='M0 9C12 3 26 2 40 6S66 10 80 6S108 1 124 5S150 10 160 9V14C150 15 146 20 140 20S134 14 126 14S100 17 86 15S60 12 40 15S14 16 0 14Z' fill='%23f1f8fc'/%3E%3Cpath d='M160 14C150 15 146 20 140 20S134 14 126 14S100 17 86 15S60 12 40 15S14 16 0 14' fill='none' stroke='%236fa5c4' stroke-width='1.2'/%3E%3C/svg%3E");
+}
+
+:root[data-theme="light"] {
+  --proto-cap: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 22' preserveAspectRatio='none'%3E%3Cpath d='M0 9C12 3 26 2 40 6S66 10 80 6S108 1 124 5S150 10 160 9V14C150 15 146 20 140 20S134 14 126 14S100 17 86 15S60 12 40 15S14 16 0 14Z' fill='%23ffffff'/%3E%3Cpath d='M0 9C12 3 26 2 40 6S66 10 80 6S108 1 124 5S150 10 160 9' fill='none' stroke='%23a9b8c6' stroke-width='1'/%3E%3Cpath d='M160 14C150 15 146 20 140 20S134 14 126 14S100 17 86 15S60 12 40 15S14 16 0 14' fill='none' stroke='%236e8296' stroke-width='1.4'/%3E%3C/svg%3E");
+}
+
+.fm-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- canvases ---------- */
+.proto-canvas-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  pointer-events: none;
+}
+
+.proto-canvas-hero {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  pointer-events: none;
+}
+
+.proto-v-b .proto-canvas-hero {
+  mask-image: linear-gradient(to bottom, #000 90%, transparent);
+}
+
+.proto-v-b .fm-hero-content,
+.proto-v-b .fm-scroll-down {
+  z-index: 1;
+}
+
+.proto-v-b .fm-hero-content {
+  position: relative;
+  /* lift the copy a little so the ground has room */
+  translate: 0 -6svh;
+}
+
+.proto-band {
+  position: relative;
+  z-index: 1;
+  block-size: clamp(170px, 26vw, 250px);
+  margin-block-start: 1rem;
+  pointer-events: none;
+}
+
+.proto-band canvas {
+  inline-size: 100%;
+  block-size: 100%;
+  display: block;
+}
+
+.proto-v-a .fm-footer {
+  margin-top: 0;
+  border-top-color: var(--proto-snow-shade);
+}
+
+.proto-companion {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 20;
+  inline-size: clamp(120px, 22vw, 210px);
+  block-size: clamp(120px, 22vw, 210px);
+  pointer-events: none;
+}
+
+.proto-drift {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 19;
+  block-size: 30px;
+  pointer-events: none;
+  transform-origin: bottom;
+  animation: proto-drift-grow 40s ease-out both;
+}
+
+.proto-drift svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.proto-drift path {
+  fill: var(--proto-snow);
+  stroke: var(--proto-snow-shade);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.proto-still .proto-drift {
+  animation: none;
+}
+
+@keyframes proto-drift-grow {
+  from {
+    transform: scaleY(0.05);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* ---------- content accents: caps on cards ---------- */
+.proto-caps .fm-card {
+  position: relative;
+}
+
+.proto-caps .fm-card::before {
+  content: "";
+  position: absolute;
+  left: 0.7rem;
+  right: 0.7rem;
+  top: -14px;
+  block-size: 22px;
+  border-radius: 11px;
+  background: var(--proto-cap) round 0 0 / 160px 22px;
+  pointer-events: none;
+}
+
+.proto-caps .fm-project-card:nth-child(even)::before {
+  left: 30%;
+  right: 0.9rem;
+  background-position-x: 60px;
+}
+
+.proto-caps .fm-timeline-dot::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: -4px;
+  block-size: 7px;
+  border-radius: 60% 60% 40% 40% / 90% 90% 30% 30%;
+  background: var(--proto-snow);
+  box-shadow: 0 1px 0 var(--proto-snow-shade);
+}
+
+/* ---------- content accents: snow resting on each letter ---------- */
+.proto-w {
+  white-space: nowrap;
+}
+
+.proto-l {
+  position: relative;
+  display: inline-block;
+}
+
+.proto-l[data-snow]::before {
+  content: "";
+  position: absolute;
+  left: var(--l);
+  inline-size: var(--w);
+  top: var(--t);
+  block-size: var(--h);
+  border-radius: 50% 50% 34% 34% / 100% 100% 16% 16%;
+  background: var(--proto-snow);
+  box-shadow:
+    0 0.012em 0 0.012em var(--proto-snow-shade),
+    inset 0 -0.02em 0.03em
+    color-mix(in srgb, var(--proto-snow-shade) 45%, transparent);
+  rotate: var(--r);
+  pointer-events: none;
+}
+
+@media (forced-colors: active) {
+  .proto-caps .fm-card::before,
+  .proto-caps .fm-timeline-dot::after,
+  .proto-l[data-snow]::before,
+  .proto-drift {
+    display: none;
+  }
+}
+
+/* ---------- prototype switcher (not part of the design) ---------- */
+.proto-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 0.9rem;
+  z-index: 1000;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.45rem;
+  border-radius: 999px;
+  background: #ffe14d;
+  color: #111;
+  font:
+    500 13px / 1.2 ui-monospace,
+    Menlo,
+    monospace;
+  box-shadow: 0 6px 22px rgb(0 0 0 / 0.45);
+  white-space: nowrap;
+}
+
+.proto-bar button {
+  appearance: none;
+  border: 1px solid #111;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+}
+
+.proto-bar button[aria-pressed="true"] {
+  background: #111;
+  color: #ffe14d;
+}
+
+.proto-bar-label {
+  min-inline-size: 14rem;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .proto-bar {
+    font-size: 11px;
+    gap: 0.2rem;
+  }
+  .proto-bar-label {
+    min-inline-size: 6.5rem;
+  }
+}
+
+/* Round 2: the scene fades in from the page background instead of popping in. */
+.proto-v-b2 .proto-canvas-hero {
+  opacity: 0;
+  transition: opacity 2.8s cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+.proto-v-b2 .proto-canvas-hero.proto-in {
+  opacity: 1;
+}

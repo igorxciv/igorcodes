@@ -88,9 +88,15 @@ module.exports = (eleventyConfig) => {
     });
   } else {
     eleventyConfig.addPassthroughCopy({ "app/assets/": "/assets/" });
+    // PROTOTYPE (winter look): serve three.js straight from node_modules.
+    eleventyConfig.addPassthroughCopy({
+      "node_modules/three/build/": "/prototype-three/",
+      "node_modules/three/examples/jsm/": "/prototype-three-addons/",
+    });
   }
   eleventyConfig.addWatchTarget("./app/assets/css/");
   eleventyConfig.addWatchTarget("./app/assets/js/");
+  eleventyConfig.addWatchTarget("./app/assets/prototype/");
 
   eleventyConfig.addNunjucksShortcode(
     "lucide",

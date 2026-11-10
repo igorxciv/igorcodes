@@ -234,6 +234,15 @@
     {% if includeDefaultJs %}
       <script src="{{ assets.js | url }}" defer></script>
     {% endif %}
+    {# PROTOTYPE (winter look): three variants of the winter scene on the home
+       page, switchable via ?variant=A|B|C. Dev server only; never built. #}
+    {% if eleventy.env.runMode == "serve" and not notFoundPage %}
+      <link rel="stylesheet" href="/assets/prototype/winter-prototype.css" />
+      <script type="importmap">
+        { "imports": { "three": "/prototype-three/three.module.js", "three/addons/": "/prototype-three-addons/" } }
+      </script>
+      <script type="module" src="/assets/prototype/winter-prototype.js"></script>
+    {% endif %}
     {% if notFoundPage and assets.notFoundJs %}
       <script src="{{ assets.notFoundJs | url }}" defer></script>
     {% endif %}
