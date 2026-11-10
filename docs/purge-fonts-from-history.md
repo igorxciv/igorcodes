@@ -44,7 +44,7 @@ vercel env pull          # writes BLOB_READ_WRITE_TOKEN into .env.local
 pnpm fonts:upload        # uploads the 6 woff2 from public/fonts/
 ```
 
-> Alternative to the whole approach: switch to open-licensed fonts you *can*
+> Alternative to the whole approach: switch to open-licensed fonts you _can_
 > commit (Wotfard → a libre grotesque, Dank Mono → JetBrains Mono in
 > `noncritical-fonts.css` / `personal-site-critical.css`). That is a visual
 > change but removes the licensing constraint entirely.
