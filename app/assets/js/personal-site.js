@@ -14,13 +14,10 @@
   const scrollDownIndicator = document.querySelector(".fm-scroll-down");
   const timeline = document.querySelector("[data-timeline]");
   const timelineProgress = document.querySelector("[data-timeline-progress]");
-  const prefersReducedMotion =
-    "matchMedia" in window &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const systemThemeQuery =
-    "matchMedia" in window
-      ? window.matchMedia("(prefers-color-scheme: light)")
-      : null;
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  const systemThemeQuery = window.matchMedia("(prefers-color-scheme: light)");
 
   const getStoredTheme = () => {
     try {
@@ -39,7 +36,7 @@
       return storedTheme;
     }
 
-    return systemThemeQuery?.matches ? "light" : "dark";
+    return systemThemeQuery.matches ? "light" : "dark";
   };
 
   const updateThemeToggleState = (theme) => {
@@ -91,15 +88,13 @@
     themeToggle.addEventListener("click", toggleTheme);
   }
 
-  if (systemThemeQuery) {
-    systemThemeQuery.addEventListener("change", (event) => {
-      if (getStoredTheme()) {
-        return;
-      }
+  systemThemeQuery.addEventListener("change", (event) => {
+    if (getStoredTheme()) {
+      return;
+    }
 
-      applyTheme(event.matches ? "light" : "dark");
-    });
-  }
+    applyTheme(event.matches ? "light" : "dark");
+  });
 
   const setScrollIndicatorActive = (isActive) => {
     if (!scrollDownIndicator) {
@@ -112,7 +107,7 @@
     );
   };
 
-  if ("IntersectionObserver" in window && heroSection && scrollDownIndicator) {
+  if (heroSection && scrollDownIndicator) {
     const heroObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -131,7 +126,7 @@
     setScrollIndicatorActive(Boolean(scrollDownIndicator));
   }
 
-  if ("IntersectionObserver" in window && revealItems.length > 0) {
+  if (revealItems.length > 0) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -148,10 +143,6 @@
 
     revealItems.forEach((item) => {
       observer.observe(item);
-    });
-  } else {
-    revealItems.forEach((item) => {
-      item.classList.add("is-visible");
     });
   }
 
