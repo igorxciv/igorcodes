@@ -12,7 +12,9 @@ moment.
 The decorative layer shown on the site while a season is current, such as
 falling snow, a snowman, or snow resting on text. A seasonal scene sits on top
 of the content and of either theme, never replaces them, and can be removed or
-swapped for another season's scene without touching the content.
+swapped for another season's scene without touching the content. A page shows
+either the whole scene or its content accents alone; the 404 page shows content
+accents alone.
 
 ## Theme
 
@@ -35,9 +37,12 @@ readability and remain when the ambient layer is not running.
 
 The visitor-facing switch that turns the whole seasonal scene on or off, both
 the ambient layer and the content accents. The choice is remembered across
-visits and applies to every season. An explicit choice always wins over what
-the site would otherwise pick for the visitor. The control is absent when the
-current season has no scene.
+visits and applies to every season and every page. An explicit choice always
+wins over what the site would otherwise pick for the visitor. Switching the
+scene back on from a page that shows no ambient layer is not such a choice: it
+returns the visitor to what the site would pick. The control is absent when the
+current season has no scene, and on a page where that scene has nothing to
+show.
 
 ## Occasion
 
