@@ -16,20 +16,22 @@ const COUNTS = { name: [3, 4], heading: [1, 2] };
 
 // No leaf on tall narrow stems: there is nothing for it to rest on.
 const TALL_STEMS = /[bdfhkltijI1]/;
-const RESTS_LEAF = /[\p{L}\p{N}&]/u;
+const CAN_HOLD_LEAF = /[\p{L}\p{N}&]/u;
 
-// Leaf geometry, as fractions of the heading's font size.
+// Leaf geometry, as fractions of the heading's font size. A leaf is broad
+// and lies close on its letter, so it reads as a fallen leaf rather than as
+// an accent mark over the letter.
 const MIN_INK_WIDTH = 0.3;
-const LEAF_WIDTH = 0.34;
+const LEAF_WIDTH = 0.42;
 const LEAF_WIDTH_VARIATION = 0.08;
 // Height to width of a leaf seen lying almost flat.
-const LEAF_ASPECT = 0.4;
+const LEAF_ASPECT = 0.34;
 // Clear space between a leaf and any glyph.
-const LEAF_GAP = 0.03;
+const LEAF_GAP = 0.015;
 const MAX_TILT_DEG = 7;
-// A leaf keeps this many pixels clear of the viewport's edges, where the
-// section box would clip it.
-const VIEW_MARGIN = 2;
+// A leaf keeps this many pixels clear of the edges of its section and of the
+// viewport: the section box clips anything that overflows it.
+const BOX_MARGIN = 2;
 const TONES = 4;
 
 // Leaf outlines in a 100 x 40 box, lying on their lower edge, each with its
@@ -142,7 +144,11 @@ function candidatesIn(glyphs, size) {
   const candidates = [];
   glyphs.forEach((glyph, index) => {
     const isWide = glyph.right - glyph.left >= size * MIN_INK_WIDTH;
-    if (isWide && RESTS_LEAF.test(glyph.char) && !TALL_STEMS.test(glyph.char)) {
+    if (
+      isWide &&
+      CAN_HOLD_LEAF.test(glyph.char) &&
+      !TALL_STEMS.test(glyph.char)
+    ) {
       candidates.push(index);
     }
   });
@@ -165,10 +171,24 @@ const overlaps = (first, second) =>
   first.top < second.bottom &&
   second.top < first.bottom;
 
-// The leaf for one letter, or null when it would touch a glyph or leave the
-// viewport. The box it is checked with covers the leaf at its tilt plus the
-// clear space, so the drawn leaf stays clear of every glyph.
-function leafOn(glyph, rolls, glyphs, size) {
+// The room a heading's leaves must stay inside: its section's box, within
+// the viewport.
+function roomFor(heading) {
+  const section = (
+    heading.closest("section") ?? heading
+  ).getBoundingClientRect();
+  const viewWidth = document.documentElement.clientWidth;
+  return {
+    left: Math.max(section.left, 0) + BOX_MARGIN,
+    right: Math.min(section.right, viewWidth) - BOX_MARGIN,
+    top: section.top + BOX_MARGIN,
+  };
+}
+
+// The leaf for one letter, or null when it would touch a glyph or another
+// leaf, or leave the room. The box it is checked with (its reach) covers the
+// leaf at its tilt plus the clear space, so the drawn leaf stays clear.
+function leafOn(glyph, rolls, { glyphs, size, room, leaves }) {
   const [widthRoll, offsetRoll, tiltRoll, shapeRoll, toneRoll] = rolls;
   const inkWidth = glyph.right - glyph.left;
   const width = Math.min(
@@ -192,15 +212,19 @@ function leafOn(glyph, rolls, glyphs, size) {
     bottom: top + height + growY + gap,
   };
 
-  const viewWidth = document.documentElement.clientWidth;
-  if (reach.left < VIEW_MARGIN || reach.right > viewWidth - VIEW_MARGIN) {
-    return null;
-  }
-  if (glyphs.some((other) => overlaps(reach, other))) {
+  const isInRoom =
+    reach.left >= room.left &&
+    reach.right <= room.right &&
+    reach.top >= room.top;
+  const isClear = [...glyphs, ...leaves.map((leaf) => leaf.reach)].every(
+    (other) => !overlaps(reach, other),
+  );
+  if (!(isInRoom && isClear)) {
     return null;
   }
 
   return {
+    reach,
     left,
     top,
     width,
@@ -212,32 +236,41 @@ function leafOn(glyph, rolls, glyphs, size) {
 }
 
 // Picks this heading's leaves: a seeded count, offered to letters in a
-// seeded order, never two on neighbouring letters.
+// seeded order, preferably never two on neighbouring letters. If that leaves
+// the heading short of its fewest, neighbours are offered too.
 function chooseLeaves(heading, hook) {
   const { glyphs, size } = measureGlyphs(heading);
   const random = createRandom(heading.textContent);
   const [fewest, most] = COUNTS[hook];
   const count = fewest + Math.floor(random() * (most - fewest + 1));
-  const leaves = [];
+  // Each letter's random values are drawn once, so a leaf does not depend on
+  // whether another found room, nor on which pass placed it.
+  const offers = shuffled(candidatesIn(glyphs, size), random).map((index) => ({
+    index,
+    rolls: [random(), random(), random(), random(), random()],
+  }));
+  const placed = { glyphs, size, room: roomFor(heading), leaves: [] };
   const taken = [];
 
-  for (const index of shuffled(candidatesIn(glyphs, size), random)) {
-    // The same number of random values for every letter, so that one leaf
-    // does not depend on whether another found room.
-    const rolls = [random(), random(), random(), random(), random()];
-    if (leaves.length === count) {
-      break;
+  const offer = (isSpaced) => {
+    for (const { index, rolls } of offers) {
+      const isNeighbour = taken.some((other) => Math.abs(other - index) < 2);
+      const isSkipped =
+        placed.leaves.length === count ||
+        taken.includes(index) ||
+        (isSpaced && isNeighbour);
+      const leaf = isSkipped ? null : leafOn(glyphs[index], rolls, placed);
+      if (leaf) {
+        placed.leaves.push(leaf);
+        taken.push(index);
+      }
     }
-    if (taken.some((other) => Math.abs(other - index) < 2)) {
-      continue;
-    }
-    const leaf = leafOn(glyphs[index], rolls, glyphs, size);
-    if (leaf) {
-      leaves.push(leaf);
-      taken.push(index);
-    }
+  };
+  offer(true);
+  if (placed.leaves.length < fewest) {
+    offer(false);
   }
-  return leaves;
+  return placed.leaves;
 }
 
 function createPart(tag, part, d) {
@@ -275,8 +308,10 @@ function attach(heading, hook) {
   let isDetached = false;
 
   const draw = () => {
-    // The font may finish loading after the leaves were taken off.
-    if (isDetached || !isWebFontLoaded(fontOf(heading), originalText)) {
+    // The font may finish loading after the leaves were taken off, and a
+    // heading removed from the page has no font to check.
+    const isGone = isDetached || !heading.isConnected;
+    if (isGone || !isWebFontLoaded(fontOf(heading), originalText)) {
       return;
     }
     const origin = heading.getBoundingClientRect();

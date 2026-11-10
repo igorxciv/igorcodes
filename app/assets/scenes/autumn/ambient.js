@@ -1,5 +1,5 @@
-// Autumn scene, ambient layer: the winter place in another season. Green
-// pines on the left, a deciduous tree in full colour on the right with a
+// Autumn scene, ambient layer: green pines on the left, a deciduous tree in
+// full colour on the right with a
 // scarecrow in front of it, leaf-covered ground, and leaves falling from the
 // tree's side of the hero. During Halloween three carved pumpkins sit on the
 // ground: two at the scarecrow's feet, one by the pines.
@@ -66,6 +66,8 @@ const FADE_IN = "opacity 2.8s cubic-bezier(0.3, 0, 0.2, 1)";
 const FRAMES_BEFORE_FADE = 3;
 const MAX_LEAVES = 40;
 const CROWN_LEAVES = 1400;
+// Colours in each theme's leaf palette (THEMES[theme].leaves).
+const LEAF_TONES = 4;
 // Lines of copy the falling leaves keep dim behind (spec 1.9); more are
 // ignored.
 const MAX_COPY_LINES = 24;
@@ -148,17 +150,19 @@ const PINES = [
   [-0.62, -7, 3.6, 2],
   [-0.44, -3.2, 2.2, 4],
 ];
-// The deciduous tree behind the scarecrow: [fraction, z, height].
-const TREE = [0.82, -7.5, 3.4];
+// The deciduous tree behind the scarecrow: [fraction, z]. It is shown at the
+// size it is built (see CROWN).
+const TREE = [0.82, -7.5];
 const SCARECROW_X = 0.62;
 const SCARECROW_Z = -2;
-// Halloween pumpkins: [x, z, radius, turn]. The first two sit at the
-// scarecrow's feet, offset from it; the third stands by the pines, with x as
-// a fraction of the half-width.
+// Halloween pumpkins at the scarecrow's feet: [x offset from him (scaled
+// with the scene), z offset from him, radius, turn].
 const PUMPKINS_AT_FEET = [
   [-0.62, 0.55, 0.27, 0.35],
   [0.55, 0.35, 0.22, -0.3],
 ];
+// The Halloween pumpkin by the pines: [x as a fraction of the half-width at
+// that depth, z, radius, turn].
 const PUMPKIN_BY_PINES = [-0.36, -2.4, 0.3, 0.2];
 
 // Ground height: broad swells plus small lumps.
@@ -341,11 +345,13 @@ function createEnvironment(stage) {
 
 // ---------------------------------------------------------------- ground
 
-// Shared by the ground, the tree and the falling leaves, so one theme change
-// recolours them all.
+// Uniforms shared by the ground and the falling leaves, so one theme change
+// recolours both. The tree colours its own leaf cards from the theme.
 function createPalette() {
   return {
-    tones: { value: [0, 1, 2, 3].map(() => new Color()) },
+    tones: {
+      value: Array.from({ length: LEAF_TONES }, () => new Color()),
+    },
     soil: { value: new Color() },
     contour: { value: 0 },
   };
@@ -356,7 +362,8 @@ function createPalette() {
 // where a cell shrinks under a pixel, the leaves blend to their average
 // colour instead of shimmering.
 const LITTER_GLSL = `
-  uniform vec3 uTones[4];
+  #define LEAF_TONES ${LEAF_TONES}
+  uniform vec3 uTones[LEAF_TONES];
   uniform vec3 uSoil;
   varying vec2 vGround;
   vec4 litterHash(vec2 cell) {
@@ -367,7 +374,11 @@ const LITTER_GLSL = `
       dot(cell, vec2(91.7, 233.1)))) * 43758.5453);
   }
   vec3 litter(vec2 p) {
-    vec3 average = (uTones[0] + uTones[1] + uTones[2] + uTones[3]) * 0.22;
+    vec3 average = vec3(0.0);
+    for (int tone = 0; tone < LEAF_TONES; tone++) {
+      average += uTones[tone];
+    }
+    average *= 0.88 / float(LEAF_TONES);
     float lumps = 0.5 + 0.5 * sin(p.x * 1.3 + sin(p.y * 0.9) * 2.0);
     vec3 color = uSoil * mix(0.75, 1.1, lumps);
     for (int layer = 0; layer < 3; layer++) {
@@ -385,7 +396,7 @@ const LITTER_GLSL = `
       float present = step(0.32, fract(h.w * 7.31));
       float inside = smoothstep(-blur, blur, edge) * step(abs(along), 1.0) * present;
       // Fallen leaves are duller and darker than those still falling.
-      vec3 tone = mix(uSoil, uTones[int(h.w * 3.99)], mix(0.45, 0.85, h.y));
+      vec3 tone = mix(uSoil, uTones[int(h.w * float(LEAF_TONES) * 0.999)], mix(0.45, 0.85, h.y));
       color = mix(color, tone * mix(0.6, 0.95, h.x), inside);
     }
     float detail = smoothstep(0.25, 0.6, fwidth(p.x * 3.2) + fwidth(p.y * 3.2));
@@ -484,7 +495,7 @@ async function loadPine(assets) {
   return { model: gltf.scene, foliage, bark };
 }
 
-// The same pines as winter, green and without snow.
+// The pines, green and with the model's own textures.
 function createPines(pine) {
   const materials = {
     foliage: new MeshStandardMaterial({
@@ -529,8 +540,8 @@ function createPines(pine) {
 
 // ---------------------------------------------------------------- tree
 
-// Crown clusters of the deciduous tree: [x, y, z, radius], for a tree
-// TREE[2] high. Each sits at the end of a limb from the top of the trunk.
+// Crown clusters of the deciduous tree: [x, y, z, radius], for a tree about
+// 3.4 high. Each sits at the end of a limb from the top of the trunk.
 const CROWN = [
   [0, 2.75, 0, 0.62],
   [-0.62, 2.35, 0.15, 0.52],
@@ -615,7 +626,7 @@ function createTree() {
     );
     size.setScalar(0.2 + random() * 0.1);
     cards.setMatrixAt(index, matrix.compose(point, turn, size));
-    tones[index] = Math.floor(random() * 4);
+    tones[index] = Math.floor(random() * LEAF_TONES);
     shades[index] = 0.75 + random() * 0.3;
   }
   group.add(cards);
@@ -700,8 +711,8 @@ function createSleeve(side, cloth, straw) {
 }
 
 // The head is its own group so it can turn without the body: a lumpy burlap
-// sack with stitched features, straw under the hat, and the same tilted top
-// hat as winter's snowman.
+// sack with stitched features, straw under the hat, and a tilted top hat
+// with a band in the accent colour.
 function createScarecrowHead(accent, straw) {
   const head = new Group();
   head.position.y = 1.9;
@@ -757,7 +768,7 @@ function createScarecrowHead(accent, straw) {
   return head;
 }
 
-// A procedural scarecrow where winter's snowman stands: a post and crossbar,
+// A procedural scarecrow, the scene character: a post and crossbar,
 // a patched shirt with straw at the cuffs and hem, a scarf and hat band in
 // the site accent colour.
 function createScarecrow() {
@@ -952,7 +963,7 @@ const LEAF_VERTEX_SHADER = `
   uniform vec3 uSpread;
   uniform float uDrift;
   uniform float uSize;
-  uniform vec3 uTones[4];
+  uniform vec3 uTones[LEAF_TONES];
   varying vec2 vUv;
   varying vec3 vColor;
   varying float vAlpha;
@@ -981,7 +992,7 @@ const LEAF_VERTEX_SHADER = `
     corner.xy = mat2(cos(spin), -sin(spin), sin(spin), cos(spin)) * corner.xy;
     corner.xz = mat2(cos(flip), -sin(flip), sin(flip), cos(flip)) * corner.xz;
     // Turned edge-on it darkens, turned flat to the light it brightens.
-    vColor = uTones[int(traits.x * 3.99)] * mix(0.62, 1.0, abs(cos(flip)));
+    vColor = uTones[int(traits.x * float(LEAF_TONES) * 0.999)] * mix(0.62, 1.0, abs(cos(flip)));
     vUv = position.xy * 2.0;
     vSeed = release.y * 40.0;
     gl_Position = projectionMatrix * viewMatrix * vec4(p + corner, 1.0);
@@ -1045,7 +1056,7 @@ function createFallingLeaves(palette) {
     transparent: true,
     depthWrite: false,
     side: DoubleSide,
-    defines: { MAX_COPY_LINES },
+    defines: { MAX_COPY_LINES, LEAF_TONES },
     uniforms: {
       uTime: { value: 0 },
       uSource: { value: new Vector3() },
@@ -1397,12 +1408,11 @@ function layOut(stage, world) {
     world.blobShadows.place(blob++, { x, z }, pineHeight * 0.22 * scale);
   });
 
-  const [treeFraction, treeZ, treeHeight] = TREE;
+  const [treeFraction, treeZ] = TREE;
   const treeX = xAt(treeFraction, treeZ);
-  const treeScale = (scale * treeHeight) / 3.4;
   stand(world.tree.group, treeX, treeZ, 0.06);
-  world.tree.group.scale.setScalar(treeScale);
-  world.blobShadows.place(blob++, { x: treeX, z: treeZ }, 0.9 * treeScale);
+  world.tree.group.scale.setScalar(scale);
+  world.blobShadows.place(blob++, { x: treeX, z: treeZ }, 0.9 * scale);
 
   const scarecrowX = xAt(SCARECROW_X, SCARECROW_Z);
   const { group } = world.scarecrow;
@@ -1437,11 +1447,11 @@ function layOut(stage, world) {
   const halfWidth = HALF_FOV_TAN * camera.aspect * 22;
   const { uniforms } = world.leaves;
   uniforms.uSource.value.set(
-    treeX - 0.3 * treeScale,
-    world.tree.group.position.y + CROWN_CENTRE.y * treeScale,
+    treeX - 0.3 * scale,
+    world.tree.group.position.y + CROWN_CENTRE.y * scale,
     treeZ + 3,
   );
-  uniforms.uSpread.value.set(1.6 * treeScale, 0.7 * treeScale, 3.2);
+  uniforms.uSpread.value.set(1.6 * scale, 0.7 * scale, 3.2);
   uniforms.uDrift.value = halfWidth * 0.32;
   uniforms.uSize.value = 0.24 * MathUtils.clamp(scale * 1.2, 0.8, 1);
 
@@ -1498,6 +1508,8 @@ function animateScarecrow(stage, scarecrow, pointer, clock) {
 function applyLighterForm(stage, world) {
   const form = FORMS.lighter;
   stage.sun.castShadow = false;
+  // Release the shadow map now rather than at destroy.
+  stage.sun.shadow.dispose();
   world.blobShadows.group.visible = true;
   world.leaves.geometry.instanceCount = form.leaves;
   world.ground.geometry.dispose();
