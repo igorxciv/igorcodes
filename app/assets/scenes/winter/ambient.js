@@ -41,7 +41,9 @@ import {
   SRGBColorSpace,
   TextureLoader,
   TorusGeometry,
+  Vector2,
   Vector3,
+  Vector4,
   VSMShadowMap,
   WebGLRenderer,
 } from "three";
@@ -57,6 +59,8 @@ const FADE_IN = "opacity 2.8s cubic-bezier(0.3, 0, 0.2, 1)";
 // and the scene never pops in.
 const FRAMES_BEFORE_FADE = 3;
 const MAX_FLAKES = 760;
+// Lines of copy the snowfall keeps dim behind (spec 1.9); more are ignored.
+const MAX_COPY_LINES = 24;
 
 // The full form and the lighter form: same composition, lower cost.
 const FORMS = {
@@ -175,7 +179,7 @@ function createRandom(seed) {
 }
 
 const CSS_COLOR =
-  /(?:rgba?|color)\(\s*(?:srgb\s+)?([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/;
+  /(?:rgba?|color)\(\s*(?:srgb\s+)?([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+%?))?/;
 
 // Resolves a page colour token (theme-dependent, light-dark()) to the colour
 // it has right now, so the scene follows the site's tokens.
@@ -772,6 +776,10 @@ const FLAKE_FRAGMENT_SHADER = `
   uniform float uOpacity;
   uniform vec3 uShade;
   uniform float uShadeAmount;
+  uniform vec4 uCopyLines[MAX_COPY_LINES];
+  uniform float uCopyCaps[MAX_COPY_LINES];
+  uniform int uCopyLineCount;
+  uniform vec2 uCopyEdge;
   varying vec2 vLight;
   varying vec2 vUv;
   varying float vAlpha;
@@ -784,6 +792,17 @@ const FLAKE_FRAGMENT_SHADER = `
     float edge = 0.6 + 0.09 * sin(a * 2.0 + vSeed) + 0.07 * sin(a * 3.0 - vSeed * 1.7) + 0.04 * sin(a * 5.0 + vSeed * 0.3);
     float soft = mix(0.45, 1.0, vBlur);
     float alpha = smoothstep(edge, edge - soft * edge, r) * vAlpha * uOpacity;
+    // Behind a line of the page's copy a flake is held under that line's
+    // cap, easing back to full strength just outside it.
+    float cap = 1.0;
+    for (int i = 0; i < MAX_COPY_LINES; i++) {
+      if (i >= uCopyLineCount) break;
+      vec4 line = uCopyLines[i];
+      vec2 outside = max(line.xy - gl_FragCoord.xy, gl_FragCoord.xy - line.zw);
+      float near = 1.0 - smoothstep(uCopyEdge.x, uCopyEdge.y, length(max(outside, 0.0)));
+      cap = min(cap, mix(1.0, uCopyCaps[i], near));
+    }
+    alpha = min(alpha, cap);
     if (alpha < 0.004) discard;
     // Lit side white, far side shaded: a flake with volume, not a speck.
     float lit = smoothstep(-0.5, 0.25, dot(vUv, vLight));
@@ -805,6 +824,7 @@ function createSnowfall() {
   const material = new ShaderMaterial({
     transparent: true,
     depthWrite: false,
+    defines: { MAX_COPY_LINES },
     uniforms: {
       uTime: { value: 0 },
       uColor: { value: new Color() },
@@ -814,6 +834,13 @@ function createSnowfall() {
       uSize: { value: 1 },
       uFocus: { value: 15 },
       uBox: { value: new Vector3(26, 11, 20) },
+      // Filled by the copy guard, in drawing-buffer pixels.
+      uCopyLines: {
+        value: Array.from({ length: MAX_COPY_LINES }, () => new Vector4()),
+      },
+      uCopyCaps: { value: new Array(MAX_COPY_LINES).fill(1) },
+      uCopyLineCount: { value: 0 },
+      uCopyEdge: { value: new Vector2() },
     },
     vertexShader: FLAKE_VERTEX_SHADER,
     fragmentShader: FLAKE_FRAGMENT_SHADER,
@@ -832,6 +859,156 @@ function createSnowfall() {
   };
 
   return { mesh, geometry, uniforms: material.uniforms, applyTheme };
+}
+
+// ---------------------------------------------------------------- copy guard
+
+// Text keeps at least 4.5:1 (3:1 for the name) against anything drawn behind
+// it (spec 1.9). Only flakes cross the copy, so each line of text in the
+// page's "copy" hook gets a cap on flake opacity, worked out from that line's
+// colour, the page background and the theme's flake colours. The cap holds
+// even where two flakes overlap.
+
+// Room around a line before flakes start to recover, and the width of the
+// recovery, in CSS pixels.
+const COPY_PAD = 4;
+const COPY_FEATHER = 14;
+const COPY_RATIO = 4.5;
+const NAME_RATIO = 3;
+// Longer than the slowest transition on the copy (the 1.8 s hero lift).
+const COPY_TRANSITION_WATCH_MS = 2000;
+
+const toLinear = (channel) => {
+  const value = channel / 255;
+  return value <= 0.040_45 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+};
+
+// WCAG relative luminance of an sRGB colour with 0-255 channels.
+const luminance = ([red, green, blue]) =>
+  0.2126 * toLinear(red) + 0.7152 * toLinear(green) + 0.0722 * toLinear(blue);
+
+const contrastRatio = (first, second) =>
+  (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05);
+
+// A solid colour as 0-255 sRGB channels, or null when it cannot be read or
+// is translucent, since what shows through it is unknown.
+const parseCssColor = (value) => {
+  const match = CSS_COLOR.exec(value);
+  const alpha = match?.[4] ?? "1";
+  const opacity = Number.parseFloat(alpha) / (alpha.endsWith("%") ? 100 : 1);
+  if (!match || opacity < 1) {
+    return null;
+  }
+  const scale = value.startsWith("color(") ? 255 : 1;
+  return [match[1] * scale, match[2] * scale, match[3] * scale];
+};
+
+// The strongest flake opacity at which text of this colour still holds its
+// ratio against the page background with any flake colour behind it, two
+// flakes deep. The canvas blends in sRGB, so the mix is done there too.
+function flakeCap(text, background, flakeColors, ratio) {
+  const textLuminance = luminance(text);
+  const holds = (alpha) =>
+    flakeColors.every((flake) => {
+      const behind = background.map(
+        (channel, index) => channel + (flake[index] - channel) * alpha,
+      );
+      return contrastRatio(textLuminance, luminance(behind)) >= ratio;
+    });
+
+  let cap = 0;
+  for (let step = 1; step <= 100; step++) {
+    const single = step / 100;
+    if (!holds(1 - (1 - single) ** 2)) {
+      break;
+    }
+    cap = single;
+  }
+  return cap;
+}
+
+// Every line box of text in the copy, with the element that colours it.
+function readCopyLines(copy) {
+  const lines = [];
+  const range = document.createRange();
+  const walker = document.createTreeWalker(copy, NodeFilter.SHOW_TEXT);
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (!node.data.trim()) {
+      continue;
+    }
+    range.selectNodeContents(node);
+    for (const rect of range.getClientRects()) {
+      if (rect.width && rect.height) {
+        lines.push({ rect, owner: node.parentElement });
+      }
+    }
+  }
+  return lines;
+}
+
+function createCopyGuard(stage, uniforms) {
+  const { host, renderer } = stage;
+  const copy = host.parentElement?.querySelector("[data-scene-copy]") ?? null;
+  let flakeColors = [];
+  let pageColor = [];
+  // Caps by text colour and ratio, for the current theme.
+  const caps = new Map();
+
+  // Called on every theme change, after the page has switched theme.
+  const setLook = (look) => {
+    flakeColors = [look.flake, look.flakeShade].map((hex) =>
+      [1, 3, 5].map((start) =>
+        Number.parseInt(hex.slice(start, start + 2), 16),
+      ),
+    );
+    const page = readPageColor(host, "--fm-bg", new Color()).getRGB(
+      new Color(),
+      SRGBColorSpace,
+    );
+    pageColor = [page.r * 255, page.g * 255, page.b * 255];
+    caps.clear();
+  };
+
+  // The flake cap for one text node, from its colour and its role.
+  const capFor = (owner) => {
+    const color = getComputedStyle(owner).color;
+    const ratio = owner.closest('[data-scene-accent="name"]')
+      ? NAME_RATIO
+      : COPY_RATIO;
+    const key = `${color} ${ratio}`;
+    if (!caps.has(key)) {
+      const text = parseCssColor(color);
+      // A colour that cannot be read keeps flakes out entirely.
+      caps.set(key, text ? flakeCap(text, pageColor, flakeColors, ratio) : 0);
+    }
+    return caps.get(key);
+  };
+
+  const measure = () => {
+    const box = host.getBoundingClientRect();
+    if (!copy || flakeColors.length === 0 || !box.width || !box.height) {
+      return;
+    }
+    const scale = renderer.domElement.width / box.width;
+    const lines = readCopyLines(copy).slice(0, MAX_COPY_LINES);
+    lines.forEach(({ rect, owner }, index) => {
+      // gl_FragCoord counts from the bottom left of the drawing buffer.
+      uniforms.uCopyLines.value[index].set(
+        (rect.left - box.left) * scale,
+        (box.bottom - rect.bottom) * scale,
+        (rect.right - box.left) * scale,
+        (box.bottom - rect.top) * scale,
+      );
+      uniforms.uCopyCaps.value[index] = capFor(owner);
+    });
+    uniforms.uCopyLineCount.value = lines.length;
+    uniforms.uCopyEdge.value.set(
+      COPY_PAD * scale,
+      (COPY_PAD + COPY_FEATHER) * scale,
+    );
+  };
+
+  return { copy, setLook, measure };
 }
 
 // ---------------------------------------------------------------- blob shadows
@@ -898,6 +1075,7 @@ function buildWorld(stage, pine, context) {
   const pines = createPines(pine);
   const snowfall = createSnowfall();
   snowfall.geometry.instanceCount = form.flakes;
+  const copyGuard = createCopyGuard(stage, snowfall.uniforms);
   const blobShadows = createBlobShadows(pines.trees.length + 1);
   blobShadows.group.visible = form.shadowMap === 0;
   const christmas = context.occasions.includes("christmas")
@@ -919,6 +1097,7 @@ function buildWorld(stage, pine, context) {
     snowman,
     pines,
     snowfall,
+    copyGuard,
     blobShadows,
     christmas,
   };
@@ -943,6 +1122,8 @@ function applyTheme(stage, world, theme) {
   world.environment.applyTheme(look);
   world.pines.snowAmount.value = look.treeSnow;
   world.snowfall.applyTheme(look);
+  world.copyGuard.setLook(look);
+  world.copyGuard.measure();
   world.blobShadows.strength.value = look.blobShadow;
   world.christmas?.applyTheme(look);
 }
@@ -996,6 +1177,7 @@ function layOut(stage, world) {
   renderer.shadowMap.needsUpdate = true;
 
   world.snowfall.uniforms.uBox.value.set(halfWidth * 2 + 4, 11, 20);
+  world.copyGuard.measure();
 }
 
 // Moves the snowman: the head follows the pointer, the body sways and one
@@ -1118,6 +1300,9 @@ export async function mount(host, context) {
   let isInView = true;
   let isContextLost = false;
   let isDestroyed = false;
+  // The copy moves without resizing when it transitions (the hero lift,
+  // link hovers), so it is measured every frame until shortly after.
+  let copyMovingUntil = 0;
 
   const draw = (now) => {
     frameRequest = requestAnimationFrame(draw);
@@ -1139,6 +1324,9 @@ export async function mount(host, context) {
     clock.time += clock.delta;
 
     world.snowfall.uniforms.uTime.value = clock.time;
+    if (now < copyMovingUntil) {
+      world.copyGuard.measure();
+    }
     animateSnowman(stage, world.snowman, tracking.pointer, clock);
     world.christmas?.animate(clock.time);
     renderer.render(scene, camera);
@@ -1164,6 +1352,11 @@ export async function mount(host, context) {
   };
 
   const resizeObserver = new ResizeObserver(() => layOut(stage, world));
+  const copyObserver = new ResizeObserver(() => world.copyGuard.measure());
+  const onCopyMeasure = () => world.copyGuard.measure();
+  const onCopyTransition = () => {
+    copyMovingUntil = performance.now() + COPY_TRANSITION_WATCH_MS;
+  };
   const viewObserver = new IntersectionObserver((entries) => {
     isInView = entries.at(-1).isIntersecting;
     syncLoop();
@@ -1179,6 +1372,14 @@ export async function mount(host, context) {
 
   resizeObserver.observe(host);
   viewObserver.observe(host);
+  const { copy } = world.copyGuard;
+  if (copy) {
+    copyObserver.observe(copy);
+    copy.addEventListener("transitionrun", onCopyTransition);
+    copy.addEventListener("transitionend", onCopyMeasure);
+    copy.addEventListener("transitioncancel", onCopyMeasure);
+  }
+  document.fonts.addEventListener("loadingdone", onCopyMeasure);
   document.addEventListener("visibilitychange", syncLoop);
   canvas.addEventListener("webglcontextlost", onContextLost);
   syncLoop();
@@ -1208,6 +1409,11 @@ export async function mount(host, context) {
       syncLoop();
       resizeObserver.disconnect();
       viewObserver.disconnect();
+      copyObserver.disconnect();
+      copy?.removeEventListener("transitionrun", onCopyTransition);
+      copy?.removeEventListener("transitionend", onCopyMeasure);
+      copy?.removeEventListener("transitioncancel", onCopyMeasure);
+      document.fonts.removeEventListener("loadingdone", onCopyMeasure);
       tracking.stop();
       document.removeEventListener("visibilitychange", syncLoop);
       canvas.removeEventListener("webglcontextlost", onContextLost);
