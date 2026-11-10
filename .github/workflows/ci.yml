@@ -23,4 +23,4 @@ jobs:
         env:
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
       - name: Check internal links and assets
-        run: pnpm dlx linkinator ./_site --recurse --silent --skip "^https?://"
+        run: pnpm dlx linkinator ./_site --recurse --silent --skip "^https?://(?!localhost|127\.0\.0\.1|\[::1\])"
