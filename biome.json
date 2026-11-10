@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.2/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.6/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -47,7 +47,12 @@
         "useMaxParams": {
           "level": "error",
           "options": { "max": 4 }
-        }
+        },
+        "noExcessiveNestedCallbacks": {
+          "level": "error",
+          "options": { "max": 4 }
+        },
+        "noUnnecessaryTemplateExpression": "error"
       },
       "correctness": {
         "preset": "recommended",
@@ -169,14 +174,9 @@
       },
       "nursery": {
         "preset": "none",
-        "noExcessiveNestedCallbacks": {
-          "level": "error",
-          "options": { "max": 4 }
-        },
         "noFloatingPromises": "error",
         "noImpliedEval": "error",
-        "noMisusedPromises": "error",
-        "noUnnecessaryTemplateExpression": "error"
+        "noMisusedPromises": "error"
       }
     }
   },
