@@ -2,15 +2,20 @@ const {
   currentOccasions,
   currentSeason,
 } = require("../_tools/season-clock.js");
+const { scenesForPage } = require("../_tools/scene-page.js");
 const getAssets = require("./assets.js");
 const seasons = require("./seasons.js");
 
 // Seasonal scenes found in app/assets/scenes/, in the shapes the layout needs:
 //   list         one entry per scene, for build-time markup (control icons,
 //                dev stylesheet links)
-//   client       per-season URLs and slot, inlined into the pre-paint script
+//   forPage      forPage(html) gives one page what its scenes can show there:
+//                  client      per-season URLs and slot, inlined into the
+//                              pre-paint script
+//                  hasScenes   false when no scene has anything to show
+//                  devModules  true when the browser loads scene modules
+//                              unbundled (an ambient layer on a dev page)
 //   clockSource  the season picker's source, inlined next to the date table
-//   devModules   true when the browser loads scene modules unbundled
 module.exports = async () => {
   const { discoverScenes } = await import("../_tools/scene-registry.mjs");
   const scenes = await discoverScenes(seasons);
@@ -36,7 +41,11 @@ module.exports = async () => {
         `[scenes] assets-manifest.json has no entry for the ${scene.season} scene. Run pnpm build:assets first.`,
       );
     }
-    client[scene.season] = { slot: scene.slot, ...urls };
+    client[scene.season] = {
+      slot: scene.slot,
+      hasAccents: scene.accentsCss || scene.accentsJs,
+      ...urls,
+    };
   }
 
   return {
@@ -48,8 +57,15 @@ module.exports = async () => {
           ? `/assets/scenes/${scene.season}/accents.css`
           : null,
     })),
-    client,
+    forPage: (html) => {
+      const page = scenesForPage(client, html);
+      return {
+        ...page,
+        devModules:
+          !isProduction &&
+          Object.values(page.client).some((entry) => entry.ambient),
+      };
+    },
     clockSource: `${currentSeason}\n${currentOccasions}`,
-    devModules: !isProduction && scenes.some((scene) => scene.ambient),
   };
 };

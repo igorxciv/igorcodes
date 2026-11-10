@@ -584,9 +584,22 @@
 
     seasonToggle.addEventListener("click", () => {
       const isOn = seasonToggle.getAttribute("aria-checked") === "true";
-      choice = isOn ? "off" : "on";
+      if (isOn) {
+        choice = "off";
+      } else {
+        // Where the scene has no ambient layer by design (no slot on this
+        // page, or none in the scene), switching on is not an explicit
+        // choice: it clears the stored one and returns the visitor to what
+        // the site would pick. An ambient layer that exists but is not
+        // running (no WebGL, failed download, too slow) still stores "on".
+        choice = hasAmbient ? "on" : null;
+      }
       try {
-        window.localStorage.setItem(SCENE_STORAGE_KEY, choice);
+        if (choice) {
+          window.localStorage.setItem(SCENE_STORAGE_KEY, choice);
+        } else {
+          window.localStorage.removeItem(SCENE_STORAGE_KEY);
+        }
       } catch {
         // Ignore storage failures; the choice still holds for this visit.
       }
@@ -610,7 +623,8 @@
     return { themeChanged: () => ambient?.themeChanged() };
   };
 
-  // Set by the pre-paint script when the current season has a scene.
+  // Set by the pre-paint script when the current season has a scene with
+  // something to show on this page; otherwise the control stays hidden.
   if (window.__fmScene) {
     seasonalScene = initSeasonalScene(window.__fmScene);
   }

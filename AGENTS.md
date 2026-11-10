@@ -90,13 +90,25 @@ control, occasion, lighter form) are defined in `GLOSSARY.md`.
 - `ambient.js` exports `mount(host, context)` returning
   `{ update(context), destroy() }`. `accents.js` exports `apply()` and
   `remove()` and may not import three.js.
-- The machinery is on per page through `seasonalScene: true` front matter
-  (home page only). The pre-paint script in `personal-site.njk` sets
+- The machinery is on per page through `seasonalScene: true` front matter:
+  the home page (whole scene) and the 404 page (content accents alone; only
+  its title carries a hook). The pre-paint script in `personal-site.njk` sets
   `data-scene` on `<html>`; `personal-site.js` owns the season control, loading
   and the frame-rate watch. Both must agree on the `fm-scene` storage key
   (a shared `fm-` name, like `fm-theme`).
+- What a page gets is decided at build time from its HTML
+  (`app/_tools/scene-page.js`): a page without a scene's slot never learns
+  that scene's ambient URLs, so it cannot load three.js. A scene with nothing
+  to show on a page (no content accents, and no slot for its ambient layer) is
+  left out there: no `data-scene`, no season control.
+- Switching the season control on where the scene has no ambient layer by
+  design (no slot on the page, or none in the scene) removes the stored
+  `fm-scene` value instead of storing `"on"`. Where an ambient layer exists
+  but is not running (no WebGL, failed download, too slow), a press still
+  stores `"on"`.
 - `?season=<name>` and `?occasion=<name>` preview a scene for one page view,
-  in production too: `/?season=winter&occasion=christmas`.
+  in production too: `/?season=winter&occasion=christmas`,
+  `/404.html?season=winter`.
 - `build-assets.mjs` appends every `accents.css` to the full stylesheet and
   builds each `accents.js` and `ambient.js` as its own hashed ES module, with
   three.js bundled into the ambient one. `pnpm dev` loads them unbundled
