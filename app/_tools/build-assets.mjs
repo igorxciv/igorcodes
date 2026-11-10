@@ -5,6 +5,8 @@ import path from "node:path";
 import { bundle as bundleCss } from "lightningcss";
 import { rolldown } from "rolldown";
 
+import browserTargets from "./browser-targets.js";
+
 const rootDir = path.resolve(import.meta.dirname, "../..");
 const appDir = path.join(rootDir, "app");
 const buildDir = path.join(appDir, "assets", "build");
@@ -19,16 +21,6 @@ const notFoundCssEntryPath = path.join(
   "not-found.css",
 );
 const notFoundJsEntryPath = path.join(appDir, "assets", "js", "not-found.js");
-
-const packVersion = (major, minor = 0, patch = 0) =>
-  (major << 16) | (minor << 8) | patch;
-
-const browserTargets = {
-  chrome: packVersion(111),
-  edge: packVersion(111),
-  firefox: packVersion(113),
-  safari: packVersion(16, 4),
-};
 
 const hashContent = (content) =>
   createHash("sha256").update(content).digest("hex").slice(0, 10);

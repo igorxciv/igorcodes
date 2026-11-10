@@ -1,3 +1,14 @@
+/*
+ * Theme colors use light-dark(<light>, <dark>), resolved from the element's
+ * color-scheme. The theme is chosen by color-scheme on :root (dark by default,
+ * light under [data-theme="light"]), so each color is declared once. Values
+ * that are not colors (shadows, the --fm-accent-rgb triplet) still need the
+ * explicit light override below.
+ *
+ * For translucent accents use color-mix(in srgb, var(--fm-accent) N%,
+ * transparent). --fm-accent-rgb is unused on this site; it stays only for
+ * stylesheets elsewhere (the blog) that may still consume it.
+ */
 :root {
   --font-sans:
     "Wotfard", "Avenir Next", "Segoe UI Variable", "Segoe UI", "Helvetica Neue",
@@ -7,32 +18,41 @@
     "Dank Mono", "SFMono-Regular", "Menlo", "Consolas", "Liberation Mono",
     monospace;
   --fm-accent-rgb: 0, 217, 255;
-  --fm-bg: #0a0a0a;
-  --fm-text: #e5e5e5;
-  --fm-muted: #9d9d9d;
-  --fm-muted-strong: #c9c9c9;
-  --fm-muted-soft: #5a5a5a;
-  --fm-border: #2f2f2f;
-  --fm-border-soft: #1b1b1b;
-  --fm-border-strong: #3a3a3a;
-  --fm-accent: #00d9ff;
-  --fm-accent-soft: rgba(var(--fm-accent-rgb), 0.12);
-  --fm-accent-soft-strong: rgba(var(--fm-accent-rgb), 0.16);
-  --fm-accent-line: rgba(var(--fm-accent-rgb), 0.45);
-  --fm-surface: #121212;
-  --fm-surface-hover: #171717;
-  --fm-surface-raised: #161616;
-  --fm-surface-strong: #181818;
-  --fm-surface-inset: #141414;
-  --fm-shadow-elevated: 0 12px 24px rgba(0, 0, 0, 0.28);
-  --fm-theme-button-bg: #242424;
-  --fm-theme-button-border: #646464;
-  --fm-theme-button-shadow: 0 0 0 rgba(0, 0, 0, 0);
-  --fm-theme-button-icon: #b5b5b5;
-  --fm-theme-button-icon-muted: #b5b5b5;
-  --fm-theme-button-highlight: rgba(255, 255, 255, 0.06);
-  --fm-theme-button-glow: rgba(255, 255, 255, 0.08);
-  --fm-theme-button-focus-ring: #8aefff;
+  --fm-bg: light-dark(#f6f1e8, #0a0a0a);
+  --fm-text: light-dark(#16130f, #e5e5e5);
+  --fm-muted: light-dark(#6e6558, #9d9d9d);
+  --fm-muted-strong: light-dark(#423b32, #c9c9c9);
+  --fm-muted-soft: light-dark(#796c5b, #5a5a5a);
+  --fm-border: light-dark(#d8cfc3, #2f2f2f);
+  --fm-border-soft: light-dark(#ebe1d5, #1b1b1b);
+  --fm-border-strong: light-dark(#c8bdae, #3a3a3a);
+  --fm-accent: light-dark(#006a80, #00d9ff);
+  --fm-accent-soft: light-dark(rgb(0 106 128 / 0.1), rgb(0 217 255 / 0.12));
+  --fm-accent-soft-strong: light-dark(
+    rgb(0 106 128 / 0.14),
+    rgb(0 217 255 / 0.16)
+  );
+  --fm-accent-line: light-dark(rgb(0 106 128 / 0.34), rgb(0 217 255 / 0.45));
+  --fm-surface: light-dark(rgb(255 251 244 / 0.84), #121212);
+  --fm-surface-hover: light-dark(#f4ebdf, #171717);
+  --fm-surface-raised: light-dark(#fffaf2, #161616);
+  --fm-surface-strong: light-dark(#f1e8dc, #181818);
+  --fm-surface-inset: light-dark(#efe5d8, #141414);
+  --fm-shadow-elevated: 0 12px 24px rgb(0 0 0 / 0.28);
+  --fm-theme-button-bg: light-dark(#ece4d8, #242424);
+  --fm-theme-button-border: light-dark(#8a7760, #646464);
+  --fm-theme-button-shadow: 0 0 0 transparent;
+  --fm-theme-button-icon: light-dark(#5f5648, #b5b5b5);
+  --fm-theme-button-icon-muted: var(--fm-theme-button-icon);
+  --fm-theme-button-highlight: light-dark(
+    rgb(255 255 255 / 0.45),
+    rgb(255 255 255 / 0.06)
+  );
+  --fm-theme-button-glow: light-dark(
+    rgb(95 86 72 / 0.08),
+    rgb(255 255 255 / 0.08)
+  );
+  --fm-theme-button-focus-ring: light-dark(#005f75, #8aefff);
   --fm-motion-fast: 160ms;
   --fm-motion-base: 220ms;
   --fm-motion-slow: 320ms;
@@ -44,32 +64,7 @@
 
 :root[data-theme="light"] {
   --fm-accent-rgb: 0, 106, 128;
-  --fm-bg: #f6f1e8;
-  --fm-text: #16130f;
-  --fm-muted: #6e6558;
-  --fm-muted-strong: #423b32;
-  --fm-muted-soft: #796c5b;
-  --fm-accent: #006a80;
-  --fm-border: #d8cfc3;
-  --fm-border-soft: #ebe1d5;
-  --fm-border-strong: #c8bdae;
-  --fm-accent-soft: rgba(var(--fm-accent-rgb), 0.1);
-  --fm-accent-soft-strong: rgba(var(--fm-accent-rgb), 0.14);
-  --fm-accent-line: rgba(var(--fm-accent-rgb), 0.34);
-  --fm-surface: rgba(255, 251, 244, 0.84);
-  --fm-surface-hover: #f4ebdf;
-  --fm-surface-raised: #fffaf2;
-  --fm-surface-strong: #f1e8dc;
-  --fm-surface-inset: #efe5d8;
-  --fm-shadow-elevated: 0 18px 36px rgba(77, 56, 27, 0.1);
-  --fm-theme-button-bg: #ece4d8;
-  --fm-theme-button-border: #8a7760;
-  --fm-theme-button-shadow: 0 0 0 rgba(0, 0, 0, 0);
-  --fm-theme-button-icon: #5f5648;
-  --fm-theme-button-icon-muted: #5f5648;
-  --fm-theme-button-highlight: rgba(255, 255, 255, 0.45);
-  --fm-theme-button-glow: rgba(95, 86, 72, 0.08);
-  --fm-theme-button-focus-ring: #005f75;
+  --fm-shadow-elevated: 0 18px 36px rgb(77 56 27 / 0.1);
   color-scheme: light;
 }
 

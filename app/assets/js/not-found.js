@@ -13,9 +13,9 @@
   );
   const commandElement = notFoundPage.querySelector("[data-404-command]");
   const backButton = notFoundPage.querySelector("[data-404-back-link]");
-  const prefersReducedMotion =
-    "matchMedia" in window &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
   const prefersDataSaving =
     "connection" in navigator &&
     navigator.connection &&
