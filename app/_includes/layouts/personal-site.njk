@@ -13,6 +13,9 @@
     {% set robotsContent = "noindex, nofollow" if noindex else "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" %}
     {% set isHomepage = page.url == "/" %}
     {% set includeDefaultJs = not skipDefaultJs %}
+    {# Seasonal scenes are switched on per page by `seasonalScene: true` in
+       front matter, and only matter when at least one scene folder exists. #}
+    {% set sceneMachinery = seasonalScene and (scenes.list | length) > 0 %}
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -177,10 +180,92 @@
         });
       })();
     </script>
+    {% if sceneMachinery %}
+      <script>
+        // Picks the seasonal scene pre-paint, so a visitor who switched scenes
+        // off never sees one flash. Sets data-scene (and data-occasions) on
+        // <html> only when a scene is showing; no attribute means the plain
+        // site. Must agree with personal-site.js on the "fm-scene" storage
+        // key. The date table comes from _data/seasons.js and the picker
+        // functions from _tools/season-clock.js.
+        (() => {
+          {{ scenes.clockSource | safe }}
+
+          const table = {{ seasons | dump | safe }};
+          const scenes = {{ scenes.client | dump | safe }};
+          const storageKey = "fm-scene";
+          const root = document.documentElement;
+          const params = new URLSearchParams(window.location.search);
+          const now = new Date();
+          const month = now.getMonth() + 1;
+          const day = now.getDate();
+
+          // ?season= and ?occasion= preview one page view; nothing is stored.
+          let season = currentSeason(table.starts, month, day);
+          const previewSeason = params.get("season");
+          if (previewSeason !== null && Object.hasOwn(table.starts, previewSeason)) {
+            season = previewSeason;
+          }
+
+          if (!Object.hasOwn(scenes, season)) {
+            return;
+          }
+
+          const occasions = currentOccasions(table.occasions, season, month, day);
+          const previewOccasion = params.get("occasion");
+          const isPreviewable = table.occasions.some(
+            (occasion) => occasion.name === previewOccasion && occasion.season === season,
+          );
+          if (isPreviewable && !occasions.includes(previewOccasion)) {
+            occasions.push(previewOccasion);
+          }
+
+          // Read by personal-site.js, which owns everything after first paint.
+          window.__fmScene = { season, occasions, ...scenes[season] };
+
+          if (window.matchMedia("(forced-colors: active)").matches) {
+            return;
+          }
+
+          let storedChoice = null;
+          try {
+            storedChoice = window.localStorage.getItem(storageKey);
+          } catch {}
+
+          if (storedChoice === "off") {
+            return;
+          }
+
+          root.dataset.scene = season;
+          if (occasions.length > 0) {
+            root.dataset.occasions = occasions.join(" ");
+          }
+        })();
+      </script>
+    {% endif %}
     <style>
       {{ criticalCss | safe }}
     </style>
     <link rel="stylesheet" href="{{ assets.css | url }}" />
+    {% if sceneMachinery %}
+      {# Dev server only: production appends every accents.css to the full
+         stylesheet and bundles three.js into each scene. #}
+      {% for scene in scenes.list %}
+        {% if scene.accentsCss %}
+          <link rel="stylesheet" href="{{ scene.accentsCss | url }}" />
+        {% endif %}
+      {% endfor %}
+      {% if scenes.devModules %}
+        <script type="importmap">
+          {
+            "imports": {
+              "three": "{{ '/assets/vendor/three/three.module.js' | url }}",
+              "three/addons/": "{{ '/assets/vendor/three-addons/' | url }}"
+            }
+          }
+        </script>
+      {% endif %}
+    {% endif %}
     {% if notFoundPage and assets.notFoundCss %}
       <link rel="stylesheet" href="{{ assets.notFoundCss | url }}" />
     {% endif %}
@@ -202,6 +287,27 @@
         <p>© {{ build.year }} {{ site.name }}. All rights reserved.</p>
       </div>
     </footer>
+    {% if sceneMachinery %}
+      {# Season control. Hidden until personal-site.js finds a scene for the
+         current season; it then shows that scene's icon. #}
+      <button
+        class="fm-theme-toggle fm-season-toggle"
+        type="button"
+        data-season-toggle
+        role="switch"
+        aria-label="Seasonal scene"
+        aria-checked="false"
+        hidden
+      >
+        <span class="fm-theme-toggle-shell" aria-hidden="true">
+          {% for scene in scenes.list %}
+            <span class="fm-theme-toggle-icon fm-season-toggle-icon" data-season-icon="{{ scene.season }}" hidden>
+              {% lucide scene.icon %}
+            </span>
+          {% endfor %}
+        </span>
+      </button>
+    {% endif %}
     <button
       class="fm-theme-toggle"
       type="button"

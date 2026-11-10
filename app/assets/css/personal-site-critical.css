@@ -200,6 +200,17 @@ a {
   visibility: visible;
 }
 
+/* Season control: a second round button stacked above the theme toggle. It
+   borrows the theme toggle's classes for size and style. */
+.fm-season-toggle {
+  bottom: 5.25rem;
+}
+
+.fm-theme-toggle.fm-season-toggle[hidden],
+.fm-season-toggle-icon[hidden] {
+  display: none;
+}
+
 .fm-hero {
   min-height: 100svh;
   position: relative;
@@ -209,8 +220,20 @@ a {
 }
 
 .fm-hero-content {
+  position: relative;
+  z-index: 1;
   max-width: 48rem;
   text-align: center;
+}
+
+/* Seasonal scene slot "hero": the ambient layer's host. Decorative only, so
+   it sits behind the copy and never takes pointer events. */
+.fm-scene-slot {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 .fm-role {
@@ -289,6 +312,10 @@ a {
   .fm-theme-toggle {
     right: 1.5rem;
     bottom: 1.5rem;
+  }
+
+  .fm-season-toggle {
+    bottom: 5.75rem;
   }
 }
 

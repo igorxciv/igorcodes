@@ -1,5 +1,7 @@
 const { EleventyHtmlBasePlugin } = require("@11ty/eleventy");
 const { minify } = require("html-minifier-terser");
+const lucide = require("lucide");
+
 const {
   ArrowLeft,
   ArrowRight,
@@ -12,7 +14,7 @@ const {
   Mail,
   SquareArrowOutUpRight,
   Terminal,
-} = require("lucide");
+} = lucide;
 
 const lucideIcons = {
   arrowLeft: ArrowLeft,
@@ -27,6 +29,21 @@ const lucideIcons = {
   squareArrowOutUpRight: SquareArrowOutUpRight,
   terminal: Terminal,
 };
+
+// Scene manifests name their season control icon by its lucide name
+// ("snowflake", "leaf"), so a new scene needs no edit here.
+function findLucideIcon(name) {
+  if (lucideIcons[name]) {
+    return lucideIcons[name];
+  }
+
+  const exportName = name
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join("");
+  const iconNode = lucide[exportName];
+  return Array.isArray(iconNode) ? iconNode : null;
+}
 
 const lucideDefaultAttributes = {
   xmlns: "http://www.w3.org/2000/svg",
@@ -88,14 +105,22 @@ module.exports = (eleventyConfig) => {
     });
   } else {
     eleventyConfig.addPassthroughCopy({ "app/assets/": "/assets/" });
+    // The dev server loads scene modules unbundled; the layout's import map
+    // points "three" at these copies. Production bundles three.js into each
+    // scene instead (build-assets.mjs).
+    eleventyConfig.addPassthroughCopy({
+      "node_modules/three/build/": "/assets/vendor/three/",
+      "node_modules/three/examples/jsm/": "/assets/vendor/three-addons/",
+    });
   }
   eleventyConfig.addWatchTarget("./app/assets/css/");
   eleventyConfig.addWatchTarget("./app/assets/js/");
+  eleventyConfig.addWatchTarget("./app/assets/scenes/");
 
   eleventyConfig.addNunjucksShortcode(
     "lucide",
     (name, className = "", label = "") => {
-      const iconNode = lucideIcons[name];
+      const iconNode = findLucideIcon(name);
       if (!iconNode) {
         throw new Error(`Unknown Lucide icon "${name}"`);
       }
