@@ -1,0 +1,230 @@
+{
+ "engine": "firefox",
+ "preview and toggle": {
+  "atLoad": {
+   "scene": "winter",
+   "occasions": "christmas",
+   "ambient": null,
+   "control": "true",
+   "busy": false,
+   "overlays": 6,
+   "canvas": null,
+   "antialias": null,
+   "stored": null,
+   "csp": []
+  },
+  "ambientMounted": true,
+  "mounted": {
+   "scene": "winter",
+   "occasions": "christmas",
+   "ambient": "winter",
+   "control": "true",
+   "busy": false,
+   "overlays": 6,
+   "canvas": "1440x900 opacity=1",
+   "antialias": true,
+   "stored": null,
+   "csp": []
+  },
+  "drawing": {
+   "fps": 61,
+   "drawsPerSec": 6954
+  },
+  "heroOffscreen": {
+   "fps": 0,
+   "drawsPerSec": 0
+  },
+  "heroBack": {
+   "fps": 60,
+   "drawsPerSec": 6840
+  },
+  "headings": [
+   {
+    "text": "Igor Cheliadinski",
+    "selected": "Igor Cheliadinski",
+    "snow": true
+   },
+   {
+    "text": "Career Journey",
+    "selected": "Career Journey",
+    "snow": true
+   },
+   {
+    "text": "Selected Work",
+    "selected": "",
+    "snow": true
+   },
+   {
+    "text": "Writing & Notes",
+    "selected": "",
+    "snow": true
+   },
+   {
+    "text": "Experiments",
+    "selected": "",
+    "snow": true
+   },
+   {
+    "text": "Get in Touch",
+    "selected": "",
+    "snow": true
+   }
+  ],
+  "find": {
+   "word": "Career",
+   "found": true
+  },
+  "aria": "- main:\n  - region \"Igor Cheliadinski\":\n    - paragraph: Software Engineer\n    - heading \"Igor Cheliadinski\" [level=1]\n    - paragraph: Frontend-focused full-stack engineer with a systems and architecture mindset.\n    - navigation \"Hero links\":\n      - link \"View Work\":\n        - /url: \"#projects\"\n      - link \"Get in Touch\":\n        - /url: \"#contact\"\n    - link \"Scroll to career journey\":\n      - /url: \"#timeline\"\n  - region \"Career Journey\":\n    - heading \"Career Journey\" [level=2]\n    - paragraph: Building digital products and engineering systems since 2014\n    - list:\n      - listitem:\n        - paragraph: \"2023\"\n        - heading \"Principal Engineer\" [level=3]\n        - paragraph: Contributing to a membership and learning platform by shipping product improvements with strong maintainability and delivery quality, while driving company-wide AI adoption across engineering, sales, and customer success.\n      - listitem:\n        - paragraph: \"2021\"\n        - heading \"Lead Software Engineer\" [level=3]\n        - paragraph: Delivered frontend and full-stack solutions for Fortune 500 clients, with emphasis on architecture decisions and long-term product stability.\n      - listitem:\n        - paragraph: \"2017\"\n        - heading \"Senior Software Engineer\" [level=3]\n        - paragraph: Worked on user-facing web products in a high-scale digital entertainment context with focus on responsiveness and UX quality.\n      - listitem:\n        - paragraph: \"2014\"\n        - heading \"Software Engineer\" [level=3]\n        - paragraph: Started engineering career building robust web interfaces and learning how to balance product goals with technical constraints.\n  - region \"Selected Work\":\n    - heading \"Selected Work\" [level=2]\n    - paragraph: Projects spanning product engineering, frontend architecture, and systems thinking\n    - article:\n      - heading \"Span — iOS Healthspan App\" [level=3]\n      - link \"Ask about it for Span — iOS Healthspan App\":\n        - /url: \"#contact\"\n      - paragraph: Building an iOS healthspan app powered by an LLM personalization engine that models real eating behavior and proposes one budget-aware food upgrade per week, adapting to observed habits. My first iOS project — owning architecture, code review, and product decisions while leaning on Claude for implementation velocity in an unfamiliar stack.\n      - list:\n        - listitem: SwiftUI\n        - listitem: Supabase\n        - listitem: iOS\n        - listitem: LLM Personalization\n        - listitem: Product Engineering\n        - listitem: AI Engineering\n    - article:\n      - heading \"Electives AI Simulations\" [level=3]\n      - link \"Visit site for Electives AI Simulations (opens in a new tab)\":\n        - /url: https://www.electives.io/ai-simulations\n      - paragraph: Built AI-powered workplace simulations that let learners practice realistic conversations, get live coaching, and repeat tailored scenarios for stronger on-the-job performance.\n      - list:\n        - listitem: React\n        - listitem: TypeScript\n        - listitem: Product Engineering\n        - listitem: Voice AI\n        - listitem: Conversational UX\n        - listitem: Realtime Systems\n    - article:\n      - heading \"AR Virtual Try-On (Web)\" [level=3]\n      - link \"Ask about it for AR Virtual Try-On (Web)\":\n        - /url: \"#contact\"\n      - paragraph: Built web-based AR try-on experiences for a global beauty brand, including eyeshadow and lipstick features that used the device camera for responsive, realistic cosmetic previews.\n      - list:\n        - listitem: Three.js\n        - listitem: TensorFlow.js\n        - listitem: MediaPipe\n        - listitem: WebAssembly\n        - listitem: WebGL\n        - listitem: Vector Graphics\n        - listitem: Computer Vision\n        - listitem: TypeScript\n    - article:\n      - heading \"Enterprise Web Platforms\" [level=3]\n      - link \"Visit site for Enterprise Web Platforms (opens in a new tab)\":\n        - /url: https://www.epam.com/\n      - paragraph: Built and optimized large-scale web platforms for Fortune 500 teams in finance and e-commerce, while leading distributed engineering teams and partnering with stakeholders to deliver reliable production systems.\n      - list:\n        - listitem: React\n        - listitem: Angular\n        - listitem: Node.js\n        - listitem: Performance Optimization\n        - listitem: Web Accessibility\n        - listitem: CI/CD\n        - listitem: Frontend Architecture\n    - article:\n      - heading \"Accessible E-Commerce Checkout\" [level=3]\n      - link \"Ask about it for Accessible E-Commerce Checkout\":\n        - /url: \"#contact\"\n      - paragraph: Built advanced accessibility improvements for a high-traffic e-commerce checkout, targeting WCAG AAA with robust external keyboard support on mobile and tablet devices, screen reader compatibility, and accessible validation.\n      - list:\n        - listitem: React\n        - listitem: TypeScript\n        - listitem: Web Accessibility\n        - listitem: Semantic HTML\n        - listitem: ARIA\n        - listitem: Performance Optimization\n  - region \"Writing & Notes\":\n    - heading \"Writing & Notes\" [level=2]\n    - paragraph: Ideas on systems, product engineering, and practical frontend work\n    - list:\n      - listitem:\n        - link \"Technical Debt Is a Risk Conversation May 12, 2026 A practical framework for turning engineering pain into decision-ready technical debt proposals... (opens in a new tab)\":\n          - /url: https://blog.igorcodes.dev/blog/2026/05/12/technical-debt-is-a-risk-conversation\n          - strong: Technical Debt Is a Risk Conversation\n          - text: May 12, 2026 A practical framework for turning engineering pain into decision-ready technical debt proposals... (opens in a new tab)\n      - listitem:\n        - link \"AI Doesn’t Make You Learn Faster. It Changes What You Learn. Apr 14, 2026 AI can help you finish work faster, but it can also remove the practice that builds real engine... (opens in a new tab)\":\n          - /url: https://blog.igorcodes.dev/blog/2026/04/14/ai-doesnt-make-you-learn-faster\n          - strong: AI Doesn’t Make You Learn Faster. It Changes What You Learn.\n          - text: Apr 14, 2026 AI can help you finish work faster, but it can also remove the practice that builds real engine... (opens in a new tab)\n  - region \"Experiments\":\n    - heading \"Experiments\" [level=2]\n    - paragraph: No public experiments at the moment\n    - article:\n      - heading \"Nothing public yet\" [level=3]\n      - paragraph: I’m still experimenting privately. When something is ready to share, it will show up here.\n  - region \"Get in Touch\":\n    - heading \"Get in Touch\" [level=2]\n    - paragraph: Open to interesting product and engineering conversations\n    - paragraph: \"I focus on outcomes, not stacks: turning constraints, context, and intent into software that is maintainable, predictable, and useful.\"\n    - list:\n      - listitem:\n        - link \"Email hi@igorcodes.dev\":\n          - /url: mailto:hi@igorcodes.dev\n          - text: Email\n          - strong: hi@igorcodes.dev\n      - listitem:\n        - link \"GitHub github.com/igorxciv (opens in a new tab)\":\n          - /url: https://github.com/igorxciv\n          - text: GitHub\n          - strong: github.com/igorxciv\n          - text: (opens in a new tab)\n      - listitem:\n        - link \"LinkedIn linkedin.com/in/igorxciv (opens in a new tab)\":\n          - /url: https://linkedin.com/in/igorxciv\n          - text: LinkedIn\n          - strong: linkedin.com/in/igorxciv\n          - text: (opens in a new tab)\n      - listitem:\n        - link \"Telegram t.me/igorxciv (opens in a new tab)\":\n          - /url: https://t.me/igorxciv\n          - text: Telegram\n          - strong: t.me/igorxciv\n          - text: (opens in a new tab)",
+  "switchByRole": 1,
+  "translation": {
+   "before": true,
+   "after": false
+  },
+  "off": {
+   "scene": null,
+   "occasions": null,
+   "ambient": null,
+   "control": "false",
+   "busy": false,
+   "overlays": 0,
+   "canvas": null,
+   "antialias": null,
+   "stored": "off",
+   "csp": []
+  },
+  "onImmediately": {
+   "scene": "winter",
+   "occasions": "christmas",
+   "ambient": "winter",
+   "control": "true",
+   "busy": false,
+   "overlays": 6,
+   "canvas": "1440x900 opacity=0",
+   "antialias": true,
+   "stored": "on",
+   "csp": []
+  },
+  "onRemounted": true,
+  "on": {
+   "scene": "winter",
+   "occasions": "christmas",
+   "ambient": "winter",
+   "control": "true",
+   "busy": false,
+   "overlays": 6,
+   "canvas": "1440x900 opacity=0.167365",
+   "antialias": true,
+   "stored": "on",
+   "csp": []
+  },
+  "errors": []
+ },
+ "preview stores nothing": {
+  "preview": {
+   "scene": "winter",
+   "stored": null
+  },
+  "plainNext": {
+   "scene": null,
+   "occasions": null,
+   "ambient": null,
+   "control": "absent",
+   "busy": false,
+   "overlays": 0,
+   "canvas": null,
+   "antialias": null,
+   "stored": null,
+   "csp": []
+  }
+ },
+ "plain site aria": {
+  "aria": "- main:\n  - region \"Igor Cheliadinski\":\n    - paragraph: Software Engineer\n    - heading \"Igor Cheliadinski\" [level=1]\n    - paragraph: Frontend-focused full-stack engineer with a systems and architecture mindset.\n    - navigation \"Hero links\":\n      - link \"View Work\":\n        - /url: \"#projects\"\n      - link \"Get in Touch\":\n        - /url: \"#contact\"\n    - link \"Scroll to career journey\":\n      - /url: \"#timeline\"\n  - region \"Career Journey\":\n    - heading \"Career Journey\" [level=2]\n    - paragraph: Building digital products and engineering systems since 2014\n    - list:\n      - listitem:\n        - paragraph: \"2023\"\n        - heading \"Principal Engineer\" [level=3]\n        - paragraph: Contributing to a membership and learning platform by shipping product improvements with strong maintainability and delivery quality, while driving company-wide AI adoption across engineering, sales, and customer success.\n      - listitem:\n        - paragraph: \"2021\"\n        - heading \"Lead Software Engineer\" [level=3]\n        - paragraph: Delivered frontend and full-stack solutions for Fortune 500 clients, with emphasis on architecture decisions and long-term product stability.\n      - listitem:\n        - paragraph: \"2017\"\n        - heading \"Senior Software Engineer\" [level=3]\n        - paragraph: Worked on user-facing web products in a high-scale digital entertainment context with focus on responsiveness and UX quality.\n      - listitem:\n        - paragraph: \"2014\"\n        - heading \"Software Engineer\" [level=3]\n        - paragraph: Started engineering career building robust web interfaces and learning how to balance product goals with technical constraints.\n  - region \"Selected Work\":\n    - heading \"Selected Work\" [level=2]\n    - paragraph: Projects spanning product engineering, frontend architecture, and systems thinking\n    - article:\n      - heading \"Span — iOS Healthspan App\" [level=3]\n      - link \"Ask about it for Span — iOS Healthspan App\":\n        - /url: \"#contact\"\n      - paragraph: Building an iOS healthspan app powered by an LLM personalization engine that models real eating behavior and proposes one budget-aware food upgrade per week, adapting to observed habits. My first iOS project — owning architecture, code review, and product decisions while leaning on Claude for implementation velocity in an unfamiliar stack.\n      - list:\n        - listitem: SwiftUI\n        - listitem: Supabase\n        - listitem: iOS\n        - listitem: LLM Personalization\n        - listitem: Product Engineering\n        - listitem: AI Engineering\n    - article:\n      - heading \"Electives AI Simulations\" [level=3]\n      - link \"Visit site for Electives AI Simulations (opens in a new tab)\":\n        - /url: https://www.electives.io/ai-simulations\n      - paragraph: Built AI-powered workplace simulations that let learners practice realistic conversations, get live coaching, and repeat tailored scenarios for stronger on-the-job performance.\n      - list:\n        - listitem: React\n        - listitem: TypeScript\n        - listitem: Product Engineering\n        - listitem: Voice AI\n        - listitem: Conversational UX\n        - listitem: Realtime Systems\n    - article:\n      - heading \"AR Virtual Try-On (Web)\" [level=3]\n      - link \"Ask about it for AR Virtual Try-On (Web)\":\n        - /url: \"#contact\"\n      - paragraph: Built web-based AR try-on experiences for a global beauty brand, including eyeshadow and lipstick features that used the device camera for responsive, realistic cosmetic previews.\n      - list:\n        - listitem: Three.js\n        - listitem: TensorFlow.js\n        - listitem: MediaPipe\n        - listitem: WebAssembly\n        - listitem: WebGL\n        - listitem: Vector Graphics\n        - listitem: Computer Vision\n        - listitem: TypeScript\n    - article:\n      - heading \"Enterprise Web Platforms\" [level=3]\n      - link \"Visit site for Enterprise Web Platforms (opens in a new tab)\":\n        - /url: https://www.epam.com/\n      - paragraph: Built and optimized large-scale web platforms for Fortune 500 teams in finance and e-commerce, while leading distributed engineering teams and partnering with stakeholders to deliver reliable production systems.\n      - list:\n        - listitem: React\n        - listitem: Angular\n        - listitem: Node.js\n        - listitem: Performance Optimization\n        - listitem: Web Accessibility\n        - listitem: CI/CD\n        - listitem: Frontend Architecture\n    - article:\n      - heading \"Accessible E-Commerce Checkout\" [level=3]\n      - link \"Ask about it for Accessible E-Commerce Checkout\":\n        - /url: \"#contact\"\n      - paragraph: Built advanced accessibility improvements for a high-traffic e-commerce checkout, targeting WCAG AAA with robust external keyboard support on mobile and tablet devices, screen reader compatibility, and accessible validation.\n      - list:\n        - listitem: React\n        - listitem: TypeScript\n        - listitem: Web Accessibility\n        - listitem: Semantic HTML\n        - listitem: ARIA\n        - listitem: Performance Optimization\n  - region \"Writing & Notes\":\n    - heading \"Writing & Notes\" [level=2]\n    - paragraph: Ideas on systems, product engineering, and practical frontend work\n    - list:\n      - listitem:\n        - link \"Technical Debt Is a Risk Conversation May 12, 2026 A practical framework for turning engineering pain into decision-ready technical debt proposals... (opens in a new tab)\":\n          - /url: https://blog.igorcodes.dev/blog/2026/05/12/technical-debt-is-a-risk-conversation\n          - strong: Technical Debt Is a Risk Conversation\n          - text: May 12, 2026 A practical framework for turning engineering pain into decision-ready technical debt proposals... (opens in a new tab)\n      - listitem:\n        - link \"AI Doesn’t Make You Learn Faster. It Changes What You Learn. Apr 14, 2026 AI can help you finish work faster, but it can also remove the practice that builds real engine... (opens in a new tab)\":\n          - /url: https://blog.igorcodes.dev/blog/2026/04/14/ai-doesnt-make-you-learn-faster\n          - strong: AI Doesn’t Make You Learn Faster. It Changes What You Learn.\n          - text: Apr 14, 2026 AI can help you finish work faster, but it can also remove the practice that builds real engine... (opens in a new tab)\n  - region \"Experiments\":\n    - heading \"Experiments\" [level=2]\n    - paragraph: No public experiments at the moment\n    - article:\n      - heading \"Nothing public yet\" [level=3]\n      - paragraph: I’m still experimenting privately. When something is ready to share, it will show up here.\n  - region \"Get in Touch\":\n    - heading \"Get in Touch\" [level=2]\n    - paragraph: Open to interesting product and engineering conversations\n    - paragraph: \"I focus on outcomes, not stacks: turning constraints, context, and intent into software that is maintainable, predictable, and useful.\"\n    - list:\n      - listitem:\n        - link \"Email hi@igorcodes.dev\":\n          - /url: mailto:hi@igorcodes.dev\n          - text: Email\n          - strong: hi@igorcodes.dev\n      - listitem:\n        - link \"GitHub github.com/igorxciv (opens in a new tab)\":\n          - /url: https://github.com/igorxciv\n          - text: GitHub\n          - strong: github.com/igorxciv\n          - text: (opens in a new tab)\n      - listitem:\n        - link \"LinkedIn linkedin.com/in/igorxciv (opens in a new tab)\":\n          - /url: https://linkedin.com/in/igorxciv\n          - text: LinkedIn\n          - strong: linkedin.com/in/igorxciv\n          - text: (opens in a new tab)\n      - listitem:\n        - link \"Telegram t.me/igorxciv (opens in a new tab)\":\n          - /url: https://t.me/igorxciv\n          - text: Telegram\n          - strong: t.me/igorxciv\n          - text: (opens in a new tab)"
+ },
+ "stored off: no flash": {
+  "scene": null,
+  "occasions": null,
+  "ambient": null,
+  "control": "false",
+  "busy": false,
+  "overlays": 0,
+  "canvas": null,
+  "antialias": null,
+  "stored": "off",
+  "csp": [],
+  "sceneEver": false,
+  "snowEver": false,
+  "ambientRequests": 0
+ },
+ "three.js blocked": {
+  "scene": "winter",
+  "occasions": "christmas",
+  "ambient": null,
+  "control": "true",
+  "busy": false,
+  "overlays": 6,
+  "canvas": null,
+  "antialias": null,
+  "stored": null,
+  "csp": [],
+  "errors": []
+ },
+ "WebGL disabled": {
+  "scene": "winter",
+  "occasions": "christmas",
+  "ambient": null,
+  "control": "true",
+  "busy": false,
+  "overlays": 6,
+  "canvas": null,
+  "antialias": null,
+  "stored": null,
+  "csp": [],
+  "ambientRequests": 1,
+  "errors": []
+ },
+ "reduced motion": {
+  "scene": "winter",
+  "occasions": "christmas",
+  "ambient": null,
+  "control": "false",
+  "busy": false,
+  "overlays": 6,
+  "canvas": null,
+  "antialias": null,
+  "stored": null,
+  "csp": [],
+  "ambientRequests": 0
+ },
+ "forced colours (emulated)": {
+  "emulated": true,
+  "scene": null,
+  "occasions": null,
+  "ambient": null,
+  "control": "absent",
+  "busy": false,
+  "overlays": 0,
+  "canvas": null,
+  "antialias": null,
+  "stored": null,
+  "csp": [],
+  "ambientRequests": 0
+ },
+ "phone: lighter form": {
+  "mounted": true,
+  "scene": "winter",
+  "occasions": "christmas",
+  "ambient": "winter",
+  "control": "true",
+  "busy": false,
+  "overlays": 6,
+  "canvas": "390x844 opacity=0.996174",
+  "antialias": false,
+  "stored": null,
+  "csp": [],
+  "drawing": {
+   "fps": 31,
+   "drawsPerSec": 3658
+  },
+  "errors": []
+ }
+}
