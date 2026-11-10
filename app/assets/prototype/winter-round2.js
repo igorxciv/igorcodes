@@ -4,7 +4,11 @@
 // the shader, and irregular tumbling flakes with depth blur.
 import {
   ACESFilmicToneMapping,
+  AdditiveBlending,
   BackSide,
+  CanvasTexture,
+  Sprite,
+  SpriteMaterial,
   Box3,
   BufferAttribute,
   Color,
@@ -81,15 +85,63 @@ const THEMES = {
   },
 };
 
+// Round 3 (issue #22): light-theme looks. Each one overrides parts of the light
+// rig and picks a style for flakes and Christmas lights. They do nothing in
+// the dark theme.
+//   L1  Blue shadow   cream stays; snow is drawn by cool shading
+//   L2  Winter sky    a pale sky wash behind the scene (CSS, .proto-sky)
+//   L3  Dusk pocket   a twilight band behind the lower hero; lights glow
+const BLUE_SHADE = {
+  sunI: 3,
+  hemiI: 0.7,
+  gnd: 0x7f_98_c4,
+  envI: 0.5,
+  envHor: 0xc9_d6_ea,
+  flake: 0xff_ff_ff,
+  flakeShade: 0x6a_80_a6,
+  flakeShadeAmt: 1,
+  flakeA: 1,
+  flakeSize: 1.45,
+  treeSnow: 0.8,
+  rim: 0.6,
+  rimCol: 0x7d_97_c2,
+};
+const LOOKS = {
+  L1: { theme: BLUE_SHADE, bulbs: "glass" },
+  L2: {
+    theme: {
+      hemiI: 1,
+      gnd: 0xa9_bb_d8,
+      envI: 0.7,
+      flake: 0xff_ff_ff,
+      flakeShade: 0x9f_b3_d0,
+      flakeShadeAmt: 0.8,
+      flakeA: 1,
+      flakeSize: 1.2,
+      rim: 0.35,
+      rimCol: 0x8f_a6_cc,
+    },
+    bulbs: "halo",
+  },
+  L3: {
+    theme: { ...BLUE_SHADE, sun: 0xff_d9_b0, rim: 0.7, rimCol: 0x5e_74_a8 },
+    bulbs: "glow",
+  },
+};
+
 // Ground height: broad swells plus small lumps.
 const groundY = (x, z) =>
   0.3 * Math.sin(x * 0.33 + 1) * Math.cos(z * 0.4) +
   0.1 * Math.sin(x * 1.1 + z * 0.9) +
   0.04 * Math.sin(x * 3.1) * Math.sin(z * 2.7);
 
-export async function start({ canvas, christmas }) {
+export async function start({ canvas, christmas, look }) {
   const root = document.documentElement;
-  const theme = () => THEMES[root.dataset.theme === "light" ? "light" : "dark"];
+  const lk = LOOKS[look] || {};
+  const lightTheme = { ...THEMES.light, ...lk.theme };
+  const theme = () =>
+    root.dataset.theme === "light" ? lightTheme : THEMES.dark;
+  const bulbStyle = root.dataset.theme === "light" ? lk.bulbs : undefined;
 
   const renderer = new WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -143,6 +195,23 @@ export async function start({ canvas, christmas }) {
     sheen: 1,
     sheenRoughness: 0.45,
   });
+  // Rim shading: tint the snow toward a cool shade where it turns away from
+  // the viewer, so a white ball keeps an edge against a cream page.
+  const rim = { value: 0 };
+  const rimCol = { value: new Color() };
+  snowMat.onBeforeCompile = (sh) => {
+    sh.uniforms.uRim = rim;
+    sh.uniforms.uRimCol = rimCol;
+    sh.fragmentShader = sh.fragmentShader
+      .replace(
+        "#include <common>",
+        "#include <common>\nuniform float uRim;\nuniform vec3 uRimCol;",
+      )
+      .replace(
+        "#include <opaque_fragment>",
+        "outgoingLight = mix(outgoingLight, outgoingLight * uRimCol, pow(1.0 - saturate(dot(normalize(vViewPosition), normal)), 2.2) * uRim);\n#include <opaque_fragment>",
+      );
+  };
   const groundMat = snowMat.clone();
   groundMat.transparent = true;
   // Fade the far ground to transparent so it dissolves into the page.
@@ -316,14 +385,55 @@ export async function start({ canvas, christmas }) {
     m.castShadow = m.receiveShadow = true;
   });
   const bulbGeo = new IcosahedronGeometry(1, 1);
-  const bulbMats = [0xff_c8_57, 0xff_5d_5d, 0x7f_e9_ff, 0xff_f1_c9].map(
-    (c) =>
-      new MeshStandardMaterial({
-        color: c,
-        emissive: c,
-        emissiveIntensity: 2.2,
-      }),
+  // Bulb styles. Default: pale emissive (round 2). "glass": saturated glossy
+  // ornaments that read by colour, not glow. "halo"/"glow": saturated bulbs
+  // that skip tone mapping, plus a soft sprite around each one.
+  const BULB_COLS = bulbStyle
+    ? [0xd8_1e_3a, 0xf0_9a_00, 0x00_8f_a8, 0x2f_8f_3c]
+    : [0xff_c8_57, 0xff_5d_5d, 0x7f_e9_ff, 0xff_f1_c9];
+  const bulbBase = bulbStyle === "glass" ? 0.25 : bulbStyle ? 1 : 1.9;
+  const bulbSize = bulbStyle === "glass" ? 0.07 : bulbStyle ? 0.055 : 0.045;
+  const bulbMats = BULB_COLS.map((c) =>
+    bulbStyle === "glass"
+      ? new MeshPhysicalMaterial({
+          color: c,
+          emissive: c,
+          roughness: 0.18,
+          clearcoat: 1,
+        })
+      : new MeshStandardMaterial({
+          color: c,
+          emissive: c,
+          toneMapped: !bulbStyle,
+        }),
   );
+  let haloMats = [];
+  const haloA = bulbStyle === "glow" ? 0.7 : 0.5;
+  if (bulbStyle === "halo" || bulbStyle === "glow") {
+    const hc = document.createElement("canvas");
+    hc.width = hc.height = 64;
+    const hx = hc.getContext("2d");
+    const g = hx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, "rgb(255 255 255 / 1)");
+    g.addColorStop(0.25, "rgb(255 255 255 / 0.45)");
+    g.addColorStop(1, "rgb(255 255 255 / 0)");
+    hx.fillStyle = g;
+    hx.fillRect(0, 0, 64, 64);
+    const haloTex = new CanvasTexture(hc);
+    haloMats = BULB_COLS.map(
+      (c) =>
+        new SpriteMaterial({
+          map: haloTex,
+          color: c,
+          transparent: true,
+          depthWrite: false,
+          toneMapped: false,
+          opacity: haloA,
+          blending: bulbStyle === "glow" ? AdditiveBlending : 1,
+        }),
+    );
+  }
+  const haloSize = bulbStyle === "glow" ? 0.5 : 0.42;
   const starShape = new Shape();
   for (let i = 0; i < 10; i++) {
     const r = i % 2 ? 0.07 : 0.17;
@@ -334,11 +444,17 @@ export async function start({ canvas, christmas }) {
     depth: 0.04,
     bevelEnabled: false,
   }).translate(0, 0, -0.02);
-  const starMat = new MeshStandardMaterial({
-    color: 0xff_d7_6a,
-    emissive: 0xff_b9_2e,
-    emissiveIntensity: 1.4,
-  });
+  const starMat = new MeshStandardMaterial(
+    bulbStyle
+      ? {
+          color: 0xf2_a9_00,
+          emissive: 0xf2_a9_00,
+          emissiveIntensity: bulbStyle === "glass" ? 0.35 : 1,
+          toneMapped: bulbStyle === "glass",
+          roughness: 0.3,
+        }
+      : { color: 0xff_d7_6a, emissive: 0xff_b9_2e, emissiveIntensity: 1.4 },
+  );
   const stars = [];
 
   // [x as a fraction of the half-width at that depth, z, height, turn]
@@ -390,8 +506,14 @@ export async function start({ canvas, christmas }) {
         leafMesh.localToWorld(v);
         tree.worldToLocal(v);
         b.position.copy(v);
-        b.scale.setScalar(0.045);
+        b.scale.setScalar(bulbSize);
         tree.add(b);
+        if (haloMats.length) {
+          const h = new Sprite(haloMats[(placed + ti) % haloMats.length]);
+          h.position.copy(v);
+          h.scale.setScalar(haloSize);
+          tree.add(h);
+        }
         placed++;
       }
     }
@@ -413,6 +535,9 @@ export async function start({ canvas, christmas }) {
       uTime: { value: 0 },
       uColor: { value: new Color() },
       uOpacity: { value: 1 },
+      uShade: { value: new Color() },
+      uShadeAmt: { value: 0 },
+      uSize: { value: 1 },
       uFocus: { value: 15 },
       uBox: { value: new Vector3(26, 11, 20) },
     },
@@ -421,6 +546,8 @@ export async function start({ canvas, christmas }) {
       uniform float uTime;
       uniform float uFocus;
       uniform vec3 uBox;
+      uniform float uSize;
+      varying vec2 vLight;
       varying vec2 vUv;
       varying float vAlpha;
       varying float vBlur;
@@ -436,13 +563,15 @@ export async function start({ canvas, christmas }) {
         p.xz += drift + vec2(gust * 1.6 + uTime * 0.12, 0.0);
         p = mod(p, uBox) - vec3(uBox.x * 0.5, 1.0, uBox.z * 0.5 + 4.0);
         vec4 mv = viewMatrix * vec4(p, 1.0);
-        float base = mix(0.03, 0.075, seed.w * seed.w);
+        float base = mix(0.03, 0.075, seed.w * seed.w) * uSize;
         float coc = abs(-mv.z - uFocus) * 0.011;
         float size = base + coc;
         vAlpha = (base * base) / (size * size);
         vBlur = clamp(coc / size, 0.0, 1.0);
         float ang = seed.x * 6.283 + uTime * (seed.y - 0.5) * 3.0;
         mat2 r = mat2(cos(ang), -sin(ang), sin(ang), cos(ang));
+        // Light from the upper left, expressed in the flake's turning frame.
+        vLight = vec2(-0.53, 0.85) * r;
         vec2 corner = r * (position.xy * vec2(1.0, mix(0.55, 1.0, abs(sin(uTime * 2.0 * seed.z + seed.y * 6.0)))));
         corner.y *= 1.0 + fall * 0.3;
         mv.xy += corner * size;
@@ -453,6 +582,9 @@ export async function start({ canvas, christmas }) {
     fragmentShader: `
       uniform vec3 uColor;
       uniform float uOpacity;
+      uniform vec3 uShade;
+      uniform float uShadeAmt;
+      varying vec2 vLight;
       varying vec2 vUv;
       varying float vAlpha;
       varying float vBlur;
@@ -464,7 +596,10 @@ export async function start({ canvas, christmas }) {
         float soft = mix(0.45, 1.0, vBlur);
         float alpha = smoothstep(edge, edge - soft * edge, r) * vAlpha * uOpacity;
         if (alpha < 0.004) discard;
-        gl_FragColor = vec4(uColor, alpha);
+        // Lit side white, far side shaded: a flake with volume, not a speck.
+        float lit = smoothstep(-0.5, 0.25, dot(vUv, vLight));
+        vec3 col = mix(uColor, mix(uShade, uColor, lit), uShadeAmt);
+        gl_FragColor = vec4(col, alpha);
         #include <colorspace_fragment>
       }`,
   });
@@ -487,6 +622,11 @@ export async function start({ canvas, christmas }) {
     treeSnow.value = t.treeSnow;
     flakeMat.uniforms.uColor.value.set(t.flake);
     flakeMat.uniforms.uOpacity.value = t.flakeA;
+    flakeMat.uniforms.uShade.value.set(t.flakeShade ?? t.flake);
+    flakeMat.uniforms.uShadeAmt.value = t.flakeShadeAmt ?? 0;
+    flakeMat.uniforms.uSize.value = t.flakeSize ?? 1;
+    rim.value = t.rim ?? 0;
+    rimCol.value.set(t.rimCol ?? 0xff_ff_ff);
     const col = skyGeo.attributes.color;
     const pos = skyGeo.attributes.position;
     const top = new Color(t.envTop);
@@ -573,12 +713,17 @@ export async function start({ canvas, christmas }) {
     armR.rotation.z = -1.15 + 0.5 * lift + Math.sin(ph * 10) * 0.28 * lift;
     for (const s of stars) s.rotation.y = t * 0.8;
     bulbMats.forEach((m, i) => {
-      m.emissiveIntensity = 1.6 + Math.sin(t * 2.2 + i * 1.9) * 0.9;
+      const tw = 1 + Math.sin(t * 2.2 + i * 1.9) * 0.45;
+      m.emissiveIntensity = bulbBase * tw;
+      if (haloMats[i]) haloMats[i].opacity = haloA * tw * 0.8;
     });
     renderer.render(scene, camera);
     // Feedback round 2: the scene must not pop in. Once a few frames have
     // rendered (shaders compiled, shadows drawn), fade the canvas in slowly.
-    if (++frames === 3) canvas.classList.add("proto-in");
+    if (++frames === 3) {
+      canvas.classList.add("proto-in");
+      canvas.previousElementSibling?.classList.add("proto-in");
+    }
   }
   let frames = 0;
   frame();

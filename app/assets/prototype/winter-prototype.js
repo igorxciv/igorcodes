@@ -17,10 +17,18 @@ const VARIANTS = {
   B: "Hero vignette, round 1",
   C: "Companion",
   B2: "Hero vignette, natural",
+  // Round 3 (issue #22): the B2 scene in the light theme. L* variants force
+  // the light theme for the view unless ?theme=dark is given.
+  L0: "Light theme as it is now",
+  L1: "Blue shadow",
+  L2: "Winter sky",
+  L3: "Dusk pocket",
 };
 const params = new URLSearchParams(location.search);
-const rawVariant = (params.get("variant") || "B2").toUpperCase();
-const variant = rawVariant in VARIANTS ? rawVariant : "B2";
+const rawVariant = (params.get("variant") || "L1").toUpperCase();
+const variant = rawVariant in VARIANTS ? rawVariant : "L1";
+if (variant.startsWith("L") && !params.get("theme"))
+  params.set("theme", "light");
 const christmas = params.get("occasion") === "christmas";
 const still = params.has("still")
   ? params.get("still") !== "0"
@@ -621,16 +629,30 @@ function variantC() {
 
 // Round 2 of the winning variant: same layout, natural-looking scene built
 // from the research on issue #19 (see winter-round2.js).
-function variantB2() {
+function variantB2(look) {
   body.classList.add("proto-v-b", "proto-v-b2");
+  if (look) body.classList.add(`proto-look-${look.toLowerCase()}`);
   letterSnow(".fm-name, .fm-section-head h2");
   if (still) return;
   const c = canvasEl("proto-canvas-hero");
-  document.querySelector("#hero").prepend(c);
-  import("./winter-round2.js").then((m) => m.start({ canvas: c, christmas }));
+  const sky = document.createElement("div");
+  sky.className = "proto-sky";
+  document.querySelector("#hero").prepend(sky, c);
+  import("./winter-round2.js").then((m) =>
+    m.start({ canvas: c, christmas, look }),
+  );
 }
 
-({ A: variantA, B: variantB, C: variantC, B2: variantB2 })[variant]();
+({
+  A: variantA,
+  B: variantB,
+  C: variantC,
+  B2: () => variantB2(),
+  L0: () => variantB2(),
+  L1: () => variantB2("L1"),
+  L2: () => variantB2("L2"),
+  L3: () => variantB2("L3"),
+})[variant]();
 applyPalette();
 new MutationObserver(applyPalette).observe(root, {
   attributes: true,

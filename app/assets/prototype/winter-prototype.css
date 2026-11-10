@@ -251,3 +251,61 @@
 .proto-v-b2 .proto-canvas-hero.proto-in {
   opacity: 1;
 }
+
+/* ---------- Round 3 (issue #22): light-theme looks, ?variant=L1|L2|L3 ---------- */
+.proto-sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 2.8s cubic-bezier(0.3, 0, 0.2, 1);
+  mask-image: linear-gradient(to bottom, #000 88%, transparent);
+}
+
+.proto-sky.proto-in {
+  opacity: 1;
+}
+
+/* L2 Winter sky: stays near cream behind the copy, deepens toward the horizon. */
+:root[data-theme="light"] .proto-look-l2 .proto-sky {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #e6ecf3 30%,
+    #dbe4ef 58%,
+    #b9cbe3 76%,
+    #b9cbe3 100%
+  );
+}
+
+/* L3 Dusk pocket: twilight only below the copy. */
+:root[data-theme="light"] .proto-look-l3 .proto-sky {
+  background: linear-gradient(
+    to bottom,
+    transparent 58%,
+    rgb(135 149 184 / 0.45) 64%,
+    #6a789f 69%,
+    #44527c 75%,
+    #2a3660 100%
+  );
+}
+
+/* Letter snow on cream. L1/L3: white with a full cool contour and a shaded
+   underside. L2: no outline, an icy fill with a soft shadow beneath. */
+:root[data-theme="light"]
+  :is(.proto-look-l1, .proto-look-l3)
+  .proto-l[data-snow]::before {
+  background: linear-gradient(to bottom, #ffffff 35%, #dfe9f5);
+  box-shadow:
+    0 0 0 0.014em #6a80a6,
+    0 0.02em 0 0.014em #4f6590,
+    inset 0 -0.03em 0.03em rgb(106 128 166 / 0.55);
+}
+
+:root[data-theme="light"] .proto-look-l2 .proto-l[data-snow]::before {
+  background: linear-gradient(to bottom, #ffffff 40%, #dbe7f5);
+  box-shadow:
+    0 0.028em 0.045em rgb(36 56 100 / 0.75),
+    inset 0 -0.025em 0.03em rgb(106 128 166 / 0.5);
+}
