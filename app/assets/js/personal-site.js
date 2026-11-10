@@ -559,7 +559,9 @@
       : null;
 
     const getState = () => {
-      if (forcedColorsQuery.matches) {
+      // No control where the scene has nothing to show on this page. The
+      // build already leaves such a scene out (app/_tools/scene-page.js).
+      if (forcedColorsQuery.matches || !(scene.hasAccents || hasAmbient)) {
         return { hasControl: false, showAccents: false, runAmbient: false };
       }
       if (choice === "off") {
@@ -587,11 +589,9 @@
       if (isOn) {
         choice = "off";
       } else {
-        // Where the scene has no ambient layer by design (no slot on this
-        // page, or none in the scene), switching on is not an explicit
-        // choice: it clears the stored one and returns the visitor to what
-        // the site would pick. An ambient layer that exists but is not
-        // running (no WebGL, failed download, too slow) still stores "on".
+        // With no ambient layer on this page by design, switching on is not
+        // an explicit choice: clear it. An ambient layer that exists but is
+        // not running still stores "on". See "Season control" in GLOSSARY.md.
         choice = hasAmbient ? "on" : null;
       }
       try {

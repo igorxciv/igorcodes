@@ -10,8 +10,8 @@ const seasons = require("./seasons.js");
 //   list         one entry per scene, for build-time markup (control icons,
 //                dev stylesheet links)
 //   forPage      forPage(html) gives one page what its scenes can show there:
-//                  client      per-season URLs and slot, inlined into the
-//                              pre-paint script
+//                  client      per-season URLs, slot and hasAccents,
+//                              inlined into the pre-paint script
 //                  hasScenes   false when no scene has anything to show
 //                  devModules  true when the browser loads scene modules
 //                              unbundled (an ambient layer on a dev page)

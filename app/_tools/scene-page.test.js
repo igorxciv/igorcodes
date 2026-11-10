@@ -23,6 +23,7 @@ test("a page with the scene's slot gets the whole scene", () => {
 
   assert.deepEqual(client.winter, {
     slot: "hero",
+    hasAccents: true,
     accents: "/assets/scenes/winter/accents.js",
     ambient: "/assets/scenes/winter/ambient.js",
     assets: { "snowman.glb": "/assets/scenes/winter/assets/snowman.glb" },
@@ -34,6 +35,7 @@ test("a page without the scene's slot gets its content accents alone", () => {
 
   assert.deepEqual(client.winter, {
     slot: null,
+    hasAccents: true,
     accents: "/assets/scenes/winter/accents.js",
     ambient: null,
     assets: {},
