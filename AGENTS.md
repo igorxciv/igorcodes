@@ -76,7 +76,7 @@ control, occasion, lighter form) are defined in `GLOSSARY.md`.
 
 - `app/_data/seasons.js` is the date table: four season start dates plus
   occasions. It is the only place outside `app/assets/scenes/` that names a
-  season. The browser picks the season from the visitor's date, so no rebuild
+  season (tests aside). The browser picks the season from the visitor's date, so no rebuild
   is needed when a season starts.
 - A scene is one folder, `app/assets/scenes/<season>/`, and the folder is the
   registration: `scene.js` (manifest, required), `accents.css`, `accents.js`,
@@ -93,7 +93,8 @@ control, occasion, lighter form) are defined in `GLOSSARY.md`.
 - The machinery is on per page through `seasonalScene: true` front matter
   (home page only). The pre-paint script in `personal-site.njk` sets
   `data-scene` on `<html>`; `personal-site.js` owns the season control, loading
-  and the frame-rate watch. Both must agree on the `fm-season` storage key.
+  and the frame-rate watch. Both must agree on the `fm-scene` storage key
+  (a shared `fm-` name, like `fm-theme`).
 - `?season=<name>` and `?occasion=<name>` preview a scene for one page view,
   in production too: `/?season=winter&occasion=christmas`.
 - `build-assets.mjs` appends every `accents.css` to the full stylesheet and
@@ -113,8 +114,9 @@ control, occasion, lighter form) are defined in `GLOSSARY.md`.
 ## Content and SEO
 
 - Static-first: reach for CSS or build-time rendering before client JS.
-- No images ship today; if adding any, use `@11ty/eleventy-img` rather than
-  originals.
+- No content images ship today; if adding any, use `@11ty/eleventy-img`
+  rather than originals. Scene textures in `app/assets/scenes/*/assets/` are
+  not content images: they ship as authored, at most 256 px.
 - `sitemap.njk`, `robots.njk`, `llms.txt.njk`, and canonical metadata stay
   consistent. Content dates come from `site.contentUpdated` in `site.js`, not
   the build clock, so update it with content changes.

@@ -3,11 +3,11 @@
 // Both must agree on the storage key "fm-theme" and the default-dark behavior.
 //
 // The same holds for seasonal scenes: the pre-paint script picks the season
-// and reads the stored choice under "fm-season"; this file owns the season
+// and reads the stored choice under "fm-scene"; this file owns the season
 // control and everything a scene does after first paint.
 (function initPersonalSitePage() {
   const THEME_STORAGE_KEY = "fm-theme";
-  const SEASON_STORAGE_KEY = "fm-season";
+  const SCENE_STORAGE_KEY = "fm-scene";
 
   // The ambient layer waits this long after page load, then for an idle
   // browser, before it downloads anything.
@@ -17,8 +17,6 @@
   const FRAME_WATCH_SETTLE_MS = 4500;
   const FRAME_WATCH_WINDOW_MS = 3000;
   const FRAME_WATCH_MIN_FPS = 20;
-  // A gap this long between frames means drawing was paused, not slow.
-  const FRAME_WATCH_PAUSE_MS = 250;
 
   document.body.classList.add("fm-enhanced");
 
@@ -284,7 +282,6 @@
     let settleTimer = null;
     let frameRequest = null;
     let windowStart = 0;
-    let lastFrame = 0;
     let frameCount = 0;
     let isHostVisible = true;
 
@@ -292,14 +289,18 @@
       isHostVisible = entries.at(-1).isIntersecting;
     });
 
-    const measure = (now) => {
-      const isPaused =
-        document.hidden ||
-        !isHostVisible ||
-        now - lastFrame > FRAME_WATCH_PAUSE_MS;
-      lastFrame = now;
+    // Paused time is ignored: a window only counts while the tab is visible
+    // and the host is in view, and starts again after either changes.
+    const restartWindow = () => {
+      windowStart = 0;
+    };
 
-      if (isPaused || windowStart === 0) {
+    const measure = (now) => {
+      if (document.hidden || !isHostVisible) {
+        restartWindow();
+        return;
+      }
+      if (windowStart === 0) {
         windowStart = now;
         frameCount = 0;
         return;
@@ -326,14 +327,16 @@
       window.clearTimeout(settleTimer);
       window.cancelAnimationFrame(frameRequest);
       hostObserver.disconnect();
+      document.removeEventListener("visibilitychange", restartWindow);
       settleTimer = null;
       frameRequest = null;
     };
 
     const start = () => {
       stop();
-      windowStart = 0;
+      restartWindow();
       hostObserver.observe(host);
+      document.addEventListener("visibilitychange", restartWindow);
       settleTimer = window.setTimeout(() => {
         frameRequest = window.requestAnimationFrame(tick);
       }, FRAME_WATCH_SETTLE_MS);
@@ -371,7 +374,20 @@
       }
       isLighter = true;
       handle?.update(getContext());
+      // Give the lighter form time to settle before judging it.
+      frameWatch.start();
     });
+
+    // A lost graphics context ends the ambient layer for this visit, like
+    // any other failure. The event does not bubble, hence the capture phase.
+    host.addEventListener(
+      "webglcontextlost",
+      () => {
+        isGoneForVisit = true;
+        stop();
+      },
+      true,
+    );
 
     const loadModule = () => {
       modulePromise ??= import(scene.ambient).catch((error) => {
@@ -526,7 +542,7 @@
 
     const readStoredChoice = () => {
       try {
-        const stored = window.localStorage.getItem(SEASON_STORAGE_KEY);
+        const stored = window.localStorage.getItem(SCENE_STORAGE_KEY);
         return stored === "on" || stored === "off" ? stored : null;
       } catch {
         return null;
@@ -570,7 +586,7 @@
       const isOn = seasonToggle.getAttribute("aria-checked") === "true";
       choice = isOn ? "off" : "on";
       try {
-        window.localStorage.setItem(SEASON_STORAGE_KEY, choice);
+        window.localStorage.setItem(SCENE_STORAGE_KEY, choice);
       } catch {
         // Ignore storage failures; the choice still holds for this visit.
       }

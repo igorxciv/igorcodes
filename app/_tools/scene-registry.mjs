@@ -9,12 +9,7 @@ import path from "node:path";
 
 const require = createRequire(import.meta.url);
 
-export const scenesDir = path.resolve(
-  import.meta.dirname,
-  "..",
-  "assets",
-  "scenes",
-);
+const scenesDir = path.resolve(import.meta.dirname, "..", "assets", "scenes");
 
 // Host elements the home template offers. Adding a slot is a template change.
 const SLOTS = ["hero"];

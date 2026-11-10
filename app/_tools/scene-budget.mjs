@@ -20,7 +20,7 @@ const brotliSize = (content) =>
     },
   }).length;
 
-export function transferSize(fileName, content) {
+function transferSize(fileName, content) {
   return RAW_EXTENSIONS.has(path.extname(fileName))
     ? content.length
     : brotliSize(content);
@@ -45,6 +45,4 @@ export function checkSceneBudget(season, files) {
       `[scenes] The ${season} ambient layer transfers ${kB(total)}, over the ${kB(SCENE_TRANSFER_CAP_BYTES)} cap (SCENE_TRANSFER_CAP_BYTES in app/_tools/scene-budget.mjs).`,
     );
   }
-
-  return total;
 }

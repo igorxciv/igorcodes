@@ -178,8 +178,11 @@ function attach(heading, density) {
   overlay.setAttribute("aria-hidden", "true");
   overlay.dataset.winterSnow = "";
 
+  let isDetached = false;
+
   const draw = () => {
-    if (!isWebFontLoaded(fontOf(heading), originalText)) {
+    // The font may finish loading after the snow was taken off.
+    if (isDetached || !isWebFontLoaded(fontOf(heading), originalText)) {
       return;
     }
     renderCaps(overlay, measureCaps(heading, density));
@@ -204,6 +207,7 @@ function attach(heading, density) {
   });
 
   function detach() {
+    isDetached = true;
     resizeObserver.disconnect();
     textObserver.disconnect();
     document.fonts.removeEventListener("loadingdone", draw);

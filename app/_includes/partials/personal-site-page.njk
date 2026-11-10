@@ -1,7 +1,9 @@
 <div class="fm-page">
   <section id="hero" class="fm-hero" aria-labelledby="hero-title">
-    {# Seasonal scene slot "hero": a scene's ambient layer mounts here. #}
-    <div class="fm-scene-slot" data-scene-slot="hero" aria-hidden="true"></div>
+    {% if seasonalScene %}
+      {# Seasonal scene slot "hero": a scene's ambient layer mounts here. #}
+      <div class="fm-scene-slot" data-scene-slot="hero" aria-hidden="true"></div>
+    {% endif %}
     <div class="fm-hero-content">
       <p class="fm-role">Software Engineer</p>
       <h1 id="hero-title" class="fm-name" data-scene-accent="name">Igor Cheliadinski</h1>

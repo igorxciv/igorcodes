@@ -1102,7 +1102,10 @@ export async function mount(host, context) {
     await renderer.compileAsync(scene, camera);
   } catch (error) {
     canvas.remove();
+    disposeScene(scene);
+    world?.environment.dispose();
     renderer.dispose();
+    renderer.forceContextLoss();
     throw error;
   }
 
@@ -1110,6 +1113,7 @@ export async function mount(host, context) {
   const clock = { time: 0, delta: 0 };
   let frameRequest = null;
   let lastFrame = 0;
+  let frameSlot = 0;
   let framesDrawn = 0;
   let isInView = true;
   let isContextLost = false;
@@ -1118,10 +1122,18 @@ export async function mount(host, context) {
   const draw = (now) => {
     frameRequest = requestAnimationFrame(draw);
     // Never above the form's frame rate, whatever the display runs at.
-    const elapsed = now - lastFrame;
-    if (elapsed < 1000 / form.fps - 1.5) {
+    // Frames are drawn in slots one interval apart; carrying the remainder
+    // forward keeps a 75 or 90 Hz display at the cap instead of at half its
+    // own rate.
+    const interval = 1000 / form.fps;
+    const sinceSlot = now - frameSlot;
+    if (sinceSlot < interval - 1) {
       return;
     }
+    const remainder = sinceSlot % interval;
+    frameSlot = now - (remainder > interval - 1 ? 0 : remainder);
+
+    const elapsed = now - lastFrame;
     lastFrame = now;
     clock.delta = Math.min(elapsed, 100) / 1000;
     clock.time += clock.delta;
@@ -1143,6 +1155,7 @@ export async function mount(host, context) {
       !isDestroyed && !isContextLost && isInView && !document.hidden;
     if (shouldRun && frameRequest === null) {
       lastFrame = performance.now() - 1000 / form.fps;
+      frameSlot = lastFrame;
       frameRequest = requestAnimationFrame(draw);
     } else if (!shouldRun && frameRequest !== null) {
       cancelAnimationFrame(frameRequest);
@@ -1155,7 +1168,8 @@ export async function mount(host, context) {
     isInView = entries.at(-1).isIntersecting;
     syncLoop();
   });
-  // A lost graphics context ends the scene quietly.
+  // A lost graphics context ends the scene quietly. The site hears the
+  // same event on the host and removes the layer.
   const onContextLost = (event) => {
     event.preventDefault();
     isContextLost = true;
@@ -1201,9 +1215,11 @@ export async function mount(host, context) {
       // Release graphics memory, then the context itself.
       disposeScene(scene);
       world.environment.dispose();
+      // Out of the host first: releasing the context fires a context-lost
+      // event, which must not look like a failure to the site.
+      canvas.remove();
       renderer.dispose();
       renderer.forceContextLoss();
-      canvas.remove();
     },
   };
 }

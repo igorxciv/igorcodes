@@ -185,7 +185,7 @@
         // Picks the seasonal scene pre-paint, so a visitor who switched scenes
         // off never sees one flash. Sets data-scene (and data-occasions) on
         // <html> only when a scene is showing; no attribute means the plain
-        // site. Must agree with personal-site.js on the "fm-season" storage
+        // site. Must agree with personal-site.js on the "fm-scene" storage
         // key. The date table comes from _data/seasons.js and the picker
         // functions from _tools/season-clock.js.
         (() => {
@@ -193,7 +193,7 @@
 
           const table = {{ seasons | dump | safe }};
           const scenes = {{ scenes.client | dump | safe }};
-          const storageKey = "fm-season";
+          const storageKey = "fm-scene";
           const root = document.documentElement;
           const params = new URLSearchParams(window.location.search);
           const now = new Date();
