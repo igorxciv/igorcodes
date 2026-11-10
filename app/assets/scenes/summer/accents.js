@@ -13,7 +13,8 @@ const SVG = "http://www.w3.org/2000/svg";
 const QUOTES = /^["']|["']$/g;
 const SPACE = /\s/;
 
-// Tuft geometry, as fractions of the heading's font size.
+// Tuft geometry, as fractions of the heading's font size. (Stroke widths
+// in accents.css are in pixels.)
 const TUFT_WIDTH = 0.36;
 const TUFT_HEIGHT = 0.52;
 // Clear space between a tuft and the ink of the nearest glyph.
@@ -24,11 +25,15 @@ const MIN_GAP_WIDTH = 0.09;
 const BLADE_HALF_WIDTH = 0.017;
 const DAISY_RADIUS = 0.062;
 const DAISY_PETALS = 8;
+// A tuft keeps this many pixels clear of the viewport's edges, where the
+// section box would clip it.
+const VIEW_MARGIN = 2;
 
-// Which tufts a heading gets, by template hook.
+// Which tufts a heading gets, by template hook: a list of tufts, each a
+// list of places in order of preference. The first place with room wins.
 const PLACES = {
-  name: () => ["start", "gap", "end"],
-  heading: (random) => [random() < 0.5 ? "start" : "end"],
+  name: () => [["start"], ["gap"], ["end"]],
+  heading: (random) => [random() < 0.5 ? ["start", "end"] : ["end", "start"]],
 };
 // Share of end tufts that carry a daisy, by template hook. A tuft in a word
 // gap is too narrow for one.
@@ -125,9 +130,24 @@ function measureGlyphs(heading) {
   return { glyphs, size: font.size };
 }
 
+// A box has room when it lies inside the viewport: the sections clip
+// anything that overflows them.
+function hasRoom(box) {
+  return (
+    box.left >= VIEW_MARGIN &&
+    box.left + box.width <= document.documentElement.clientWidth - VIEW_MARGIN
+  );
+}
+
 // The box a tuft may draw in: beside the first or last glyph, or inside the
-// first word gap whose two words share a line. Null when there is no room.
+// first word gap whose two words share a line (a name that wraps between
+// its words has no such gap). Null when there is no room.
 function boxFor(place, glyphs, size) {
+  const box = measureBox(place, glyphs, size);
+  return box && hasRoom(box) ? box : null;
+}
+
+function measureBox(place, glyphs, size) {
   const width = size * TUFT_WIDTH;
   const clearance = size * CLEARANCE;
 
@@ -201,17 +221,21 @@ function designTuft(box, size, random, hasDaisy) {
     };
   });
 
+  // The daisy's head sits at the top of the box, one pixel in from its
+  // edges so that the petal contour is inside too. One roll places the head
+  // and turns its petals; it is drawn whether or not there is a daisy, so
+  // the blades above do not depend on it.
   let daisy = null;
-  const daisyRoll = random();
+  const placement = random();
   if (hasDaisy) {
-    const radius = size * DAISY_RADIUS;
-    const x = radius + 1 + daisyRoll * (width - (radius + 1) * 2);
+    const reach = size * DAISY_RADIUS + 1;
+    const x = reach + placement * (width - reach * 2);
     daisy = {
       x,
-      y: radius + 1,
-      radius,
-      foot: Math.max(inset, Math.min(width - inset, x + (daisyRoll - 0.5) * 4)),
-      turn: daisyRoll * 360,
+      y: reach,
+      radius: size * DAISY_RADIUS,
+      foot: Math.max(inset, Math.min(width - inset, x + (placement - 0.5) * 4)),
+      turn: placement * 360,
     };
   }
 
@@ -287,19 +311,22 @@ function drawTufts(heading, hook) {
   const origin = heading.getBoundingClientRect();
   const random = createRandom(heading.textContent);
   const tufts = [];
-  for (const place of PLACES[hook](random)) {
-    // Draw the same number of random values for every place, so that one
+  for (const places of PLACES[hook](random)) {
+    // Draw the same number of random values for every tuft, so that one
     // tuft does not depend on whether another found room.
     const daisyRoll = random();
-    const tuftRandom = createRandom(`${heading.textContent}/${place}`);
-    const box = boxFor(place, glyphs, size);
-    if (!box) {
-      continue;
+    for (const place of places) {
+      const box = boxFor(place, glyphs, size);
+      if (!box) {
+        continue;
+      }
+      const hasDaisy = place !== "gap" && daisyRoll < DAISY_SHARE[hook];
+      const tuftRandom = createRandom(`${heading.textContent}/${place}`);
+      tufts.push(
+        renderTuft(designTuft(box, size, tuftRandom, hasDaisy), box, origin),
+      );
+      break;
     }
-    const hasDaisy = place !== "gap" && daisyRoll < DAISY_SHARE[hook];
-    tufts.push(
-      renderTuft(designTuft(box, size, tuftRandom, hasDaisy), box, origin),
-    );
   }
   return tufts;
 }

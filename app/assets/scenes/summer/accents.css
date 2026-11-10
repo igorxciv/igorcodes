@@ -31,8 +31,8 @@
   opacity: 1;
 }
 
-/* One tuft. accents.js sets its box in pixels; it grows up from the text
-   baseline and stays inside that box. */
+/* One tuft. accents.js sets its box in pixels and draws every blade inside
+   it; overflow stays visible so a stroke on the box edge is not cut. */
 [data-scene="summer"] [data-summer-tufts] > svg {
   position: absolute;
   display: block;
@@ -54,7 +54,8 @@
   stroke-linecap: round;
 }
 
-/* On cream, a white petal needs a contour to read as a petal. */
+/* A contour in both themes; on cream it is what makes a white petal read
+   as a petal. */
 [data-scene="summer"] [data-summer-tufts] [data-part="petal"] {
   fill: var(--summer-petal);
   stroke: var(--summer-petal-contour);

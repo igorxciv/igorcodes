@@ -41,8 +41,9 @@ const FAR_Z = -14;
 // Stalks reach a little past both edges, as a fraction of the half-width.
 const OVERHANG = 1.12;
 const BLADE_SEGMENTS = 4;
-// Half-width, in CSS pixels, of the dip in the grass around the hero's
-// scroll-down link.
+// Size, in CSS pixels, of the dip in the grass at the centre of the hero's
+// bottom edge, where the scroll-down link sits. The grass is lowest within
+// 0.4 of this distance from the centre and back to full height by 1.7 of it.
 const CLEARING_PX = 34;
 
 // Height of the grass under the hero copy, where there is room for it, and
@@ -55,10 +56,15 @@ const TALL_GRASS = [0.8, 2.5];
 // Where the grass starts to rise towards the edges, as a fraction of the
 // half-width: on a narrow hero and on a wide one.
 const EDGE_START = [0.7, 0.42];
-// How high a firefly or seed can float: this many times the height of the
-// grass under it, plus its own wander and glow. Matches the particle shaders.
+// How high a firefly or seed can float. Its centre sits at most FLOAT_LIFT
+// times the height of the grass under it, plus FLOAT_BASE, and bobs up to
+// FLOAT_BOB around that; it is drawn on a quad of at most FLOAT_SIZE across.
+// The particle shaders are built from these same numbers.
 const FLOAT_LIFT = 1.45;
-const FLOAT_RISE = 0.3;
+const FLOAT_BASE = 0.08;
+const FLOAT_BOB = 0.15;
+const FLOAT_SIZE = 0.5;
+const FLOAT_RISE = FLOAT_BASE + FLOAT_BOB + FLOAT_SIZE / 2;
 // Clear space kept between the scene and the hero copy: below it as a
 // fraction of the hero's height, beside it as a fraction of the half-width.
 const COPY_MARGIN_BELOW = 0.02;
@@ -70,7 +76,7 @@ const MAX_FIREFLIES = 46;
 const MAX_SEEDS = 40;
 // The lighter form keeps this share of every count.
 const LIGHTER_SHARE = 0.4;
-const share = (count) => Math.round(count * LIGHTER_SHARE);
+const lighterCount = (count) => Math.round(count * LIGHTER_SHARE);
 
 // The full form and the lighter form: same composition, lower cost. Neither
 // has a shadow map; depth comes from shading each blade darker at its root.
@@ -86,10 +92,10 @@ const FORMS = {
   },
   lighter: {
     pixelRatio: 1.5,
-    blades: share(MAX_BLADES),
-    flowers: share(MAX_FLOWERS),
-    fireflies: share(MAX_FIREFLIES),
-    seeds: share(MAX_SEEDS),
+    blades: lighterCount(MAX_BLADES),
+    flowers: lighterCount(MAX_FLOWERS),
+    fireflies: lighterCount(MAX_FIREFLIES),
+    seeds: lighterCount(MAX_SEEDS),
     // Fewer blades, each a little wider, so the band still reads as grass.
     bladeWidth: 1.3,
     fps: 30,
@@ -128,7 +134,7 @@ const THEMES = {
     petalContourAmount: 0.85,
     heart: "#f0b400",
     bloom: 1,
-    fluff: "#75694f",
+    fluff: "#8a7e66",
     fluffCore: "#ffffff",
     husk: "#5f4526",
   },
@@ -192,7 +198,7 @@ const MEADOW_GLSL = `
   // Pointer in clip space (x, y) and how strongly it is felt (z).
   uniform vec3 uPointer;
 
-  const float CAMERA_Z = ${CAMERA_Z.toFixed(1)};
+  const float CAMERA_Z = ${CAMERA_Z.toFixed(3)};
 
   // Low under the hero copy, tall towards the left and right edges, with a
   // small dip around the scroll-down link.
@@ -204,6 +210,11 @@ const MEADOW_GLSL = `
 
   float stalkHeight(float u, float roll) {
     return meadowTop(u) * mix(0.5, 1.0, roll);
+  }
+
+  // Sideways push away from the pointer, for a point that near to it.
+  float pointerPush(vec2 away, float near) {
+    return away.x / (abs(away.x) + 0.04) * near * 0.5;
   }
 
   // How far a point is from the pointer on screen: 1 on it, 0 far away.
@@ -235,7 +246,7 @@ const MEADOW_GLSL = `
     // Lean away from the pointer.
     vec2 away;
     float near = pointerNearness(root + vec3(0.0, height * 0.7, 0.0), away);
-    bend.x += away.x / (abs(away.x) + 0.04) * near * 0.5;
+    bend.x += pointerPush(away, near);
 
     float reach = min(length(bend), 0.8);
     bend = normalize(bend + vec2(0.00001)) * reach;
@@ -365,19 +376,24 @@ const FLOWER_FRAGMENT_SHADER = `
     #include <colorspace_fragment>
   }`;
 
-// Where an airborne particle floats: over the grass at its own spot, so
+// Where an airborne particle floats: over the grass in the column it is in
+// right now, wherever its wandering and the pointer have taken it. So
 // particles stay in the grass band under the copy and rise only at the sides.
 const FLOAT_GLSL = `
-  vec3 floatPoint(float u, float z, float lift) {
-    return vec3(u * uSpan * (CAMERA_Z - z), meadowTop(u) * lift + 0.08, z);
+  float floatHeight(float x, float z, float lift) {
+    float u = x / (uSpan * (CAMERA_Z - z));
+    return meadowTop(u) * lift + ${FLOAT_BASE.toFixed(3)};
   }
 
-  // Moves a view-space point sideways, away from the pointer. Never upwards:
-  // a particle must not be pushed towards the copy.
-  void driftAside(inout vec4 mv, vec3 world) {
+  // x and z are where the particle has wandered to. It drifts sideways,
+  // away from the pointer, and takes its height from where it ends up.
+  vec3 floatPoint(float x, float z, float lift) {
+    vec3 p = vec3(x, floatHeight(x, z, lift), z);
     vec2 away;
-    float near = pointerNearness(world, away);
-    mv.x += away.x / (abs(away.x) + 0.04) * near * 0.5;
+    float near = pointerNearness(p, away);
+    p.x += pointerPush(away, near);
+    p.y = floatHeight(p.x, z, lift);
+    return p;
   }`;
 
 const FIREFLY_VERTEX_SHADER = `
@@ -391,13 +407,13 @@ const FIREFLY_VERTEX_SHADER = `
     float u = aSeed.x * 2.0 - 1.0;
     u = sign(u) * pow(abs(u), 0.6) * 1.05;
     float z = mix(-10.0, 0.4, aSeed.z);
-    vec3 p = floatPoint(u, z, mix(0.45, ${FLOAT_LIFT.toFixed(2)}, aSeed.y));
     // Each wanders slowly around its own spot.
     float pace = uTime * mix(0.22, 0.45, aSeed.w);
-    p += vec3(
-      sin(pace + aSeed.y * 40.0) + 0.6 * sin(pace * 2.3 + aSeed.x * 17.0),
-      sin(pace * 1.7 + aSeed.z * 29.0),
-      cos(pace * 1.3 + aSeed.w * 11.0)) * vec3(0.45, 0.14, 0.4);
+    float x = u * uSpan * (CAMERA_Z - z)
+      + 0.45 * (sin(pace + aSeed.y * 40.0) + 0.6 * sin(pace * 2.3 + aSeed.x * 17.0));
+    z += 0.4 * cos(pace * 1.3 + aSeed.w * 11.0);
+    vec3 p = floatPoint(x, z, mix(0.45, ${FLOAT_LIFT.toFixed(3)}, aSeed.y));
+    p.y += ${FLOAT_BOB.toFixed(3)} * sin(pace * 1.7 + aSeed.z * 29.0);
 
     // Each fades in and out on its own cycle of 3.2 to 7 seconds, out of
     // step with the others. A smooth swell, never a blink.
@@ -406,8 +422,7 @@ const FIREFLY_VERTEX_SHADER = `
     vGlow = swell * swell;
 
     vec4 mv = viewMatrix * vec4(p, 1.0);
-    driftAside(mv, p);
-    mv.xy += position.xy * 0.5;
+    mv.xy += position.xy * ${FLOAT_SIZE.toFixed(3)};
     vUv = position.xy * 2.0;
     gl_Position = projectionMatrix * mv;
   }`;
@@ -438,15 +453,15 @@ const SEED_VERTEX_SHADER = `
     // the edges.
     float reach = 2.5;
     float u = mod(aSeed.x * reach + uTime * mix(0.012, 0.03, aSeed.w), reach) - reach * 0.5;
-    float z = mix(-9.0, 0.4, aSeed.z);
-    vec3 p = floatPoint(u, z, mix(0.45, 1.3, aSeed.y));
     float pace = uTime * mix(0.3, 0.6, aSeed.w);
-    p.y += 0.12 * sin(pace + aSeed.y * 37.0) + 0.05 * sin(pace * 2.7 + aSeed.x * 13.0);
-    p.z += 0.3 * cos(pace * 0.8 + aSeed.z * 19.0);
+    float z = mix(-9.0, 0.4, aSeed.z) + 0.3 * cos(pace * 0.8 + aSeed.z * 19.0);
+    vec3 p = floatPoint(u * uSpan * (CAMERA_Z - z), z, mix(0.45, ${FLOAT_LIFT.toFixed(3)}, aSeed.y));
+    p.y += ${FLOAT_BOB.toFixed(3)}
+      * (0.7 * sin(pace + aSeed.y * 37.0) + 0.3 * sin(pace * 2.7 + aSeed.x * 13.0));
 
     vec4 mv = viewMatrix * vec4(p, 1.0);
-    driftAside(mv, p);
-    // A seed hangs under its fluff and rocks as it goes.
+    // A seed hangs under its fluff and rocks as it goes. Its quad is 0.2 to
+    // 0.3 across, inside the ${FLOAT_SIZE} the layout allows for.
     float rock = 0.3 + 0.3 * sin(pace * 1.4 + aSeed.w * 23.0);
     mat2 turn = mat2(cos(rock), -sin(rock), sin(rock), cos(rock));
     mv.xy += turn * position.xy * mix(0.2, 0.3, fract(aSeed.w * 3.3));
@@ -524,7 +539,15 @@ function createStage(host, isLighter) {
   camera.position.set(0, CAMERA_Y, CAMERA_Z);
   camera.lookAt(0, CAMERA_Y + CAMERA_Z * CAMERA_PITCH, 0);
 
-  return { host, copy: findCopy(host), renderer, canvas, scene, camera };
+  return {
+    host,
+    copy: findCopy(host),
+    hasRoom: true,
+    renderer,
+    canvas,
+    scene,
+    camera,
+  };
 }
 
 // ---------------------------------------------------------------- meadow
@@ -544,17 +567,25 @@ function scatterStalk(random, target, index) {
   target[index * 4 + 3] = random();
 }
 
+// An instanced copy of a flat geometry; the source is only a template.
+function instanced(template) {
+  const geometry = new InstancedBufferGeometry().copy(template);
+  template.dispose();
+  return geometry;
+}
+
 // Instanced stalks, each a narrow strip bent in the vertex shader: one draw
-// call for the grass and one for the flower stems.
-function createStalks(material, stalks, isStem) {
+// call for the grass and one for the flower stems. stemFlag is the shader's
+// aStem value: 0 for grass blades, 1 for flower stems.
+function createStalks(material, stalks, stemFlag) {
   const count = stalks.length / 4;
-  const strip = new PlaneGeometry(1, 1, 1, BLADE_SEGMENTS).translate(0, 0.5, 0);
-  const geometry = new InstancedBufferGeometry().copy(strip);
-  strip.dispose();
+  const geometry = instanced(
+    new PlaneGeometry(1, 1, 1, BLADE_SEGMENTS).translate(0, 0.5, 0),
+  );
   geometry.setAttribute("aStalk", new InstancedBufferAttribute(stalks, 4));
   geometry.setAttribute(
     "aStem",
-    new InstancedBufferAttribute(new Float32Array(count).fill(isStem), 1),
+    new InstancedBufferAttribute(new Float32Array(count).fill(stemFlag), 1),
   );
   geometry.instanceCount = count;
 
@@ -599,9 +630,7 @@ function createMeadow(shared) {
   const grass = createStalks(stalkMaterial, blades, 0);
   const stems = createStalks(stalkMaterial, flowers, 1);
 
-  const headGeometry = new InstancedBufferGeometry().copy(
-    new PlaneGeometry(1, 1),
-  );
+  const headGeometry = instanced(new PlaneGeometry(1, 1));
   headGeometry.setAttribute("aStalk", new InstancedBufferAttribute(flowers, 4));
   headGeometry.setAttribute("aBloom", new InstancedBufferAttribute(blooms, 1));
   const headMaterial = new ShaderMaterial({
@@ -655,7 +684,7 @@ function createMeadow(shared) {
 // One instanced-quad mesh, one draw call, animated in the vertex shader.
 function createParticles(count, seed, material) {
   const random = createRandom(seed);
-  const geometry = new InstancedBufferGeometry().copy(new PlaneGeometry(1, 1));
+  const geometry = instanced(new PlaneGeometry(1, 1));
   const seeds = new Float32Array(count * 4);
   for (let index = 0; index < seeds.length; index++) {
     seeds[index] = random();
@@ -820,15 +849,20 @@ function measureCopy(stage, width, height) {
   };
 }
 
-// The shape of the meadow for this hero. On a wide hero the grass climbs
+// The shape of the meadow for this hero, or null when it has no room for
+// one. On a wide hero the grass climbs
 // high at the left and right edges; on a narrow one there are no free sides,
 // so the whole band stays low. In every case the grass, and anything
 // floating over it, stays below and beside the copy, never behind it.
 function shapeMeadow(aspect, copy) {
   const sides = MathUtils.smoothstep(aspect, 0.75, 1.6);
   const allowed = grassHeightUnder(copy.below - COPY_MARGIN_BELOW);
+  // Too little room under the copy for even the shortest grass: no meadow.
+  if (allowed < MIN_LOW_GRASS) {
+    return null;
+  }
   const shape = {
-    low: MathUtils.clamp(allowed, MIN_LOW_GRASS, LOW_GRASS),
+    low: Math.min(allowed, LOW_GRASS),
     tall: MathUtils.lerp(...TALL_GRASS, sides),
     edge: MathUtils.lerp(...EDGE_START, sides),
   };
@@ -857,7 +891,7 @@ function shapeMeadow(aspect, copy) {
 
 // Fits the meadow to the host and to the hero copy.
 function layOut(stage, world) {
-  const { host, renderer, camera } = stage;
+  const { host, renderer, canvas, camera } = stage;
   const width = host.clientWidth;
   const height = host.clientHeight;
   if (!width || !height) {
@@ -869,6 +903,13 @@ function layOut(stage, world) {
   camera.updateProjectionMatrix();
 
   const shape = shapeMeadow(camera.aspect, measureCopy(stage, width, height));
+  // With no room below the copy the scene steps aside: nothing is drawn
+  // rather than drawing behind text.
+  stage.hasRoom = shape !== null;
+  canvas.style.visibility = stage.hasRoom ? "" : "hidden";
+  if (!shape) {
+    return;
+  }
   const { shared } = world;
   shared.uSpan.value = HALF_FOV_TAN * camera.aspect;
   shared.uAspect.value = camera.aspect;
@@ -1005,7 +1046,9 @@ export async function mount(host, context) {
 
     world.shared.uTime.value = clock.time;
     followPointer();
-    renderer.render(scene, camera);
+    if (stage.hasRoom) {
+      renderer.render(scene, camera);
+    }
 
     framesDrawn += 1;
     if (framesDrawn === FRAMES_BEFORE_FADE) {
