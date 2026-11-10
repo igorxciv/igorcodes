@@ -1,0 +1,79 @@
+/*
+ * Summer scene, content accents: tufts of grass, some with a small daisy,
+ * growing from the baseline beside the hero name and the section headings.
+ * accents.js measures the text and draws the overlay; this file styles it.
+ * Every rule is scoped under [data-scene="summer"], so nothing here applies
+ * once the scene is off.
+ */
+[data-scene="summer"] {
+  --summer-blade: light-dark(#4f8f2c, #7cc46a);
+  --summer-blade-deep: light-dark(#2f6f2a, #4a9a5c);
+  --summer-petal: light-dark(#ffffff, #f4f7ee);
+  --summer-petal-contour: light-dark(#7d8496, #9fb3a4);
+  --summer-heart: light-dark(#e2a400, #f2c230);
+}
+
+[data-scene="summer"] [data-scene-accent] {
+  position: relative;
+}
+
+/* One aria-hidden overlay per heading. The heading's own text is untouched. */
+[data-scene="summer"] [data-summer-tufts] {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+
+[data-scene="summer"] [data-summer-tufts][data-settled] {
+  opacity: 1;
+}
+
+/* One tuft. accents.js sets its box in pixels and draws every blade inside
+   it; overflow stays visible so a stroke on the box edge is not cut. */
+[data-scene="summer"] [data-summer-tufts] > svg {
+  position: absolute;
+  display: block;
+  overflow: visible;
+}
+
+[data-scene="summer"] [data-summer-tufts] [data-part="blade"] {
+  fill: var(--summer-blade);
+}
+
+[data-scene="summer"] [data-summer-tufts] [data-part="blade-deep"] {
+  fill: var(--summer-blade-deep);
+}
+
+[data-scene="summer"] [data-summer-tufts] [data-part="stem"] {
+  fill: none;
+  stroke: var(--summer-blade-deep);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+/* A contour in both themes; on cream it is what makes a white petal read
+   as a petal. */
+[data-scene="summer"] [data-summer-tufts] [data-part="petal"] {
+  fill: var(--summer-petal);
+  stroke: var(--summer-petal-contour);
+  stroke-width: 0.6;
+}
+
+[data-scene="summer"] [data-summer-tufts] [data-part="heart"] {
+  fill: var(--summer-heart);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scene="summer"] [data-summer-tufts] {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  [data-scene="summer"] [data-summer-tufts] {
+    display: none;
+  }
+}
