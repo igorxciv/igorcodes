@@ -1,8 +1,24 @@
 // This theme logic is a deliberately duplicated pair with the inline pre-paint
 // script in personal-site.njk (which runs before paint to avoid a theme flash).
 // Both must agree on the storage key "fm-theme" and the default-dark behavior.
+//
+// The same holds for seasonal scenes: the pre-paint script picks the season
+// and reads the stored choice under "fm-season"; this file owns the season
+// control and everything a scene does after first paint.
 (function initPersonalSitePage() {
   const THEME_STORAGE_KEY = "fm-theme";
+  const SEASON_STORAGE_KEY = "fm-season";
+
+  // The ambient layer waits this long after page load, then for an idle
+  // browser, before it downloads anything.
+  const AMBIENT_LOAD_DELAY_MS = 2000;
+  // Frame-rate watch. It starts after the settle time (longer than any
+  // scene's fade-in), then averages over one window at a time.
+  const FRAME_WATCH_SETTLE_MS = 4500;
+  const FRAME_WATCH_WINDOW_MS = 3000;
+  const FRAME_WATCH_MIN_FPS = 20;
+  // A gap this long between frames means drawing was paused, not slow.
+  const FRAME_WATCH_PAUSE_MS = 250;
 
   document.body.classList.add("fm-enhanced");
 
@@ -18,6 +34,8 @@
     "(prefers-reduced-motion: reduce)",
   ).matches;
   const systemThemeQuery = window.matchMedia("(prefers-color-scheme: light)");
+  // Set once the seasonal scene is set up; told about every theme change.
+  let seasonalScene = null;
 
   const getStoredTheme = () => {
     try {
@@ -61,6 +79,7 @@
     });
 
     updateThemeToggleState(theme);
+    seasonalScene?.themeChanged();
   };
 
   const persistTheme = (theme) => {
@@ -207,4 +226,376 @@
   updateTimelineProgress();
   window.addEventListener("scroll", updateTimelineProgress, { passive: true });
   window.addEventListener("resize", updateTimelineProgress);
+
+  // ---- Seasonal scene -------------------------------------------------
+  // A scene has two parts: content accents (still, on the content itself) and
+  // an ambient layer (animated, optional for any visit). The season control
+  // switches both. See app/assets/scenes/ for the scenes themselves.
+
+  const wait = (ms) =>
+    new Promise((resolve) => {
+      window.setTimeout(resolve, ms);
+    });
+
+  const pageLoaded = () =>
+    new Promise((resolve) => {
+      if (document.readyState === "complete") {
+        resolve();
+        return;
+      }
+      window.addEventListener("load", resolve, { once: true });
+    });
+
+  const tabVisible = () =>
+    new Promise((resolve) => {
+      if (!document.hidden) {
+        resolve();
+        return;
+      }
+      const onChange = () => {
+        if (!document.hidden) {
+          document.removeEventListener("visibilitychange", onChange);
+          resolve();
+        }
+      };
+      document.addEventListener("visibilitychange", onChange);
+    });
+
+  const browserIdle = () =>
+    new Promise((resolve) => {
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(resolve);
+        return;
+      }
+      window.setTimeout(resolve, 200);
+    });
+
+  // Phones and less capable devices get the scene's lighter form. Decided
+  // once per visit, when the ambient layer first mounts.
+  const needsLighterForm = () =>
+    window.innerWidth < 700 ||
+    window.matchMedia("(pointer: coarse)").matches ||
+    navigator.deviceMemory <= 4 ||
+    navigator.hardwareConcurrency <= 4;
+
+  // Calls onSlow when the page's frame rate, averaged over a window, falls
+  // under the minimum while the scene is drawing. Paused time is ignored.
+  const createFrameWatch = (host, onSlow) => {
+    let settleTimer = null;
+    let frameRequest = null;
+    let windowStart = 0;
+    let lastFrame = 0;
+    let frameCount = 0;
+    let isHostVisible = true;
+
+    const hostObserver = new IntersectionObserver((entries) => {
+      isHostVisible = entries.at(-1).isIntersecting;
+    });
+
+    const measure = (now) => {
+      const isPaused =
+        document.hidden ||
+        !isHostVisible ||
+        now - lastFrame > FRAME_WATCH_PAUSE_MS;
+      lastFrame = now;
+
+      if (isPaused || windowStart === 0) {
+        windowStart = now;
+        frameCount = 0;
+        return;
+      }
+
+      frameCount += 1;
+      const elapsed = now - windowStart;
+      if (elapsed < FRAME_WATCH_WINDOW_MS) {
+        return;
+      }
+
+      windowStart = 0;
+      if ((frameCount * 1000) / elapsed < FRAME_WATCH_MIN_FPS) {
+        onSlow();
+      }
+    };
+
+    const tick = (now) => {
+      frameRequest = window.requestAnimationFrame(tick);
+      measure(now);
+    };
+
+    const stop = () => {
+      window.clearTimeout(settleTimer);
+      window.cancelAnimationFrame(frameRequest);
+      hostObserver.disconnect();
+      settleTimer = null;
+      frameRequest = null;
+    };
+
+    const start = () => {
+      stop();
+      windowStart = 0;
+      hostObserver.observe(host);
+      settleTimer = window.setTimeout(() => {
+        frameRequest = window.requestAnimationFrame(tick);
+      }, FRAME_WATCH_SETTLE_MS);
+    };
+
+    return { start, stop };
+  };
+
+  // Loads, mounts and removes one scene's ambient layer. Failure of any kind
+  // is silent: the content accents stay and the next visit tries again.
+  const createAmbientLayer = (scene, host, seasonToggle) => {
+    let modulePromise = null;
+    let handle = null;
+    let isWanted = false;
+    let isLighter = null;
+    let isGoneForVisit = false;
+    // Bumped on every start and stop, so work started earlier can tell that
+    // it has been overtaken.
+    let run = 0;
+
+    const getContext = () => ({
+      theme: root.dataset.theme === "light" ? "light" : "dark",
+      occasions: scene.occasions,
+      lighter: isLighter,
+      assets: scene.assets,
+    });
+
+    const frameWatch = createFrameWatch(host, () => {
+      if (isLighter) {
+        // Too slow even in the lighter form: no ambient layer for the rest
+        // of the visit. The control stays on and nothing is remembered.
+        isGoneForVisit = true;
+        stop();
+        return;
+      }
+      isLighter = true;
+      handle?.update(getContext());
+    });
+
+    const loadModule = () => {
+      modulePromise ??= import(scene.ambient).catch((error) => {
+        modulePromise = null;
+        throw error;
+      });
+      return modulePromise;
+    };
+
+    const mount = async (ownRun) => {
+      const module = await loadModule();
+      if (ownRun !== run) {
+        return;
+      }
+
+      isLighter ??= needsLighterForm();
+      const mounted = await module.mount(host, getContext());
+      if (ownRun !== run) {
+        mounted.destroy();
+        return;
+      }
+
+      handle = mounted;
+      // The theme may have changed while the scene was loading.
+      handle.update(getContext());
+      root.dataset.sceneAmbient = scene.season;
+      frameWatch.start();
+    };
+
+    const waitForIdle = async () => {
+      await pageLoaded();
+      await wait(AMBIENT_LOAD_DELAY_MS);
+      do {
+        await tabVisible();
+        await browserIdle();
+      } while (document.hidden);
+    };
+
+    const start = async (isImmediate) => {
+      run += 1;
+      const ownRun = run;
+
+      try {
+        if (isImmediate) {
+          seasonToggle.dataset.busy = "";
+        } else {
+          await waitForIdle();
+        }
+        if (ownRun === run) {
+          await mount(ownRun);
+        }
+      } catch {
+        // Silent: no three.js, no WebGL, or a failed download.
+      } finally {
+        if (ownRun === run) {
+          seasonToggle.removeAttribute("data-busy");
+        }
+      }
+    };
+
+    function stop() {
+      run += 1;
+      isWanted = false;
+      frameWatch.stop();
+      seasonToggle.removeAttribute("data-busy");
+      root.removeAttribute("data-scene-ambient");
+      handle?.destroy();
+      handle = null;
+    }
+
+    const set = (shouldRun, isImmediate) => {
+      if (!shouldRun || isGoneForVisit) {
+        stop();
+        return;
+      }
+      if (isWanted) {
+        return;
+      }
+      isWanted = true;
+      start(isImmediate).catch(() => {
+        // start() already swallows its own failures.
+      });
+    };
+
+    return {
+      set,
+      themeChanged: () => handle?.update(getContext()),
+    };
+  };
+
+  // Shows and hides one scene's content accents: the data-scene switch that
+  // its accents.css hangs off, plus its accents.js when it has one.
+  const createContentAccents = (scene) => {
+    let modulePromise = null;
+    let isShown = false;
+
+    const sync = (module) => {
+      if (isShown) {
+        module.apply();
+      } else {
+        module.remove();
+      }
+    };
+
+    const set = (shouldShow) => {
+      isShown = shouldShow;
+
+      if (shouldShow) {
+        root.dataset.scene = scene.season;
+        root.toggleAttribute("data-occasions", scene.occasions.length > 0);
+        if (scene.occasions.length > 0) {
+          root.dataset.occasions = scene.occasions.join(" ");
+        }
+      } else {
+        root.removeAttribute("data-scene");
+        root.removeAttribute("data-occasions");
+      }
+
+      if (!scene.accents || !(shouldShow || modulePromise)) {
+        return;
+      }
+      modulePromise ??= import(scene.accents);
+      modulePromise.then(sync).catch(() => {
+        // Silent: without accents.js the scene keeps its CSS accents.
+      });
+    };
+
+    return { set };
+  };
+
+  const initSeasonalScene = (scene) => {
+    const seasonToggle = document.querySelector("[data-season-toggle]");
+    const host = scene.slot
+      ? document.querySelector(`[data-scene-slot="${scene.slot}"]`)
+      : null;
+    if (!seasonToggle) {
+      return null;
+    }
+
+    const hasAmbient = Boolean(scene.ambient && host);
+    const forcedColorsQuery = window.matchMedia("(forced-colors: active)");
+    // Visitors who asked for less motion, less data or more contrast get the
+    // content accents only, unless they switch the scene on themselves.
+    const quietQueries = [
+      window.matchMedia("(prefers-reduced-motion: reduce)"),
+      window.matchMedia("(prefers-reduced-data: reduce)"),
+      window.matchMedia("(prefers-contrast: more)"),
+    ];
+    const prefersQuiet = () =>
+      quietQueries.some((query) => query.matches) ||
+      navigator.connection?.saveData === true;
+
+    const readStoredChoice = () => {
+      try {
+        const stored = window.localStorage.getItem(SEASON_STORAGE_KEY);
+        return stored === "on" || stored === "off" ? stored : null;
+      } catch {
+        return null;
+      }
+    };
+
+    // null (nothing stored), "on" or "off". One choice for every season; an
+    // explicit choice always beats the automatic rule.
+    let choice = readStoredChoice();
+
+    const accents = createContentAccents(scene);
+    const ambient = hasAmbient
+      ? createAmbientLayer(scene, host, seasonToggle)
+      : null;
+
+    const getState = () => {
+      if (forcedColorsQuery.matches) {
+        return { hasControl: false, showAccents: false, runAmbient: false };
+      }
+      if (choice === "off") {
+        return { hasControl: true, showAccents: false, runAmbient: false };
+      }
+      return {
+        hasControl: true,
+        showAccents: true,
+        runAmbient: choice === "on" || !prefersQuiet(),
+      };
+    };
+
+    const render = (isImmediate) => {
+      const state = getState();
+      const isOn = hasAmbient ? state.runAmbient : state.showAccents;
+
+      seasonToggle.hidden = !state.hasControl;
+      seasonToggle.setAttribute("aria-checked", String(isOn));
+      accents.set(state.showAccents);
+      ambient?.set(state.runAmbient, isImmediate);
+    };
+
+    seasonToggle.addEventListener("click", () => {
+      const isOn = seasonToggle.getAttribute("aria-checked") === "true";
+      choice = isOn ? "off" : "on";
+      try {
+        window.localStorage.setItem(SEASON_STORAGE_KEY, choice);
+      } catch {
+        // Ignore storage failures; the choice still holds for this visit.
+      }
+      render(true);
+    });
+
+    // With nothing stored, the scene follows these settings live.
+    [forcedColorsQuery, ...quietQueries].forEach((query) => {
+      query.addEventListener("change", () => render(false));
+    });
+
+    const icon = seasonToggle.querySelector(
+      `[data-season-icon="${scene.season}"]`,
+    );
+    if (icon) {
+      icon.hidden = false;
+    }
+
+    render(false);
+
+    return { themeChanged: () => ambient?.themeChanged() };
+  };
+
+  // Set by the pre-paint script when the current season has a scene.
+  if (window.__fmScene) {
+    seasonalScene = initSeasonalScene(window.__fmScene);
+  }
 })();

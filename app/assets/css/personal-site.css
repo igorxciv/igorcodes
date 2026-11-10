@@ -256,6 +256,39 @@ span {
   transform: scale(1.08) rotate(10deg);
 }
 
+/* Season control: a second round button stacked above the theme toggle. It
+   borrows the theme toggle's classes for size and style. */
+.fm-season-toggle {
+  bottom: 5.25rem;
+}
+
+.fm-theme-toggle.fm-season-toggle[hidden],
+.fm-season-toggle-icon[hidden] {
+  display: none;
+}
+
+.fm-season-toggle-icon {
+  opacity: 0.42;
+  transform: scale(0.92);
+}
+
+.fm-season-toggle[aria-checked="true"] .fm-season-toggle-icon {
+  opacity: 1;
+  color: var(--fm-accent);
+  transform: scale(1);
+}
+
+/* Shown from the press until the ambient layer starts. Visual only. */
+.fm-season-toggle[data-busy] .fm-season-toggle-icon {
+  animation: fm-season-busy 2.4s ease-in-out infinite;
+}
+
+@keyframes fm-season-busy {
+  50% {
+    opacity: 0.42;
+  }
+}
+
 :target {
   scroll-margin-block-start: 1.5rem;
 }
@@ -305,8 +338,30 @@ span {
 }
 
 .fm-hero-content {
+  position: relative;
+  z-index: 1;
   max-width: 48rem;
   text-align: center;
+}
+
+/* Seasonal scene slot "hero": the ambient layer's host. Decorative only, so
+   it sits behind the copy and never takes pointer events. */
+.fm-scene-slot {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* A scene can ask for room below the copy while its ambient layer runs, by
+   setting --fm-scene-hero-lift under its own [data-scene] selector. */
+.fm-hero-content {
+  transition: translate 1.8s var(--fm-ease-emphasized);
+}
+
+[data-scene-ambient] .fm-hero-content {
+  translate: 0 var(--fm-scene-hero-lift, 0);
 }
 
 .fm-role {
@@ -977,6 +1032,7 @@ span {
   .fm-project-link,
   .fm-theme-toggle-shell,
   .fm-theme-toggle-icon,
+  .fm-hero-content,
   .fm-arrow,
   .fm-contact-list a,
   .fm-contact-icon,
@@ -1008,6 +1064,10 @@ span {
   .fm-scroll-down.is-hero-active svg {
     animation: none;
   }
+
+  .fm-season-toggle[data-busy] .fm-season-toggle-icon {
+    animation: none;
+  }
 }
 
 @media (forced-colors: active) {
@@ -1029,12 +1089,22 @@ span {
   .fm-theme-toggle:focus-visible {
     outline-color: Highlight;
   }
+
+  /* A seasonal scene does nothing in forced-colours mode. */
+  .fm-enhanced .fm-theme-toggle.fm-season-toggle,
+  .fm-scene-slot {
+    display: none;
+  }
 }
 
 @media (min-width: 640px) {
   .fm-theme-toggle {
     right: 1.5rem;
     bottom: 1.5rem;
+  }
+
+  .fm-season-toggle {
+    bottom: 5.75rem;
   }
 
   .fm-container,

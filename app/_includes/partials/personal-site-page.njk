@@ -1,8 +1,10 @@
 <div class="fm-page">
   <section id="hero" class="fm-hero" aria-labelledby="hero-title">
+    {# Seasonal scene slot "hero": a scene's ambient layer mounts here. #}
+    <div class="fm-scene-slot" data-scene-slot="hero" aria-hidden="true"></div>
     <div class="fm-hero-content">
       <p class="fm-role">Software Engineer</p>
-      <h1 id="hero-title" class="fm-name">Igor Cheliadinski</h1>
+      <h1 id="hero-title" class="fm-name" data-scene-accent="name">Igor Cheliadinski</h1>
       <p class="fm-tagline">Frontend-focused full-stack engineer with a systems and architecture mindset.</p>
       <nav class="fm-hero-links" aria-label="Hero links">
         <a href="#projects">View Work</a>
@@ -19,7 +21,7 @@
   <section id="timeline" class="fm-section" aria-labelledby="timeline-title">
     <div class="fm-container">
       <header class="fm-section-head fm-reveal">
-        <h2 id="timeline-title">Career Journey</h2>
+        <h2 id="timeline-title" data-scene-accent="heading">Career Journey</h2>
         <p>Building digital products and engineering systems since 2014</p>
       </header>
 
@@ -45,7 +47,7 @@
   <section id="projects" class="fm-section" aria-labelledby="projects-title">
     <div class="fm-container">
       <header class="fm-section-head fm-reveal">
-        <h2 id="projects-title">Selected Work</h2>
+        <h2 id="projects-title" data-scene-accent="heading">Selected Work</h2>
         <p>Projects spanning product engineering, frontend architecture, and systems thinking</p>
       </header>
 
@@ -75,7 +77,7 @@
   <section id="writing" class="fm-section" aria-labelledby="writing-title">
     <div class="fm-container fm-narrow">
       <header class="fm-section-head fm-reveal">
-        <h2 id="writing-title">Writing &amp; Notes</h2>
+        <h2 id="writing-title" data-scene-accent="heading">Writing &amp; Notes</h2>
         <p>Ideas on systems, product engineering, and practical frontend work</p>
       </header>
 
@@ -122,7 +124,7 @@
   <section id="experiments" class="fm-section" aria-labelledby="experiments-title">
     <div class="fm-container fm-narrow">
       <header class="fm-section-head fm-reveal">
-        <h2 id="experiments-title">Experiments</h2>
+        <h2 id="experiments-title" data-scene-accent="heading">Experiments</h2>
         <p>No public experiments at the moment</p>
       </header>
 
@@ -138,7 +140,7 @@
   <section id="contact" class="fm-section fm-contact-section" aria-labelledby="contact-title">
     <div class="fm-container fm-contact-wrap">
       <header class="fm-section-head fm-reveal">
-        <h2 id="contact-title">Get in Touch</h2>
+        <h2 id="contact-title" data-scene-accent="heading">Get in Touch</h2>
         <p>Open to interesting product and engineering conversations</p>
       </header>
 

@@ -1,0 +1,69 @@
+/*
+ * Winter scene, content accents: snow resting on letter tops in the hero name
+ * and the section headings. accents.js measures the letters and draws the
+ * overlay; this file styles it. Every rule is scoped under
+ * [data-scene="winter"], so nothing here applies once the scene is off.
+ */
+[data-scene="winter"] {
+  /* Room under the hero copy for the snowy ground, while the ambient layer
+     runs (see .fm-hero-content in personal-site.css). */
+  --fm-scene-hero-lift: -6svh;
+  --winter-snow-underside: light-dark(#dfe9f5, #dcf0fb);
+  --winter-snow-contour: light-dark(#6a80a6, #6fa5c4);
+  --winter-snow-contour-low: light-dark(#4f6590, #6fa5c4);
+}
+
+[data-scene="winter"] [data-scene-accent] {
+  position: relative;
+}
+
+/* One aria-hidden overlay per heading. The heading's own text is untouched. */
+[data-scene="winter"] [data-winter-snow] {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+
+[data-scene="winter"] [data-winter-snow][data-settled] {
+  opacity: 1;
+}
+
+/* One cap of snow. accents.js sets its box in pixels and its tilt. */
+[data-scene="winter"] [data-winter-snow] > span {
+  position: absolute;
+  border-radius: 50% 50% 34% 34% / 100% 100% 16% 16%;
+  background: linear-gradient(
+    to bottom,
+    #ffffff 35%,
+    var(--winter-snow-underside)
+  );
+  box-shadow:
+    0 0.012em 0 0.012em var(--winter-snow-contour),
+    inset 0 -0.02em 0.03em
+    color-mix(in srgb, var(--winter-snow-contour) 45%, transparent);
+  rotate: var(--winter-snow-tilt, 0deg);
+}
+
+/* On cream, white needs a full cool contour to read as snow. */
+[data-scene="winter"][data-theme="light"] [data-winter-snow] > span {
+  box-shadow:
+    0 0 0 0.014em var(--winter-snow-contour),
+    0 0.02em 0 0.014em var(--winter-snow-contour-low),
+    inset 0 -0.03em 0.03em
+    color-mix(in srgb, var(--winter-snow-contour) 55%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scene="winter"] [data-winter-snow] {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  [data-scene="winter"] [data-winter-snow] {
+    display: none;
+  }
+}

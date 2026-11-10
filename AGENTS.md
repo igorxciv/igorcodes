@@ -10,6 +10,8 @@ repo root (`.eleventy.js`, `biome.json`, `lefthook.yml`, `mise.toml`,
 - `app/` is the Eleventy input: pages (`*.njk`), `_includes/layouts/` and
   `_includes/partials/`, global data in `_data/*.js`, source CSS/JS in
   `assets/`, build scripts in `_tools/`.
+- `app/assets/scenes/<season>/` holds one seasonal scene per folder (see
+  Seasonal scenes).
 - `public/` is copied through as-is (images, fonts).
 - Put new source files under `app/` or `public/`; keep content in `_data`
   files and templates presentational.
@@ -67,6 +69,47 @@ repo root (`.eleventy.js`, `biome.json`, `lefthook.yml`, `mise.toml`,
   names stable. The pre-paint script in `personal-site.njk` and
   `personal-site.js` must agree on that key.
 
+## Seasonal scenes
+
+Terms (season, seasonal scene, ambient layer, content accents, season
+control, occasion, lighter form) are defined in `GLOSSARY.md`.
+
+- `app/_data/seasons.js` is the date table: four season start dates plus
+  occasions. It is the only place outside `app/assets/scenes/` that names a
+  season. The browser picks the season from the visitor's date, so no rebuild
+  is needed when a season starts.
+- A scene is one folder, `app/assets/scenes/<season>/`, and the folder is the
+  registration: `scene.js` (manifest, required), `accents.css`, `accents.js`,
+  `ambient.js`, `assets/` (all optional). Deleting the folder removes the
+  scene; the build still passes and that season shows the plain site.
+- Scenes decorate only the season-neutral hooks in the templates
+  (`data-scene-accent="name"`, `data-scene-accent="heading"`) and mount into a
+  slot (`data-scene-slot="hero"`). They never select `fm-` content classes, and
+  every `accents.css` rule sits under `[data-scene="<season>"]`. Adding a hook
+  or slot is a template change, not part of a scene.
+- `ambient.js` exports `mount(host, context)` returning
+  `{ update(context), destroy() }`. `accents.js` exports `apply()` and
+  `remove()` and may not import three.js.
+- The machinery is on per page through `seasonalScene: true` front matter
+  (home page only). The pre-paint script in `personal-site.njk` sets
+  `data-scene` on `<html>`; `personal-site.js` owns the season control, loading
+  and the frame-rate watch. Both must agree on the `fm-season` storage key.
+- `?season=<name>` and `?occasion=<name>` preview a scene for one page view,
+  in production too: `/?season=winter&occasion=christmas`.
+- `build-assets.mjs` appends every `accents.css` to the full stylesheet and
+  builds each `accents.js` and `ambient.js` as its own hashed ES module, with
+  three.js bundled into the ambient one. `pnpm dev` loads them unbundled
+  through an import map instead.
+- An ambient layer (script plus files in `assets/`) may transfer at most
+  200 kB; the build prints each scene's total and fails over the cap
+  (`app/_tools/scene-budget.mjs`). The build also fails on a scene folder that
+  is not a season, colliding season starts, an occasion outside its season,
+  and an occasion its scene's manifest does not list.
+- The Content-Security-Policy in `vercel.json` allows scenes only while any
+  `.glb` holds geometry alone (embedded textures become `blob:` URLs), no
+  Draco, meshopt or KTX2 decoder is used (they need WebAssembly or workers),
+  and every file is served from the site.
+
 ## Content and SEO
 
 - Static-first: reach for CSS or build-time rendering before client JS.
@@ -81,9 +124,10 @@ repo root (`.eleventy.js`, `biome.json`, `lefthook.yml`, `mise.toml`,
 
 ## Validation
 
-There is no test framework. CI runs `pnpm check` (Biome lint + format),
-`pnpm build`, and linkinator over `_site`. Before every commit, run
-`pnpm check` and `pnpm build`. linkinator serves `_site` from a loopback
+Tests are few and use Node's built-in runner: `pnpm test` runs
+`app/_tools/*.test.js` (the season date logic). CI runs `pnpm check` (Biome
+lint + format), `pnpm test`, `pnpm build`, and linkinator over `_site`. Before
+every commit, run `pnpm check`, `pnpm test` and `pnpm build`. linkinator serves `_site` from a loopback
 URL, so its `--skip` pattern must exclude only external hosts; a pattern like
 `^https?://` silently skips every internal link.
 
