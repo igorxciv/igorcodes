@@ -1,0 +1,89 @@
+/*
+ * Autumn scene, content accents: fallen leaves resting on letter tops in the
+ * hero name and the section headings. accents.js measures the letters and
+ * draws the overlay; this file styles it. Every rule is scoped under
+ * [data-scene="autumn"], so nothing here applies once the scene is off.
+ */
+[data-scene="autumn"] {
+  /* Room under the hero copy for the leafy ground, while the ambient layer
+     runs (see .fm-hero-content in personal-site.css). */
+  --fm-scene-hero-lift: -6svh;
+  /* Dark theme: saturated amber, orange and rust. Light theme: rust,
+     burgundy and dark ochre, never pale yellow on cream. */
+  --autumn-leaf-0: light-dark(#a6401c, #f2a12e);
+  --autumn-leaf-1: light-dark(#7d2233, #e8671d);
+  --autumn-leaf-2: light-dark(#a87818, #b8431d);
+  --autumn-leaf-3: light-dark(#8a3b1c, #d9541f);
+}
+
+[data-scene="autumn"] [data-scene-accent] {
+  position: relative;
+}
+
+/* One aria-hidden overlay per heading. The heading's own text is untouched. */
+[data-scene="autumn"] [data-autumn-leaves] {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+
+[data-scene="autumn"] [data-autumn-leaves][data-settled] {
+  opacity: 1;
+}
+
+/* One leaf. accents.js sets its box in pixels, its tilt and its tone. */
+[data-scene="autumn"] [data-autumn-leaves] > svg {
+  position: absolute;
+  overflow: visible;
+  color: var(--autumn-leaf-0);
+}
+
+[data-scene="autumn"] [data-autumn-leaves] > [data-tone="1"] {
+  color: var(--autumn-leaf-1);
+}
+
+[data-scene="autumn"] [data-autumn-leaves] > [data-tone="2"] {
+  color: var(--autumn-leaf-2);
+}
+
+[data-scene="autumn"] [data-autumn-leaves] > [data-tone="3"] {
+  color: var(--autumn-leaf-3);
+}
+
+[data-scene="autumn"] [data-autumn-leaves] [data-part="leaf"] {
+  fill: currentcolor;
+  stroke: none;
+}
+
+[data-scene="autumn"] [data-autumn-leaves] [data-part="veins"] {
+  fill: none;
+  stroke: color-mix(in srgb, currentcolor 62%, #000);
+  stroke-width: 0.8px;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* On cream, each leaf gets a thin darker contour so it holds its shape. */
+[data-scene="autumn"][data-theme="light"]
+  [data-autumn-leaves]
+  [data-part="leaf"] {
+  stroke: color-mix(in srgb, currentcolor 55%, #000);
+  stroke-width: 1px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scene="autumn"] [data-autumn-leaves] {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  [data-scene="autumn"] [data-autumn-leaves] {
+    display: none;
+  }
+}

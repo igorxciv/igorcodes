@@ -19,6 +19,7 @@ const table = {
   },
   occasions: [
     { name: "christmas", season: "winter", start: [12, 1], end: [1, 7] },
+    { name: "halloween", season: "autumn", start: [10, 24], end: [10, 31] },
   ],
 };
 
