@@ -53,3 +53,10 @@ fewer flakes, simpler shadows and a lower frame rate. Phones and less capable
 devices get it from the start, and a visit in the full form drops to it when
 the full form runs too slowly. The full form and the lighter form ship in the
 same files.
+
+## Scene character
+
+A figure in the ambient layer that reacts to the visitor, such as winter's
+snowman or spring's bird. A seasonal scene has at most one scene character and
+may have none. "Companion" is avoided: it named a rejected idea, a figure
+pinned to the corner of the page.
