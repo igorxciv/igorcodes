@@ -14,8 +14,10 @@
     {% set isHomepage = page.url == "/" %}
     {% set includeDefaultJs = not skipDefaultJs %}
     {# Seasonal scenes are switched on per page by `seasonalScene: true` in
-       front matter, and only matter when at least one scene folder exists. #}
-    {% set sceneMachinery = seasonalScene and (scenes.list | length) > 0 %}
+       front matter. A page without a scene's slot gets that scene's content
+       accents alone, and a scene with nothing to show there is left out. #}
+    {% set pageScenes = scenes.forPage(content) if seasonalScene else { hasScenes: false } %}
+    {% set sceneMachinery = pageScenes.hasScenes %}
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -192,7 +194,7 @@
           {{ scenes.clockSource | safe }}
 
           const table = {{ seasons | dump | safe }};
-          const scenes = {{ scenes.client | dump | safe }};
+          const scenes = {{ pageScenes.client | dump | safe }};
           const storageKey = "fm-scene";
           const root = document.documentElement;
           const params = new URLSearchParams(window.location.search);
@@ -255,7 +257,7 @@
           <link rel="stylesheet" href="{{ scene.accentsCss | url }}" />
         {% endif %}
       {% endfor %}
-      {% if scenes.devModules %}
+      {% if pageScenes.devModules %}
         <script type="importmap">
           {
             "imports": {
