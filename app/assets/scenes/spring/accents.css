@@ -1,0 +1,69 @@
+/*
+ * Spring scene, content accents: fallen petals resting on letter tops in the
+ * hero name and the section headings. accents.js measures the
+ * letters and draws the overlay; this file styles it. Every rule is scoped
+ * under [data-scene="spring"], so nothing here applies once the scene is off.
+ */
+[data-scene="spring"] {
+  --spring-petal: light-dark(#ffffff, #f4ebf2);
+  --spring-petal-blush: light-dark(#f7bccf, #e3a7bf);
+  --spring-petal-contour: light-dark(#9c5672, #8a6d88);
+}
+
+[data-scene="spring"] [data-scene-accent] {
+  position: relative;
+}
+
+/* One aria-hidden overlay per heading. The heading's own text is untouched. */
+[data-scene="spring"] [data-spring-petals] {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+
+[data-scene="spring"] [data-spring-petals][data-settled] {
+  opacity: 1;
+}
+
+/* One petal. accents.js sets its box in pixels, its tilt and which way it
+   points; overflow stays visible so the contour on the box edge is not cut. */
+[data-scene="spring"] [data-spring-petals] > svg {
+  position: absolute;
+  display: block;
+  overflow: visible;
+  rotate: var(--spring-petal-tilt, 0deg);
+  scale: var(--spring-petal-flip, 1) 1;
+}
+
+[data-scene="spring"] [data-spring-petals] [data-part="petal"] {
+  fill: var(--spring-petal);
+  stroke: var(--spring-petal-contour);
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+
+[data-scene="spring"] [data-spring-petals] [data-part="blush"] {
+  fill: var(--spring-petal-blush);
+}
+
+/* On cream, a white petal needs a fuller contour to read. */
+[data-scene="spring"][data-theme="light"]
+  [data-spring-petals]
+  [data-part="petal"] {
+  stroke-width: 0.95;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scene="spring"] [data-spring-petals] {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  [data-scene="spring"] [data-spring-petals] {
+    display: none;
+  }
+}
