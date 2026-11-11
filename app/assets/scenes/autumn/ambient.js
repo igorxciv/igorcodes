@@ -216,6 +216,9 @@ function readPageColor(host, token, target) {
 
 // Adds lines to a built-in material's shaders, after the named chunks.
 function extendShader(material, { uniforms, vertex, fragment }) {
+  // Three keys compiled programs on onBeforeCompile's source, which is the
+  // same for every material extended here; key them on the added code.
+  material.customProgramCacheKey = () => JSON.stringify([vertex, fragment]);
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms);
     for (const [chunk, code] of Object.entries(vertex)) {
@@ -657,6 +660,12 @@ function createTree() {
 // Shared by both shader stages of every cloth material.
 const CLOTH_VARYINGS = "varying vec2 vCloth; varying vec3 vLocal;";
 
+// Noise; stripe() is 1 inside a band of half-width w around c, repeating
+// every 1 along x; weave() is a plain weave with one thread per unit, 1 on a
+// raised thread and darker where it dips under the next and through the
+// gaps; weather() adds grime and sun-fading in broad patches and shades the
+// inside of the cloth where it shows at an opening. Comments stay out of the
+// GLSL strings, which ship as written.
 const FABRIC_GLSL = `
   uniform vec3 uA;
   uniform vec3 uB;
@@ -676,13 +685,10 @@ const FABRIC_GLSL = `
   float fbm(vec2 p) {
     return 0.5 * noise(p) + 0.3 * noise(p * 2.03) + 0.2 * noise(p * 4.1);
   }
-  // 1 inside a band of half-width w around c, repeating every 1 along x.
   float stripe(float x, float c, float w) {
     float aa = fwidth(x);
     return 1.0 - smoothstep(-aa, aa, abs(fract(x) - c) - w);
   }
-  // A plain weave with one thread per unit: 1 on a raised thread, darker
-  // where it dips under the next and through the gaps, with uneven threads.
   float weave(vec2 p) {
     vec2 cell = floor(p);
     vec2 f = abs(fract(p) - 0.5) * 2.0;
@@ -694,8 +700,6 @@ const FABRIC_GLSL = `
       - 0.25 * along * along - 0.5 * step(0.8, f.x) * step(0.8, f.y);
     return mix(height, 0.78, smoothstep(0.3, 0.6, max(fwidth(p.x), fwidth(p.y))));
   }
-  // Grime and sun-fading in broad patches, and the shaded inside of the
-  // cloth where it shows at an opening.
   vec3 weather(vec3 color, float amount) {
     float grime = fbm(vLocal.xy * 7.0 + vLocal.z * 5.0);
     color *= 1.0 - amount * grime;
@@ -711,7 +715,6 @@ const PLAID_GLSL = `
     (stripe(p.x, 0.3, 0.14) + stripe(p.y, 0.3, 0.14)) * 0.5);
   color = mix(color, uC,
     0.7 * max(stripe(p.x, 0.72, 0.025), stripe(p.y, 0.72, 0.025)));
-  color *= mix(0.84, 1.0, weave(vCloth * 140.0));
   float front = step(0.0, vLocal.z) * step(1.13, vLocal.y) * step(vLocal.y, 1.5);
   float aa = fwidth(vLocal.x) * 1.5;
   float seam = 1.0 - smoothstep(0.003, 0.003 + aa, abs(vLocal.x));
@@ -738,9 +741,9 @@ const BURLAP_GLSL = `
     * (0.75 + 0.25 * noise(p * 120.0));
   diffuseColor.rgb = weather(mix(color, uC, ink), 0.3);`;
 
-// Woven straw with a darker band round the crown.
+// Weathered felt, mottled and faded, with a darker band round the crown.
 const HAT_GLSL = `
-  vec3 color = mix(uB, uA, weave(vCloth * 70.0));
+  vec3 color = mix(uB, uA, fbm(vCloth * 18.0));
   float band = smoothstep(0.012, 0.018, vLocal.y)
     * (1.0 - smoothstep(0.07, 0.076, vLocal.y))
     * step(length(vLocal.xz), 0.26);
@@ -780,9 +783,6 @@ function createCloth(pattern, colors, sway = 0) {
     },
     fragment: { common: CLOTH_VARYINGS + FABRIC_GLSL, color_fragment: pattern },
   });
-  // Every cloth shares onBeforeCompile's source, which is three's default
-  // program key; the pattern tells them apart.
-  material.customProgramCacheKey = () => pattern;
   material.uniforms = uniforms;
   return material;
 }
@@ -991,13 +991,13 @@ function createSleeve(side, plaid, straw, blade) {
 
 // The head is its own group so it can turn without the body: a burlap sack
 // stuffed round, gathered at the neck and tied with twine, the spare cloth
-// below the tie spread over the collar; straw hair under a floppy straw hat.
+// below the tie spread over the collar; straw hair under a floppy felt hat.
 function createScarecrowHead(straw, blade, twine) {
   const head = new Group();
   head.position.y = 1.64;
   const lean = new Group();
   lean.rotation.set(0.12, 0, 0.1);
-  lean.scale.setScalar(0.9);
+  lean.scale.setScalar(0.8);
   head.add(lean);
 
   const burlap = createCloth(BURLAP_GLSL, ["#a8977a", "#6e604c", "#1c1612"]);
@@ -1076,7 +1076,7 @@ function createScarecrowHead(straw, blade, twine) {
       2.4,
       1,
     ),
-    createCloth(HAT_GLSL, ["#c9a868", "#8a6c3e", "#4a3424"]),
+    createCloth(HAT_GLSL, ["#7d6045", "#54402d", "#2a1f17"]),
   );
   hat.position.set(0.03, 0.4, -0.01);
   hat.rotation.set(-0.08, 0, -0.16);
