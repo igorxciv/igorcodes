@@ -1,6 +1,5 @@
 // Winter scene, ambient layer: pines, a snowman and snowfall behind the hero
-// copy, with Christmas lights and a star on the trees during the Christmas
-// occasion.
+// copy, with Christmas lights on the trees during the Christmas occasion.
 //
 // The site decides when this loads and passes a context: theme, current
 // occasions, the lighter-form flag and the URLs of the files in assets/.
@@ -14,7 +13,6 @@ import {
   BackSide,
   Box3,
   BufferAttribute,
-  BufferGeometry,
   Color,
   ConeGeometry,
   CylinderGeometry,
@@ -110,9 +108,6 @@ const THEMES = {
     bulbSize: 0.045,
     bulbRoughness: 1,
     bulbClearcoat: 0,
-    star: "#ffd76a",
-    starGlowColor: "#ffb92e",
-    starGlow: 1.4,
   },
   light: {
     sun: "#ffe9c8",
@@ -141,9 +136,6 @@ const THEMES = {
     bulbSize: 0.07,
     bulbRoughness: 0.18,
     bulbClearcoat: 1,
-    star: "#f2a900",
-    starGlowColor: "#f2a900",
-    starGlow: 0.35,
   },
 };
 
@@ -157,12 +149,6 @@ const TREES = [
 const SNOWMAN_X = 0.62;
 const SNOWMAN_Z = -2;
 const BULBS_PER_TREE = 20;
-// The crown's top spike, as a fraction of the tree's height.
-const CROWN_SPIKE = 0.03;
-// How far the star's centre sits below the top of the crown, in scene
-// units: the spike runs into the star and its lower points overlap the
-// first branches, so it reads as fixed to the tree rather than floating.
-const STAR_SINK = 0.04;
 
 // Ground height: broad swells plus small lumps.
 const groundHeight = (x, z) =>
@@ -594,88 +580,15 @@ function createPines(pine) {
 
 // ---------------------------------------------------------------- Christmas
 
-// A five-pointed star with flat faces, built by hand: an extruded Shape
-// would pull three.js's curve and triangulation code into the bundle.
-function createStarGeometry() {
-  const halfDepth = 0.02;
-  const outline = Array.from({ length: 10 }, (_, point) => {
-    const radius = point % 2 ? 0.07 : 0.17;
-    const angle = (point / 10) * Math.PI * 2 + Math.PI / 2;
-    return [Math.cos(angle) * radius, Math.sin(angle) * radius];
-  });
-
-  const vertices = [];
-  outline.forEach(([x, y], point) => {
-    const [nextX, nextY] = outline[(point + 1) % outline.length];
-    vertices.push(
-      // Front face, then back face, as fans around the centre.
-      [0, 0, halfDepth],
-      [x, y, halfDepth],
-      [nextX, nextY, halfDepth],
-      [0, 0, -halfDepth],
-      [nextX, nextY, -halfDepth],
-      [x, y, -halfDepth],
-      // The edge between them.
-      [x, y, halfDepth],
-      [x, y, -halfDepth],
-      [nextX, nextY, -halfDepth],
-      [x, y, halfDepth],
-      [nextX, nextY, -halfDepth],
-      [nextX, nextY, halfDepth],
-    );
-  });
-
-  const geometry = new BufferGeometry();
-  geometry.setAttribute(
-    "position",
-    new BufferAttribute(new Float32Array(vertices.flat()), 3),
-  );
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-function findFoliage(tree) {
+// Points on the outer branch tips of one tree, in the tree group's space:
+// foliage vertices near the silhouette.
+function findBranchTips(tree, random) {
   let foliage = null;
   tree.model.traverse((object) => {
     if (object.isMesh && isFoliage(object)) {
       foliage = object;
     }
   });
-  return foliage;
-}
-
-// The top of the crown, in the tree group's space: the pine ends in a thin
-// spike that sits off the bounding box's centre, so the star is centred on
-// the spike's own vertices rather than on the box.
-function findCrownTop(tree) {
-  const foliage = findFoliage(tree);
-  if (!foliage) {
-    return new Vector3(0, tree.height, 0);
-  }
-
-  tree.group.updateWorldMatrix(true, true);
-  const positions = foliage.geometry.attributes.position;
-  const points = Array.from({ length: positions.count }, (_, index) =>
-    tree.group.worldToLocal(
-      foliage.localToWorld(new Vector3().fromBufferAttribute(positions, index)),
-    ),
-  );
-  const topY = Math.max(...points.map((point) => point.y));
-  const spike = points.filter(
-    (point) => point.y >= topY - tree.height * CROWN_SPIKE,
-  );
-  const top = new Vector3(0, topY, 0);
-  for (const point of spike) {
-    top.x += point.x / spike.length;
-    top.z += point.z / spike.length;
-  }
-  return top;
-}
-
-// Points on the outer branch tips of one tree, in the tree group's space:
-// foliage vertices near the silhouette.
-function findBranchTips(tree, random) {
-  const foliage = findFoliage(tree);
   if (!foliage) {
     return [];
   }
@@ -705,26 +618,17 @@ function findBranchTips(tree, random) {
   return tips;
 }
 
-// Coloured lights on the outer branch tips and a star on each tree. Dark
-// theme: glowing bulbs. Light theme: glossy ornaments. They never flash; the
-// glow breathes on a cycle of nearly three seconds.
+// Coloured lights on the outer branch tips. Dark theme: glowing bulbs. Light
+// theme: glossy ornaments. They never flash; the glow breathes on a cycle of
+// nearly three seconds.
 function createChristmas(trees) {
   const random = createRandom(1225);
   const bulbGeometry = new IcosahedronGeometry(1, 1);
   const bulbMaterials = [0, 1, 2, 3].map(() => new MeshPhysicalMaterial());
-  const starGeometry = createStarGeometry();
-  const starMaterial = new MeshStandardMaterial({ roughness: 0.3 });
   const bulbs = [];
   let look = THEMES.dark;
 
   trees.forEach((tree, treeIndex) => {
-    // The star stays still, facing the camera: tree groups are never turned,
-    // and a spinning flat star reads as a stick when it is edge-on.
-    const star = new Mesh(starGeometry, starMaterial);
-    star.position.copy(findCrownTop(tree));
-    star.position.y -= STAR_SINK;
-    tree.group.add(star);
-
     findBranchTips(tree, random).forEach((tip, tipIndex) => {
       const bulb = new Mesh(
         bulbGeometry,
@@ -748,9 +652,6 @@ function createChristmas(trees) {
     for (const bulb of bulbs) {
       bulb.scale.setScalar(look.bulbSize);
     }
-    starMaterial.color.set(look.star);
-    starMaterial.emissive.set(look.starGlowColor);
-    starMaterial.emissiveIntensity = look.starGlow;
   };
 
   const animate = (time) => {
