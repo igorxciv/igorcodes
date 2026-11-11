@@ -157,6 +157,12 @@ const TREES = [
 const SNOWMAN_X = 0.62;
 const SNOWMAN_Z = -2;
 const BULBS_PER_TREE = 20;
+// The crown's top spike, as a fraction of the tree's height.
+const CROWN_SPIKE = 0.03;
+// How far the star's centre sits below the top of the crown, in scene
+// units: the spike runs into the star and its lower points overlap the
+// first branches, so it reads as fixed to the tree rather than floating.
+const STAR_SINK = 0.04;
 
 // Ground height: broad swells plus small lumps.
 const groundHeight = (x, z) =>
@@ -628,15 +634,48 @@ function createStarGeometry() {
   return geometry;
 }
 
-// Points on the outer branch tips of one tree, in the tree group's space:
-// foliage vertices near the silhouette.
-function findBranchTips(tree, random) {
+function findFoliage(tree) {
   let foliage = null;
   tree.model.traverse((object) => {
     if (object.isMesh && isFoliage(object)) {
       foliage = object;
     }
   });
+  return foliage;
+}
+
+// The top of the crown, in the tree group's space: the pine ends in a thin
+// spike that sits off the bounding box's centre, so the star is centred on
+// the spike's own vertices rather than on the box.
+function findCrownTop(tree) {
+  const foliage = findFoliage(tree);
+  if (!foliage) {
+    return new Vector3(0, tree.height, 0);
+  }
+
+  tree.group.updateWorldMatrix(true, true);
+  const positions = foliage.geometry.attributes.position;
+  const points = Array.from({ length: positions.count }, (_, index) =>
+    tree.group.worldToLocal(
+      foliage.localToWorld(new Vector3().fromBufferAttribute(positions, index)),
+    ),
+  );
+  const topY = Math.max(...points.map((point) => point.y));
+  const spike = points.filter(
+    (point) => point.y >= topY - tree.height * CROWN_SPIKE,
+  );
+  const top = new Vector3(0, topY, 0);
+  for (const point of spike) {
+    top.x += point.x / spike.length;
+    top.z += point.z / spike.length;
+  }
+  return top;
+}
+
+// Points on the outer branch tips of one tree, in the tree group's space:
+// foliage vertices near the silhouette.
+function findBranchTips(tree, random) {
+  const foliage = findFoliage(tree);
   if (!foliage) {
     return [];
   }
@@ -681,7 +720,8 @@ function createChristmas(trees) {
 
   trees.forEach((tree, treeIndex) => {
     const star = new Mesh(starGeometry, starMaterial);
-    star.position.y = tree.height + 0.08;
+    star.position.copy(findCrownTop(tree));
+    star.position.y -= STAR_SINK;
     tree.group.add(star);
     stars.push(star);
 
