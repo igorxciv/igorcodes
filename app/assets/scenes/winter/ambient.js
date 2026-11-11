@@ -715,15 +715,15 @@ function createChristmas(trees) {
   const starGeometry = createStarGeometry();
   const starMaterial = new MeshStandardMaterial({ roughness: 0.3 });
   const bulbs = [];
-  const stars = [];
   let look = THEMES.dark;
 
   trees.forEach((tree, treeIndex) => {
+    // The star stays still, facing the camera: tree groups are never turned,
+    // and a spinning flat star reads as a stick when it is edge-on.
     const star = new Mesh(starGeometry, starMaterial);
     star.position.copy(findCrownTop(tree));
     star.position.y -= STAR_SINK;
     tree.group.add(star);
-    stars.push(star);
 
     findBranchTips(tree, random).forEach((tip, tipIndex) => {
       const bulb = new Mesh(
@@ -754,9 +754,6 @@ function createChristmas(trees) {
   };
 
   const animate = (time) => {
-    for (const star of stars) {
-      star.rotation.y = time * 0.8;
-    }
     bulbMaterials.forEach((material, index) => {
       material.emissiveIntensity =
         look.bulbGlow *
