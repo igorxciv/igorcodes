@@ -31,6 +31,7 @@ import {
   InstancedBufferAttribute,
   InstancedBufferGeometry,
   InstancedMesh,
+  LatheGeometry,
   MathUtils,
   Matrix4,
   Mesh,
@@ -647,193 +648,575 @@ function createTree() {
 
 // ---------------------------------------------------------------- scarecrow
 
-const STRAW_SLOTS = 16;
+// The scarecrow is built from swept and lathed cloth with its patterns drawn
+// in the fragment shader: no model file and no textures. At his size on
+// screen a real weave is far below a pixel, so each pattern fades to its
+// average colour once its threads get finer than a pixel or two, and the
+// drape, the straw and the weathering carry the look.
 
-// A bundle of straw: an open cone whose loose end is frayed to uneven
-// lengths. It points along +y from its tied end at the origin.
-function createStraw(length, radius, seed, material) {
-  const random = createRandom(seed);
-  const geometry = new CylinderGeometry(
-    radius,
-    radius * 0.3,
-    length,
-    STRAW_SLOTS,
-    1,
-    true,
-  )
-    .translate(0, length / 2, 0)
-    .toNonIndexed();
-  const positions = geometry.attributes.position;
-  const fray = Array.from(
-    { length: STRAW_SLOTS + 1 },
-    () => 0.4 + random() * 0.6,
-  );
-  for (let index = 0; index < positions.count; index++) {
-    const y = positions.getY(index);
-    if (y > length * 0.5) {
-      const around = Math.atan2(positions.getZ(index), positions.getX(index));
-      const slot = Math.floor(
-        ((around + Math.PI) / (Math.PI * 2)) * STRAW_SLOTS,
-      );
-      positions.setY(index, y * fray[slot]);
-    }
+// Shared by both shader stages of every cloth material.
+const CLOTH_VARYINGS = "varying vec2 vCloth; varying vec3 vLocal;";
+
+const FABRIC_GLSL = `
+  uniform vec3 uA;
+  uniform vec3 uB;
+  uniform vec3 uC;
+  float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
   }
-  geometry.computeVertexNormals();
-  return new Mesh(geometry, material);
+  float noise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    f *= f * (3.0 - 2.0 * f);
+    return mix(
+      mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
+      mix(hash(i + vec2(0.0, 1.0)), hash(i + 1.0), f.x),
+      f.y);
+  }
+  float fbm(vec2 p) {
+    return 0.5 * noise(p) + 0.3 * noise(p * 2.03) + 0.2 * noise(p * 4.1);
+  }
+  // 1 inside a band of half-width w around c, repeating every 1 along x.
+  float stripe(float x, float c, float w) {
+    float aa = fwidth(x);
+    return 1.0 - smoothstep(-aa, aa, abs(fract(x) - c) - w);
+  }
+  // A plain weave with one thread per unit: 1 on a raised thread, darker
+  // where it dips under the next and through the gaps, with uneven threads.
+  float weave(vec2 p) {
+    vec2 cell = floor(p);
+    vec2 f = abs(fract(p) - 0.5) * 2.0;
+    float weftUp = step(1.0, mod(cell.x + cell.y, 2.0));
+    float across = mix(f.x, f.y, weftUp);
+    float along = mix(f.y, f.x, weftUp);
+    float uneven = hash(vec2(mix(cell.x, cell.y, weftUp), 3.0));
+    float height = 1.0 - 0.45 * smoothstep(0.5 + 0.35 * uneven, 1.0, across)
+      - 0.25 * along * along - 0.5 * step(0.8, f.x) * step(0.8, f.y);
+    return mix(height, 0.78, smoothstep(0.3, 0.6, max(fwidth(p.x), fwidth(p.y))));
+  }
+  // Grime and sun-fading in broad patches, and the shaded inside of the
+  // cloth where it shows at an opening.
+  vec3 weather(vec3 color, float amount) {
+    float grime = fbm(vLocal.xy * 7.0 + vLocal.z * 5.0);
+    color *= 1.0 - amount * grime;
+    color = mix(color, vec3(dot(color, vec3(0.3, 0.55, 0.15))), amount * 0.6);
+    return gl_FrontFacing ? color : color * 0.35;
+  }`;
+
+// Faded flannel plaid, with a placket and buttons down the front of the
+// shirt (only the body reaches that high in its own coordinates).
+const PLAID_GLSL = `
+  vec2 p = vCloth / 0.17;
+  vec3 color = mix(uA, uB,
+    (stripe(p.x, 0.3, 0.14) + stripe(p.y, 0.3, 0.14)) * 0.5);
+  color = mix(color, uC,
+    0.7 * max(stripe(p.x, 0.72, 0.025), stripe(p.y, 0.72, 0.025)));
+  color *= mix(0.84, 1.0, weave(vCloth * 140.0));
+  float front = step(0.0, vLocal.z) * step(1.13, vLocal.y) * step(vLocal.y, 1.5);
+  float aa = fwidth(vLocal.x) * 1.5;
+  float seam = 1.0 - smoothstep(0.003, 0.003 + aa, abs(vLocal.x));
+  float button = length(vec2(vLocal.x - 0.012, mod(vLocal.y - 1.19, 0.1) - 0.05)) - 0.01;
+  color = mix(color, uB * 0.6, seam * front);
+  color = mix(color, uC, (1.0 - smoothstep(-aa, aa, button)) * front);
+  diffuseColor.rgb = weather(color, 0.35);`;
+
+// Burlap with a face painted on the front in dark, dry-brushed paint: two
+// round eyes and a stitched grin.
+const BURLAP_GLSL = `
+  vec3 color = mix(uB, uA, weave(vCloth * 90.0))
+    * mix(0.85, 1.1, fbm(vCloth * vec2(5.0, 36.0)));
+  vec2 p = vLocal.xy;
+  float eyes = length(vec2(abs(p.x) - 0.085, p.y - 0.25) * vec2(1.0, 0.85))
+    - 0.036 - 0.01 * noise(p * 70.0);
+  float grin = abs(p.y - 0.13 - 2.0 * p.x * p.x);
+  float line = max(grin - 0.006, abs(p.x) - 0.11);
+  float stitches = max(max(abs(mod(p.x + 0.0175, 0.035) - 0.0175) - 0.005,
+    grin - 0.022), abs(p.x) - 0.1);
+  float face = min(eyes, min(line, stitches));
+  float aa = fwidth(face);
+  float ink = (1.0 - smoothstep(-aa, aa, face)) * step(0.0, vLocal.z)
+    * (0.75 + 0.25 * noise(p * 120.0));
+  diffuseColor.rgb = weather(mix(color, uC, ink), 0.3);`;
+
+// Woven straw with a darker band round the crown.
+const HAT_GLSL = `
+  vec3 color = mix(uB, uA, weave(vCloth * 70.0));
+  float band = smoothstep(0.012, 0.018, vLocal.y)
+    * (1.0 - smoothstep(0.07, 0.076, vLocal.y))
+    * step(length(vLocal.xz), 0.26);
+  diffuseColor.rgb = weather(mix(color, uC, band), 0.4);`;
+
+// A bandana in the site accent, dulled as if dyed and washed out, with
+// small pale dots.
+const BANDANA_GLSL = `
+  vec3 color = mix(uA, uB, 0.55) * mix(0.88, 1.0, weave(vCloth * 120.0));
+  float spot = length(fract(vCloth / 0.035) - 0.5) - 0.13;
+  float aa = fwidth(spot);
+  color = mix(color, uC, 0.6 * (1.0 - smoothstep(-aa, aa, spot)));
+  diffuseColor.rgb = weather(color, 0.3);`;
+
+// The wind the scarecrow's cloth and straw move in: the shared gust's
+// strength, and the time.
+const SCARECROW_WIND = { uGust: { value: 0 }, uTime: { value: 0 } };
+
+// A cloth material: pattern is GLSL that sets diffuseColor from uA, uB and
+// uC. sway moves the lower edge (uv.y = 0) with the gust.
+function createCloth(pattern, colors, sway = 0) {
+  const uniforms = {
+    ...SCARECROW_WIND,
+    uSway: { value: sway },
+    uA: { value: new Color(colors[0]) },
+    uB: { value: new Color(colors[1]) },
+    uC: { value: new Color(colors[2]) },
+  };
+  const material = new MeshStandardMaterial({ roughness: 1, side: DoubleSide });
+  extendShader(material, {
+    uniforms,
+    vertex: {
+      common: `${CLOTH_VARYINGS} uniform float uGust; uniform float uSway;`,
+      begin_vertex: `vCloth = uv; vLocal = position;
+        transformed.xz += uGust * uSway * (1.0 - uv.y) * (1.0 - uv.y)
+          * vec2(1.0, 0.4);`,
+    },
+    fragment: { common: CLOTH_VARYINGS + FABRIC_GLSL, color_fragment: pattern },
+  });
+  // Every cloth shares onBeforeCompile's source, which is three's default
+  // program key; the pattern tells them apart.
+  material.customProgramCacheKey = () => pattern;
+  material.uniforms = uniforms;
+  return material;
 }
 
-// A sleeve along the crossbar. Its loose end hangs from the bar's tip and
-// can sway; a straw tuft spills from the cuff.
-function createSleeve(side, cloth, straw) {
-  const sleeve = new Group();
-  sleeve.position.set(side * 0.22, 1.47, 0);
-  const upper = new Mesh(
-    new CylinderGeometry(0.085, 0.105, 0.42, 10).rotateZ(Math.PI / 2),
-    cloth,
+// Scales a geometry's uv so the patterns repeat at a set size in world units.
+function scaleUv(geometry, width, height) {
+  const uv = geometry.attributes.uv;
+  for (let index = 0; index < uv.count; index++) {
+    uv.setXY(index, uv.getX(index) * width, uv.getY(index) * height);
+  }
+  return geometry;
+}
+
+// A lathed piece of cloth from [radius, y] points, the seam at the back.
+// shape(point, angle, along) pushes each vertex: along runs 0 to 1 over the
+// profile.
+function createLathe(profile, segments, shape) {
+  const geometry = new LatheGeometry(
+    profile.map(([radius, y]) => new Vector2(radius, y)),
+    segments,
+    Math.PI,
   );
-  upper.position.x = side * 0.21;
-  sleeve.add(upper);
+  const positions = geometry.attributes.position;
+  const uv = geometry.attributes.uv;
+  const point = new Vector3();
+  for (let index = 0; index < positions.count; index++) {
+    point.fromBufferAttribute(positions, index);
+    shape(point, (uv.getX(index) + 0.5) * Math.PI * 2, uv.getY(index));
+    positions.setXYZ(index, point.x, point.y, point.z);
+  }
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+// A sleeve section along +x, open at both ends. The bar runs near the top
+// inside it, so the cloth below hangs lower than above, and lengthwise folds
+// gather towards the middle. uv.y is 1 at the loose end.
+function createSleeveGeometry(length, radius, seed) {
+  const sides = 14;
+  const rings = 8;
+  const positions = [];
+  const uvs = [];
+  const indices = [];
+  for (let ring = 0; ring <= rings; ring++) {
+    const along = ring / rings;
+    const r = radius(along);
+    for (let side = 0; side <= sides; side++) {
+      const angle = (side / sides) * Math.PI * 2;
+      const fold =
+        1 + 0.1 * Math.sin(angle * 5 + along * 7 + seed) * Math.sin(along * 3);
+      const y = Math.cos(angle) * r * fold;
+      positions.push(
+        along * length,
+        (y < 0 ? y * 1.6 : y) - r * 0.5,
+        Math.sin(angle) * r * fold,
+      );
+      uvs.push((side / sides) * 0.6, along);
+      if (ring > 0 && side > 0) {
+        const a = ring * (sides + 1) + side;
+        const b = a - sides - 1;
+        indices.push(b - 1, b, a - 1, b, a, a - 1);
+      }
+    }
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute(
+    "position",
+    new BufferAttribute(new Float32Array(positions), 3),
+  );
+  geometry.setAttribute("uv", new BufferAttribute(new Float32Array(uvs), 2));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  return scaleUv(geometry, 1, length);
+}
+
+// One straw: a thin tapered blade, slightly curved, from 0 to 1 along +y.
+function createStrawBlade() {
+  const positions = [];
+  for (let step = 0; step <= 3; step++) {
+    const y = step / 3;
+    const half = 0.006 * (1 - y * 0.7);
+    positions.push(-half, y, y * y * 0.08, half, y, y * y * 0.08);
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute(
+    "position",
+    new BufferAttribute(new Float32Array(positions), 3),
+  );
+  geometry.setIndex([0, 1, 2, 1, 3, 2, 2, 3, 4, 3, 5, 4, 4, 5, 6, 5, 7, 6]);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+const STRAW_COLORS = ["#dcc07c", "#c19a52", "#a88a5a", "#8c7a58"];
+
+// Straw blades in one draw call, spilling from rings of openings. Each
+// emitter is [centre, ring radius, direction, spread, length, count]; blades
+// start round the ring, splay outwards and droop. The tips flutter.
+function createStraw(material, blade, emitters, seed) {
+  const random = createRandom(seed);
+  const count = emitters.reduce((sum, emitter) => sum + emitter[5], 0);
+  const straw = new InstancedMesh(blade, material, count);
+  const matrix = new Matrix4();
+  const turn = new Quaternion();
+  const roll = new Quaternion();
+  const up = new Vector3(0, 1, 0);
+  const color = new Color();
+  let index = 0;
+  for (const [centre, ring, direction, spread, length, total] of emitters) {
+    const axis = new Vector3(...direction).normalize();
+    const across = new Vector3()
+      .crossVectors(axis, Math.abs(axis.y) > 0.9 ? new Vector3(1, 0, 0) : up)
+      .normalize();
+    const across2 = new Vector3().crossVectors(axis, across);
+    for (let made = 0; made < total; made++, index++) {
+      const angle = random() * Math.PI * 2;
+      const out = across
+        .clone()
+        .multiplyScalar(Math.cos(angle))
+        .addScaledVector(across2, Math.sin(angle));
+      const base = new Vector3(...centre).addScaledVector(
+        out,
+        ring * (0.6 + random() * 0.4),
+      );
+      const heading = axis
+        .clone()
+        .addScaledVector(out, 0.5 + random() * spread)
+        .add(
+          new Vector3(
+            random() - 0.5,
+            random() - 0.8,
+            random() - 0.5,
+          ).multiplyScalar(spread),
+        )
+        .normalize();
+      turn.setFromUnitVectors(up, heading);
+      roll.setFromAxisAngle(up, random() * Math.PI * 2);
+      const size = length * (0.45 + random() * 0.75);
+      straw.setMatrixAt(
+        index,
+        matrix.compose(base, turn.multiply(roll), new Vector3(1, size, 1)),
+      );
+      color
+        .set(STRAW_COLORS[Math.floor(random() * STRAW_COLORS.length)])
+        .multiplyScalar(0.8 + random() * 0.35);
+      straw.setColorAt(index, color);
+    }
+  }
+  return straw;
+}
+
+function createStrawMaterial() {
+  const material = new MeshStandardMaterial({
+    roughness: 0.7,
+    side: DoubleSide,
+  });
+  extendShader(material, {
+    uniforms: SCARECROW_WIND,
+    vertex: {
+      common: "uniform float uGust; uniform float uTime;",
+      begin_vertex: `transformed.x += sin(uTime * 2.6 + float(gl_InstanceID) * 2.4)
+        * position.y * position.y * (0.03 + 0.12 * uGust);`,
+    },
+    fragment: {},
+  });
+  return material;
+}
+
+// A sleeve draped over one arm of the crossbar, built for the right side and
+// mirrored for the left. Its loose end hangs past the bar's tip and can
+// sway; straw spills from the cuff.
+function createSleeve(side, plaid, straw, blade) {
+  const sleeve = new Group();
+  sleeve.position.set(side * 0.2, 1.47, 0);
+  sleeve.scale.x = side;
+  sleeve.add(
+    new Mesh(
+      createSleeveGeometry(0.27, (along) => 0.105 - along * 0.01, side),
+      plaid,
+    ),
+  );
 
   const loose = new Group();
-  loose.position.x = side * 0.42;
+  loose.position.x = 0.26;
+  loose.rotation.z = -0.32;
   const cuff = new Mesh(
-    new CylinderGeometry(0.095, 0.08, 0.28, 10).rotateZ(Math.PI / 2),
-    cloth,
+    createSleeveGeometry(
+      0.21,
+      (along) => 0.095 - along * 0.012 + Math.max(0, along - 0.8) * 0.08,
+      side + 4,
+    ),
+    plaid,
   );
-  cuff.position.x = side * 0.13;
-  const tuft = createStraw(0.16, 0.06, side > 0 ? 11 : 12, straw);
-  tuft.rotation.z = -side * Math.PI * 0.5;
-  tuft.position.x = side * 0.26;
-  loose.add(cuff, tuft);
-  loose.rotation.z = -side * 0.22;
+  loose.add(
+    cuff,
+    createStraw(
+      straw,
+      blade,
+      [[[0.19, -0.05, 0], 0.06, [1, -0.5, 0], 0.5, 0.2, 70]],
+      side + 7,
+    ),
+  );
   sleeve.add(loose);
   return { sleeve, loose };
 }
 
-// The head is its own group so it can turn without the body: a lumpy burlap
-// sack with stitched features, straw under the hat, and a tilted top hat
-// with a band in the accent colour.
-function createScarecrowHead(accent, straw) {
+// The head is its own group so it can turn without the body: a burlap sack
+// stuffed round, gathered at the neck and tied with twine, the spare cloth
+// below the tie spread over the collar; straw hair under a floppy straw hat.
+function createScarecrowHead(straw, blade, twine) {
   const head = new Group();
-  head.position.y = 1.9;
-  const burlap = new MeshStandardMaterial({ color: "#8a8272", roughness: 1 });
-  const thread = new MeshStandardMaterial({ color: "#1f1813", roughness: 0.9 });
-  const sack = new Mesh(createLumpyBall(0.27, 4, 4, 0.05), burlap);
-  sack.scale.set(1, 1.08, 0.94);
-  head.add(sack);
+  head.position.y = 1.64;
+  const lean = new Group();
+  lean.rotation.set(0.12, 0, 0.1);
+  lean.scale.setScalar(0.9);
+  head.add(lean);
 
-  // Stitched cross eyes, and a stitched grin with a few cross stitches.
-  const stitch = new CylinderGeometry(0.009, 0.009, 1, 4);
-  const addStitch = (x, y, length, angle) => {
-    const line = new Mesh(stitch, thread);
-    line.scale.y = length;
-    // On the sack's surface, which is squashed to 0.94 front to back.
-    const depth = Math.sqrt(0.27 ** 2 - x * x - (y / 1.08) ** 2) * 0.94;
-    line.position.set(x, y, depth + 0.004);
-    line.rotation.set(-y * 2.2, x * 2.2, angle, "YXZ");
-    head.add(line);
-  };
-  for (const x of [-0.095, 0.095]) {
-    addStitch(x, 0.07, 0.08, Math.PI / 4);
-    addStitch(x, 0.07, 0.08, -Math.PI / 4);
-  }
-  const mouth = new Mesh(new TorusGeometry(0.1, 0.01, 4, 14, 2.2), thread);
-  mouth.rotation.z = Math.PI + (Math.PI - 2.2) / 2;
-  mouth.position.set(0, 0.03, 0.235);
-  mouth.rotation.x = -0.25;
-  head.add(mouth);
-  for (const x of [-0.06, 0, 0.06]) {
-    addStitch(x, -0.07 + x * x * 4, 0.045, 0);
-  }
+  const burlap = createCloth(BURLAP_GLSL, ["#a8977a", "#6e604c", "#1c1612"]);
+  const sack = new Mesh(
+    scaleUv(
+      createLathe(
+        [
+          [0.17, -0.075],
+          [0.12, -0.04],
+          [0.055, 0],
+          [0.1, 0.04],
+          [0.22, 0.13],
+          [0.265, 0.24],
+          [0.25, 0.35],
+          [0.2, 0.44],
+          [0.1, 0.5],
+          [0.001, 0.52],
+        ],
+        40,
+        (point, angle, along) => {
+          // Pleats gathered into the tie, a ragged edge to the spare cloth,
+          // lumpy stuffing, and the top sagging to one side.
+          const gather = Math.exp(-(((point.y - 0.01) / 0.07) ** 2));
+          const lump =
+            Math.sin(angle * 3 + point.y * 9) *
+              Math.sin(point.y * 7 + 1) *
+              0.06 +
+            Math.sin(angle * 5 + 2) * 0.025 +
+            Math.sin(angle * 2 - point.y * 5) * 0.03;
+          const scale =
+            1 +
+            gather * 0.18 * Math.sin(angle * 14) +
+            (point.y > 0.06 ? lump : 0);
+          point.x *= scale;
+          point.z *= scale * 0.95;
+          if (along === 0) {
+            point.y += Math.sin(angle * 6) * 0.02 + Math.sin(angle * 11) * 0.01;
+          }
+          point.x += (Math.max(0, point.y) / 0.52) ** 2 * 0.04;
+        },
+      ),
+      1.7,
+      1.1,
+    ),
+    burlap,
+  );
+  const tie = new Mesh(new TorusGeometry(0.062, 0.012, 5, 20), twine);
+  tie.rotation.x = Math.PI / 2;
+  tie.position.y = 0.005;
 
-  for (const side of [-1, 1]) {
-    const tuft = createStraw(0.12, 0.05, 20 + side, straw);
-    tuft.position.set(side * 0.22, 0.12, 0);
-    tuft.rotation.z = -side * 1.9;
-    head.add(tuft);
-  }
+  const hat = new Mesh(
+    scaleUv(
+      createLathe(
+        [
+          [0.5, -0.02],
+          [0.36, 0],
+          [0.25, 0.01],
+          [0.245, 0.1],
+          [0.22, 0.18],
+          [0.15, 0.22],
+          [0.001, 0.19],
+        ],
+        40,
+        (point, angle) => {
+          // A floppy brim that dips front and back, and a crown pinched in
+          // at the front.
+          const reach = Math.hypot(point.x, point.z);
+          point.y +=
+            MathUtils.smoothstep(reach, 0.26, 0.5) *
+            (Math.cos(angle * 2) * 0.05 + Math.sin(angle * 5) * 0.012);
+          if (point.y > 0.12) {
+            point.z *= 1 - 0.18 * Math.max(0, Math.cos(angle)) ** 2;
+          }
+        },
+      ),
+      2.4,
+      1,
+    ),
+    createCloth(HAT_GLSL, ["#c9a868", "#8a6c3e", "#4a3424"]),
+  );
+  hat.position.set(0.03, 0.4, -0.01);
+  hat.rotation.set(-0.08, 0, -0.16);
 
-  const felt = new MeshStandardMaterial({ color: "#1b1e24", roughness: 0.75 });
-  const brim = new Mesh(new CylinderGeometry(0.31, 0.32, 0.035, 24), felt);
-  brim.position.y = 0.24;
-  const crown = new Mesh(new CylinderGeometry(0.2, 0.19, 0.3, 24), felt);
-  crown.position.y = 0.4;
-  const band = new Mesh(new CylinderGeometry(0.2, 0.2, 0.07, 24), accent);
-  band.position.y = 0.29;
-  const hat = new Group();
-  hat.add(brim, crown, band);
-  hat.rotation.z = -0.12;
-  hat.position.x = 0.02;
-  head.add(hat);
+  lean.add(
+    sack,
+    tie,
+    hat,
+    createStraw(
+      straw,
+      blade,
+      [[[0.02, 0.4, -0.02], 0.25, [0, -1, 0], 0.6, 0.14, 80]],
+      5,
+    ),
+  );
   return head;
 }
 
-// A procedural scarecrow, the scene character: a post and crossbar,
-// a patched shirt with straw at the cuffs and hem, a scarf and hat band in
-// the site accent colour.
+// A procedural scarecrow, the scene character: a post and crossbar wearing
+// a faded flannel shirt cinched with twine, straw spilling from the cuffs
+// and the hem, a sack head, and a bandana in the site accent colour.
 function createScarecrow() {
   const group = new Group();
   const wood = new MeshStandardMaterial({ color: "#5a4330", roughness: 0.95 });
-  const cloth = new MeshStandardMaterial({ color: "#3d5f94", roughness: 0.95 });
-  const patch = new MeshStandardMaterial({ color: "#8f6a3c", roughness: 1 });
-  const straw = new MeshStandardMaterial({
-    color: "#d6b05a",
-    roughness: 0.9,
-    side: DoubleSide,
-  });
-  // Scarf and hat band take the site accent colour.
-  const accent = new MeshStandardMaterial({ roughness: 1 });
+  const twine = new MeshStandardMaterial({ color: "#8d7650", roughness: 1 });
+  const flannel = ["#5d7378", "#2b3336", "#c8b78e"];
+  // The same cloth; only the shirt's hem moves in the wind.
+  const plaid = createCloth(PLAID_GLSL, flannel, 0.05);
+  const sleeves = createCloth(PLAID_GLSL, flannel);
+  const straw = createStrawMaterial();
+  const blade = createStrawBlade();
 
   const post = new Mesh(new CylinderGeometry(0.035, 0.045, 1.95, 6), wood);
   post.position.y = 0.97;
   const bar = new Mesh(
-    new CylinderGeometry(0.028, 0.028, 1.18, 6).rotateZ(Math.PI / 2),
+    new CylinderGeometry(0.028, 0.028, 1, 6).rotateZ(Math.PI / 2),
     wood,
   );
   bar.position.y = 1.47;
 
-  const shirt = new Mesh(new CylinderGeometry(0.24, 0.3, 0.72, 12), cloth);
-  shirt.scale.z = 0.72;
-  shirt.position.y = 1.2;
-  const shirtPatch = new Mesh(new PlaneGeometry(0.13, 0.12), patch);
-  shirtPatch.position.set(-0.08, 1.08, 0.218);
-  shirtPatch.rotation.set(-0.08, -0.25, 0.12);
-  const hem = createStraw(0.2, 0.26, 31, straw);
-  hem.scale.z = 0.72;
-  hem.rotation.x = Math.PI;
-  hem.position.y = 0.86;
-
-  const scarf = new Mesh(new TorusGeometry(0.16, 0.06, 10, 24), accent);
-  scarf.rotation.x = Math.PI / 2;
-  scarf.position.y = 1.6;
-  const scarfTail = new Mesh(
-    new CylinderGeometry(0.05, 0.065, 0.36, 8),
-    accent,
+  // The body: shoulders squared by the bar, the cloth falling in folds below
+  // them and cinched at the waist, an uneven hem.
+  const body = new Group();
+  body.scale.z = 0.72;
+  const shirt = new Mesh(
+    scaleUv(
+      createLathe(
+        [
+          [0.27, 0.9],
+          [0.25, 1.0],
+          [0.2, 1.1],
+          [0.235, 1.22],
+          [0.25, 1.36],
+          [0.255, 1.46],
+          [0.2, 1.54],
+          [0.11, 1.6],
+          [0.075, 1.64],
+        ],
+        40,
+        (point, angle, along) => {
+          const drop = MathUtils.smoothstep(1.5 - point.y, 0, 0.55);
+          const fold =
+            Math.sin(angle * 7 + Math.sin(angle * 3) * 1.5) * 0.6 +
+            Math.sin(angle * 13 + 1) * 0.4;
+          const scale = 1 + drop * 0.07 * fold;
+          point.x *= scale;
+          point.z *= scale;
+          if (along === 0) {
+            point.y +=
+              Math.sin(angle * 5) * 0.025 + Math.sin(angle * 11) * 0.01;
+          }
+        },
+      ),
+      1.5,
+      0.8,
+    ),
+    plaid,
   );
-  scarfTail.scale.z = 0.4;
-  scarfTail.position.set(0.12, 1.42, 0.17);
-  scarfTail.rotation.set(0.25, 0, -0.2);
+  const belt = new Mesh(new TorusGeometry(0.205, 0.014, 5, 32), twine);
+  belt.rotation.x = Math.PI / 2;
+  belt.position.y = 1.1;
 
-  const left = createSleeve(-1, cloth, straw);
-  const right = createSleeve(1, cloth, straw);
-  const head = createScarecrowHead(accent, straw);
+  const bandana = createCloth(BANDANA_GLSL, ["#000000", "#6b5d4e", "#e6dccb"]);
+  const kerchief = new Mesh(
+    scaleUv(
+      createLathe(
+        [
+          [0.215, 1.525],
+          [0.18, 1.565],
+          [0.135, 1.61],
+          [0.095, 1.645],
+        ],
+        32,
+        (point, angle, along) => {
+          // Knotted at the back, its point hanging down the chest.
+          const front = Math.max(0, Math.cos(angle)) ** 4;
+          if (along === 0) {
+            point.y -= front * 0.14;
+            point.z += front * 0.08;
+          }
+          point.x *= 1 + Math.sin(angle * 9) * 0.04;
+        },
+      ),
+      0.8,
+      0.15,
+    ),
+    bandana,
+  );
 
-  group.add(
-    post,
-    bar,
+  body.add(
     shirt,
-    shirtPatch,
-    hem,
-    scarf,
-    scarfTail,
-    left.sleeve,
-    right.sleeve,
-    head,
+    belt,
+    kerchief,
+    createStraw(
+      straw,
+      blade,
+      [
+        [[0, 0.93, 0], 0.24, [0, -1, 0], 0.5, 0.2, 150],
+        [[0, 1.08, 0], 0.2, [0, -0.6, 0], 0.4, 0.09, 40],
+      ],
+      31,
+    ),
   );
+
+  const left = createSleeve(-1, sleeves, straw, blade);
+  const right = createSleeve(1, sleeves, straw, blade);
+  const head = createScarecrowHead(straw, blade, twine);
+
+  group.add(post, bar, body, left.sleeve, right.sleeve, head);
   group.rotation.y = -0.4;
+  // The post has settled a little off true.
+  group.rotation.x = 0.03;
   castsShadows(group);
 
-  return { group, head, sleeves: [left.loose, right.loose], accent };
+  return {
+    group,
+    head,
+    sleeves: [left.loose, right.loose],
+    accent: { color: bandana.uniforms.uA.value },
+  };
 }
 
 // ---------------------------------------------------------------- Halloween
@@ -1489,13 +1872,19 @@ function animateScarecrow(stage, scarecrow, pointer, clock) {
 
   const gust = gustAt(clock.time);
   const strength = MathUtils.smoothstep(Math.abs(gust), 0.3, 0.85);
+  // The shirt's hem and the straw tips move in the same wind.
+  SCARECROW_WIND.uGust.value = gust * strength;
+  SCARECROW_WIND.uTime.value = clock.time;
   sleeves.forEach((sleeve, index) => {
     const side = index === 0 ? -1 : 1;
-    // The far sleeve, on the gust's lee side, moves less.
+    // The far sleeve, on the gust's lee side, moves less. Each sleeve is
+    // built for the right and mirrored, so the sway's sign follows the side
+    // to keep both moving the same way.
     const reach = side === 1 ? 1 : 0.45;
     sleeve.rotation.z =
-      -side * 0.22 +
-      reach *
+      -0.32 +
+      side *
+        reach *
         strength *
         (gust * 0.35 + Math.sin(clock.time * 3.3 + index) * 0.16);
     sleeve.rotation.x = reach * strength * Math.sin(clock.time * 2.1) * 0.12;
