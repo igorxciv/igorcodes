@@ -6,7 +6,7 @@
  */
 [data-scene="spring"] {
   --spring-petal: light-dark(#ffffff, #f4ebf2);
-  --spring-petal-blush: light-dark(#f4a9c1, #e3a7bf);
+  --spring-petal-blush: light-dark(#f7bccf, #e3a7bf);
   --spring-petal-contour: light-dark(#9c5672, #8a6d88);
 }
 

@@ -130,11 +130,16 @@ function measurePetal(petal, char, rect, metrics) {
   }
 
   const [, widthRoll, offsetRoll, tiltRoll, flipRoll] = petal.rolls;
-  const width = size * (PETAL_WIDTH + widthRoll * PETAL_WIDTH_VARIATION);
+  // Never wider than the letter itself, so a petal cannot reach over a
+  // neighbouring glyph (an ascender beside it, say).
+  const width = Math.min(
+    size * (PETAL_WIDTH + widthRoll * PETAL_WIDTH_VARIATION),
+    inkWidth * 0.9,
+  );
   const height = width * PETAL_ASPECT;
   const inkLeft = rect.left - ink.actualBoundingBoxLeft;
-  // Resting on the top, overhanging an edge at most a little.
-  const left = inkLeft + (inkWidth - width) * (0.15 + offsetRoll * 0.7);
+  // Resting on the top, inside the letter's own ink.
+  const left = inkLeft + (inkWidth - width) * offsetRoll;
   const baseline = rect.top + (rect.height * ascent) / (ascent + descent);
   const inkTop = baseline - ink.actualBoundingBoxAscent;
 

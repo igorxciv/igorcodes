@@ -88,6 +88,9 @@ const FRAMES_BEFORE_FADE = 3;
 // Clear space kept around the hero copy, in CSS pixels.
 const COPY_MARGIN_PX = 22;
 const MAX_CLUSTERS = 2400;
+// Blossom clusters travel as one flat array: x, y, z, size, turn, light,
+// seed for each.
+const CLUSTER_STRIDE = 7;
 const MAX_PETALS = 130;
 const MAX_BLADES = 2600;
 const MAX_FLOWERS = 48;
@@ -154,12 +157,12 @@ const THEMES = {
     key: "#fff1d8",
     keyIntensity: 2.5,
     petalEdge: "#ffffff",
-    petalBase: "#f4b0c5",
-    centre: "#c0426c",
+    petalBase: "#f7c6d5",
+    centre: "#c75a80",
     stamen: "#d8932a",
     contour: "#9c5672",
     contourAmount: 0.9,
-    shade: "#d79fb3",
+    shade: "#dcacbd",
     leaf: "#78772f",
     haze: 0.1,
     grassRoot: "#467a26",
@@ -985,7 +988,7 @@ function growTree(view, plan, keepOut, side, variant) {
     );
     for (
       let index = 0;
-      index < count && clusters.length / 7 < MAX_CLUSTERS;
+      index < count && clusters.length / CLUSTER_STRIDE < MAX_CLUSTERS;
       index++
     ) {
       // Biased upward: blossom sits on top of a branch more than under it.
@@ -1049,13 +1052,19 @@ function growTree(view, plan, keepOut, side, variant) {
 }
 
 function createClusterMesh(material, clusters) {
-  const count = clusters.length / 7;
+  const count = clusters.length / CLUSTER_STRIDE;
   const geometry = new InstancedBufferGeometry().copy(new PlaneGeometry(1, 1));
   const centres = new Float32Array(count * 3);
   const data = new Float32Array(count * 4);
   for (let index = 0; index < count; index++) {
-    centres.set(clusters.slice(index * 7, index * 7 + 3), index * 3);
-    data.set(clusters.slice(index * 7 + 3, index * 7 + 7), index * 4);
+    centres.set(
+      clusters.slice(index * CLUSTER_STRIDE, index * CLUSTER_STRIDE + 3),
+      index * 3,
+    );
+    data.set(
+      clusters.slice(index * CLUSTER_STRIDE + 3, (index + 1) * CLUSTER_STRIDE),
+      index * 4,
+    );
   }
   geometry.setAttribute("aCentre", new InstancedBufferAttribute(centres, 3));
   geometry.setAttribute("aCluster", new InstancedBufferAttribute(data, 4));
@@ -1523,6 +1532,7 @@ function createCopyGuard(stage, uniforms) {
     );
     pageColor = [page.r * 255, page.g * 255, page.b * 255];
     caps.clear();
+    report.length = 0;
   };
 
   const capFor = (owner) => {
@@ -1956,7 +1966,7 @@ export async function mount(host, context) {
         ) === index,
     ),
     mode: world.plan?.mode ?? "none",
-    clusters: world.tree ? world.tree.clusters.length / 7 : 0,
+    clusters: world.tree ? world.tree.clusters.length / CLUSTER_STRIDE : 0,
   });
 
   const tracking = respondsToPointer(isLighter) ? trackPointer(stage) : null;
