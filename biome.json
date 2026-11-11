@@ -201,6 +201,17 @@
   },
   "overrides": [
     {
+      "includes": ["app/assets/scenes/spring/**"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveCognitiveComplexity": "off",
+            "useMaxParams": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["app/_tools/**/*.mjs", "*.mjs"],
       "linter": {
         "rules": {
