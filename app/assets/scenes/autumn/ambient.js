@@ -96,16 +96,20 @@ const FORMS = {
 // shadows. Neither paints anything behind the scene.
 const THEMES = {
   dark: {
-    sun: "#ffad66",
-    sunIntensity: 2.6,
+    sun: "#ffb574",
+    sunIntensity: 3.2,
     sunPosition: [-10, 5, 6],
-    sky: "#3a4c78",
-    bounce: "#140f0b",
-    hemisphereIntensity: 0.9,
-    envTop: "#26304e",
-    envHorizon: "#3a2618",
-    envIntensity: 0.55,
-    exposure: 0.95,
+    sky: "#5b6fa0",
+    bounce: "#2e2117",
+    hemisphereIntensity: 1.5,
+    envTop: "#3c4a74",
+    envHorizon: "#5e4028",
+    envIntensity: 0.9,
+    exposure: 1.1,
+    // The pine texture is a deep green that sinks into the night: lift it,
+    // and keep some of it visible on the side away from the key light.
+    pineFoliage: 1.5,
+    pineFoliageFill: 0.08,
     soil: "#2b2016",
     // Saturated amber, orange and rust.
     leaves: ["#f2a12e", "#e8671d", "#b8431d", "#d9541f"],
@@ -130,6 +134,8 @@ const THEMES = {
     envHorizon: "#eed8bc",
     envIntensity: 0.55,
     exposure: 0.92,
+    pineFoliage: 1,
+    pineFoliageFill: 0,
     soil: "#7d5d3b",
     // Rust, burgundy and dark ochre; no pale yellow on cream.
     leaves: ["#a6401c", "#7d2233", "#a87818", "#8a3b1c"],
@@ -499,11 +505,15 @@ async function loadPine(assets) {
   return { model: gltf.scene, foliage, bark };
 }
 
-// The pines, green and with the model's own textures.
+// The pines, green and with the model's own textures. The theme sets how
+// bright the foliage is and how much of its texture shows on the shaded side.
 function createPines(pine) {
   const materials = {
     foliage: new MeshStandardMaterial({
       map: pine.foliage,
+      emissiveMap: pine.foliage,
+      emissive: "#ffffff",
+      emissiveIntensity: 0,
       alphaTest: 0.5,
       side: DoubleSide,
       roughness: 0.9,
@@ -524,7 +534,7 @@ function createPines(pine) {
   castsShadows(pine.model);
 
   // One model, reused at several sizes and turns.
-  return PINES.map(([, , height, turn]) => {
+  const groups = PINES.map(([, , height, turn]) => {
     const model = pine.model.clone();
     const box = new Box3().setFromObject(model);
     model.position.set(
@@ -540,6 +550,13 @@ function createPines(pine) {
     group.add(sized);
     return group;
   });
+
+  const applyTheme = (look) => {
+    materials.foliage.color.setScalar(look.pineFoliage);
+    materials.foliage.emissiveIntensity = look.pineFoliageFill;
+  };
+
+  return { groups, applyTheme };
 }
 
 // ---------------------------------------------------------------- tree
@@ -1701,12 +1718,14 @@ function buildWorld(stage, pine, context) {
     : null;
   const pumpkins = halloween?.pumpkins ?? [];
   // One blob under each pine, the tree, the scarecrow and each pumpkin.
-  const blobShadows = createBlobShadows(pines.length + 2 + pumpkins.length);
+  const blobShadows = createBlobShadows(
+    pines.groups.length + 2 + pumpkins.length,
+  );
   blobShadows.group.visible = form.shadowMap === 0;
 
   stage.scene.add(
     ground,
-    ...pines,
+    ...pines.groups,
     tree.group,
     scarecrow.group,
     ...pumpkins.map((pumpkin) => pumpkin.group),
@@ -1753,6 +1772,7 @@ function applyTheme(stage, world, theme) {
   palette.contour.value = look.leafContour;
 
   world.environment.applyTheme(look);
+  world.pines.applyTheme(look);
   world.tree.applyTheme(look);
   world.copyGuard.setLook(look);
   world.copyGuard.measure();
@@ -1783,7 +1803,7 @@ function layOut(stage, world) {
   };
   let blob = 0;
 
-  world.pines.forEach((pine, index) => {
+  world.pines.groups.forEach((pine, index) => {
     const [fraction, z, pineHeight] = PINES[index];
     const x = xAt(fraction, z);
     stand(pine, x, z, 0.06);
