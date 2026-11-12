@@ -10,7 +10,13 @@ module.exports = {
   contentUpdated: "2026-11-12",
   author: "Igor Cheliadinski",
   email: "hi@igorcodes.dev",
-  location: "Playa del Carmen, Mexico",
+  location: "Seattle, WA",
+  hero: {
+    tagline:
+      "Principal engineer with frontend roots and a systems mindset, building for the web since 2014 and now for iPhone too.",
+  },
+  availability:
+    "Open to Principal and Staff roles and contract work in AI product engineering, frontend architecture, and accessibility.",
   person: {
     jobTitle: "Software Engineer",
     description:
@@ -28,9 +34,9 @@ module.exports = {
       "Product Engineering",
       "AI Engineering",
     ],
-    addressLocality: "Playa del Carmen",
-    addressRegion: "Quintana Roo",
-    addressCountry: "MX",
+    addressLocality: "Seattle",
+    addressRegion: "WA",
+    addressCountry: "US",
   },
   googleSiteVerification: process.env.GOOGLE_SITE_VERIFICATION || "",
   bingSiteVerification: process.env.BING_SITE_VERIFICATION || "",

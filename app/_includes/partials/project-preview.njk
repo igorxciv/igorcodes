@@ -1,0 +1,99 @@
+{#
+  Illustrative project previews: small static sketches of what each project
+  does, drawn in the site's own tokens. Static ones are aria-hidden (the card
+  text says the same thing); interactive ones are labelled fieldsets.
+  No JS: interaction is native form controls plus :has() / :focus-within.
+#}
+{% if project.preview == "loremark" %}
+  <div class="fm-preview fm-preview-loremark" aria-hidden="true">
+    <div class="fm-preview-row">
+      <span class="fm-preview-label">US National Parks</span>
+      <span class="fm-preview-mono">12 / 63</span>
+    </div>
+    <div class="fm-preview-tiles">
+      {% for i in range(0, 14) %}<span{% if i < 5 %} class="is-done"{% endif %}></span>{% endfor %}
+    </div>
+    <div class="fm-preview-mark">
+      <span class="fm-preview-mark-badge">{% lucide "mountain", "fm-preview-icon" %}</span>
+      <span>
+        <strong>Mark revealed: Yosemite</strong>
+        <small>3 memories · 2 people</small>
+      </span>
+    </div>
+  </div>
+{% elif project.preview == "temper" %}
+  <div class="fm-preview fm-preview-temper" aria-hidden="true">
+    <div class="fm-preview-ring">
+      <span class="fm-preview-mono">0:42</span>
+      <small>Work</small>
+    </div>
+    <dl class="fm-preview-stats">
+      <div><dt>Round</dt><dd>3 of 8</dd></div>
+      <div><dt>Next</dt><dd>Rest 0:20</dd></div>
+      <div>
+        <dt>Heart rate</dt>
+        <dd class="fm-preview-zones"><span></span><span></span><span class="is-on"></span><span></span><span></span> Zone 3</dd>
+      </div>
+    </dl>
+  </div>
+{% elif project.preview == "electives" %}
+  <div class="fm-preview fm-preview-electives" aria-hidden="true">
+    <p class="fm-preview-turn"><span>Learner</span>I know the report was late. Things piled up.</p>
+    <p class="fm-preview-turn"><span>Manager</span>Thanks for saying so. What’s the new date?</p>
+    <p class="fm-preview-coach">{% lucide "sparkles", "fm-preview-icon" %}Coach: name the impact, then offer a fix.</p>
+  </div>
+{% elif project.preview == "ar" %}
+  <fieldset class="fm-preview fm-preview-ar">
+    <legend class="fm-visually-hidden">Preview a lipstick shade (illustrative, no camera)</legend>
+    <svg class="fm-preview-lips" viewBox="0 0 200 90" aria-hidden="true" focusable="false">
+      <path d="M8 46 C 40 10, 72 8, 100 26 C 128 8, 160 10, 192 46 C 160 52, 130 50, 100 48 C 70 50, 40 52, 8 46 Z" />
+      <path d="M8 46 C 40 52, 70 50, 100 48 C 130 50, 160 52, 192 46 C 160 86, 40 86, 8 46 Z" />
+      <path class="fm-preview-lips-line" d="M8 46 C 40 52, 70 50, 100 48 C 130 50, 160 52, 192 46" />
+    </svg>
+    <div class="fm-preview-swatches">
+      {% for shade in [["rosewood", "Rosewood"], ["coral", "Coral"], ["plum", "Plum"], ["nude", "Nude"]] %}
+      <label class="fm-preview-swatch fm-preview-swatch-{{ shade[0] }}">
+        <input type="radio" name="fm-ar-shade" value="{{ shade[0] }}"{% if loop.first %} checked{% endif %} />
+        <span class="fm-visually-hidden">{{ shade[1] }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </fieldset>
+{% elif project.preview == "enterprise" %}
+  <div class="fm-preview fm-preview-enterprise" aria-hidden="true">
+    <svg class="fm-preview-diagram" viewBox="0 0 320 130" focusable="false">
+      <g class="fm-preview-nodes">
+        <circle cx="70" cy="16" r="9" /><circle cx="160" cy="16" r="9" /><circle cx="250" cy="16" r="9" />
+      </g>
+      <g class="fm-preview-links">
+        <path d="M70 25 V44" /><path d="M160 25 V44" /><path d="M250 25 V44" />
+        <path class="is-accent" d="M160 92 V104" />
+      </g>
+      <rect class="fm-preview-box" x="30" y="44" width="260" height="48" rx="6" />
+      <path class="fm-preview-split" d="M117 44 V92 M203 44 V92" />
+      <g class="fm-preview-pipe">
+        <rect x="70" y="104" width="50" height="20" rx="4" /><rect x="135" y="104" width="50" height="20" rx="4" /><rect x="200" y="104" width="50" height="20" rx="4" />
+        <path d="M120 114 H135 M185 114 H200" />
+      </g>
+      <g class="fm-preview-text">
+        <text x="73" y="72">Payments</text><text x="160" y="72">Catalog</text><text x="247" y="72">Accounts</text>
+      </g>
+    </svg>
+  </div>
+{% elif project.preview == "checkout" %}
+  <fieldset class="fm-preview fm-preview-checkout">
+    <legend class="fm-preview-label">Demo fields · Tab through, nothing is sent</legend>
+    <label class="fm-preview-field">
+      <span class="fm-preview-step" aria-hidden="true">1</span>
+      <span class="fm-preview-field-name">Email for receipt</span>
+      <input type="email" name="fm-demo-email" autocomplete="off" required placeholder="you@example.com" />
+      <span class="fm-preview-error">Enter an email like name@example.com.</span>
+    </label>
+    <label class="fm-preview-field">
+      <span class="fm-preview-step" aria-hidden="true">2</span>
+      <span class="fm-preview-field-name">Card number</span>
+      <input type="text" name="fm-demo-card" inputmode="numeric" autocomplete="off" required pattern="[0-9 ]{19}" placeholder="4242 4242 4242 4242" />
+      <span class="fm-preview-error">Card numbers have 16 digits.</span>
+    </label>
+  </fieldset>
+{% endif %}

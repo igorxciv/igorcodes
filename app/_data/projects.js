@@ -1,9 +1,9 @@
 module.exports = [
   {
     title: "Loremark — Collect Your Life",
-    url: "#contact",
-    linkText: "Ask about it",
-    external: false,
+    name: "Loremark",
+    preview: "loremark",
+    ask: true,
     description:
       "Building a web and iPhone product that turns lived experiences into collectibles: work through a Collection, like every US National Park or the IMDb Top 250, and each completed item is revealed as a Mark that keeps its memories and people. A full-stack TypeScript monorepo with a three.js reveal stage, a typed API, and an admin app where an AI chat drafts catalog entries and image briefs for approval before any image is generated.",
     tags: [
@@ -19,9 +19,10 @@ module.exports = [
   },
   {
     title: "Temper — iOS Training Timer",
+    name: "Temper",
+    preview: "temper",
     url: "https://github.com/igorxciv/temper",
     linkText: "View code",
-    external: true,
     description:
       "A personal training app for iPhone and Apple Watch that runs intervals, a stopwatch, or open rounds, announces each phase change aloud, and saves workouts with heart rate to Apple Health. Timing and phase logic live in a Swift package tested on macOS without a simulator. The app ships a Live Activity, App Intents, and a Watch companion that shows heart rate zones and taps the wrist on each cue.",
     tags: [
@@ -36,9 +37,10 @@ module.exports = [
   },
   {
     title: "Electives AI Simulations",
+    name: "Electives AI Simulations",
+    preview: "electives",
     url: "https://www.electives.io/ai-simulations",
     linkText: "Visit site",
-    external: true,
     description:
       "Built AI-powered workplace simulations that let learners practice realistic conversations, get live coaching, and repeat tailored scenarios for stronger on-the-job performance.",
     tags: [
@@ -52,9 +54,9 @@ module.exports = [
   },
   {
     title: "AR Virtual Try-On (Web)",
-    url: "#contact",
-    linkText: "Ask about it",
-    external: false,
+    name: "AR Virtual Try-On",
+    preview: "ar",
+    ask: true,
     description:
       "Built web-based AR try-on experiences for a global beauty brand, including eyeshadow and lipstick features that used the device camera for responsive, realistic cosmetic previews.",
     tags: [
@@ -70,9 +72,10 @@ module.exports = [
   },
   {
     title: "Enterprise Web Platforms",
+    name: "Enterprise Web Platforms",
+    preview: "enterprise",
     url: "https://www.epam.com/",
     linkText: "Visit site",
-    external: true,
     description:
       "Built and optimized large-scale web platforms for Fortune 500 teams in finance and e-commerce, while leading distributed engineering teams and partnering with stakeholders to deliver reliable production systems.",
     tags: [
@@ -87,9 +90,9 @@ module.exports = [
   },
   {
     title: "Accessible E-Commerce Checkout",
-    url: "#contact",
-    linkText: "Ask about it",
-    external: false,
+    name: "Accessible E-Commerce Checkout",
+    preview: "checkout",
+    ask: true,
     description:
       "Built advanced accessibility improvements for a high-traffic e-commerce checkout, targeting WCAG AAA with robust external keyboard support on mobile and tablet devices, screen reader compatibility, and accessible validation.",
     tags: [
