@@ -1,18 +1,37 @@
 module.exports = [
   {
-    title: "Span — iOS Healthspan App",
+    title: "Loremark — Collect Your Life",
     url: "#contact",
     linkText: "Ask about it",
     external: false,
     description:
-      "Building an iOS healthspan app powered by an LLM personalization engine that models real eating behavior and proposes one budget-aware food upgrade per week, adapting to observed habits. My first iOS project — owning architecture, code review, and product decisions while leaning on Claude for implementation velocity in an unfamiliar stack.",
+      "Building a web and iPhone product that turns lived experiences into collectibles: work through a Collection, like every US National Park or the IMDb Top 250, and each completed item is revealed as a Mark that keeps its memories and people. A full-stack TypeScript monorepo with a three.js reveal stage, a typed API, and an admin app where an AI chat drafts catalog entries and image briefs for approval before any image is generated.",
     tags: [
-      "SwiftUI",
-      "Supabase",
-      "iOS",
-      "LLM Personalization",
+      "TypeScript",
+      "React",
+      "Three.js",
+      "Hono",
+      "PostgreSQL",
+      "Astro",
+      "AI SDK",
       "Product Engineering",
-      "AI Engineering",
+    ],
+  },
+  {
+    title: "Temper — iOS Training Timer",
+    url: "https://github.com/igorxciv/temper",
+    linkText: "View code",
+    external: true,
+    description:
+      "A personal training app for iPhone and Apple Watch that runs intervals, a stopwatch, or open rounds, announces each phase change aloud, and saves workouts with heart rate to Apple Health. Timing and phase logic live in a Swift package tested on macOS without a simulator. The app ships a Live Activity, App Intents, and a Watch companion that shows heart rate zones and taps the wrist on each cue.",
+    tags: [
+      "Swift",
+      "SwiftUI",
+      "watchOS",
+      "HealthKit",
+      "ActivityKit",
+      "App Intents",
+      "Swift Testing",
     ],
   },
   {
