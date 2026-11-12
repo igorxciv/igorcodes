@@ -248,7 +248,22 @@
     <style>
       {{ criticalCss | safe }}
     </style>
-    <link rel="stylesheet" href="{{ assets.css | url }}" />
+    {% if deferStylesheet %}
+      {# Only for pages whose first viewport the inlined critical CSS fully
+         styles (the homepage hero). The full sheet then loads without
+         blocking first paint, so personal-site.js can run before it applies;
+         it finds this link by data-deferred-stylesheet to wait for it. #}
+      <link
+        rel="preload"
+        as="style"
+        href="{{ assets.css | url }}"
+        data-deferred-stylesheet
+        onload="this.onload=null;this.rel='stylesheet'"
+      />
+      <noscript><link rel="stylesheet" href="{{ assets.css | url }}" /></noscript>
+    {% else %}
+      <link rel="stylesheet" href="{{ assets.css | url }}" />
+    {% endif %}
     {% if sceneMachinery %}
       {# Dev server only: production appends every accents.css to the full
          stylesheet and bundles three.js into each scene. #}

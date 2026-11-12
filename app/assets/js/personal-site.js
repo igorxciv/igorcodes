@@ -244,6 +244,23 @@
       window.addEventListener("load", resolve, { once: true });
     });
 
+  // Resolves once the full stylesheet applies. Where the layout defers it
+  // (deferStylesheet in front matter), the link starts as rel="preload" and
+  // its onload swaps it to a stylesheet, which then loads a second time.
+  // Elsewhere it was render-blocking, so it has already applied.
+  const fullStylesheetReady = () =>
+    new Promise((resolve) => {
+      const link = document.querySelector("link[data-deferred-stylesheet]");
+      const check = () => {
+        if (!link || (link.rel === "stylesheet" && link.sheet)) {
+          resolve();
+          return;
+        }
+        link.addEventListener("load", check, { once: true });
+      };
+      check();
+    });
+
   const tabVisible = () =>
     new Promise((resolve) => {
       if (!document.hidden) {
@@ -509,7 +526,9 @@
       if (!scene.accents || !(shouldShow || modulePromise)) {
         return;
       }
-      modulePromise ??= import(scene.accents);
+      // accents.css ships inside the full stylesheet, and the overlays
+      // accents.js draws are unstyled without it.
+      modulePromise ??= fullStylesheetReady().then(() => import(scene.accents));
       modulePromise.then(sync).catch(() => {
         // Silent: without accents.js the scene keeps its CSS accents.
       });
