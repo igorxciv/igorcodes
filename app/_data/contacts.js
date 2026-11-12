@@ -24,7 +24,7 @@ module.exports = [
     label: "Telegram",
     value: "t.me/igorxciv",
     href: "https://t.me/igorxciv",
-    icon: "globe",
+    icon: "send",
     external: true,
   },
 ];

@@ -6,19 +6,60 @@
     {% endif %}
     {# Seasonal scene hook "copy": the text an ambient layer is drawn behind. #}
     <div class="fm-hero-content" data-scene-copy>
-      <p class="fm-role">Software Engineer</p>
       <h1 id="hero-title" class="fm-name" data-scene-accent="name">Igor Cheliadinski</h1>
-      <p class="fm-tagline">Frontend-focused full-stack engineer with a systems and architecture mindset.</p>
+      <p class="fm-tagline">{{ site.hero.tagline }}</p>
+      <p class="fm-hero-meta">Based in {{ site.location }}</p>
       <nav class="fm-hero-links" aria-label="Hero links">
         <a href="#projects">View Work</a>
         <span aria-hidden="true">•</span>
-        <a href="#contact">Get in Touch</a>
+        <a href="mailto:{{ site.email }}">{{ site.email }}</a>
       </nav>
     </div>
-    <a href="#timeline" class="fm-scroll-down">
+    <a href="#projects" class="fm-scroll-down">
       {% lucide "chevronDown" %}
-      <span class="fm-visually-hidden">Scroll to career journey</span>
+      <span class="fm-visually-hidden">Scroll to selected work</span>
     </a>
+  </section>
+
+  <section id="projects" class="fm-section" aria-labelledby="projects-title">
+    <div class="fm-container">
+      <header class="fm-section-head fm-reveal">
+        <h2 id="projects-title" data-scene-accent="heading">Selected Work</h2>
+        <p>Projects spanning product engineering, frontend architecture, and systems thinking. Previews are illustrative sketches, not production code.</p>
+      </header>
+
+      <div class="fm-grid fm-grid-two">
+        {% for project in projects %}
+        <article class="fm-card fm-project-card fm-reveal">
+          <h3>{{ project.title }}</h3>
+          {% if project.preview %}
+            {% include "partials/project-preview.njk" %}
+          {% endif %}
+          <p>{{ project.description }}</p>
+          <ul class="fm-tags" aria-label="Stack">
+            {% for tag in project.tags.slice(0, 4) %}
+            <li>{{ tag }}</li>
+            {% endfor %}
+          </ul>
+          <div class="fm-project-card-foot">
+            {% if project.ask %}
+              <a href="mailto:{{ site.email }}?subject={{ ('About ' + project.name) | urlencode }}" class="fm-project-link">
+                <span class="fm-project-link-icon" aria-hidden="true">{% lucide "mail" %}</span>
+                <span class="fm-project-link-text">Ask about it</span>
+                <span class="fm-visually-hidden"> by email: {{ project.name }}</span>
+              </a>
+            {% else %}
+              <a href="{{ project.url }}" target="_blank" rel="noopener noreferrer" class="fm-project-link">
+                <span class="fm-project-link-text">{{ project.linkText }}</span>
+                <span class="fm-project-link-icon" aria-hidden="true">{% lucide "squareArrowOutUpRight" %}</span>
+                <span class="fm-visually-hidden"> for {{ project.name }} (opens in a new tab)</span>
+              </a>
+            {% endif %}
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
   </section>
 
   <section id="timeline" class="fm-section" aria-labelledby="timeline-title">
@@ -43,36 +84,6 @@
           </li>
           {% endfor %}
         </ol>
-      </div>
-    </div>
-  </section>
-
-  <section id="projects" class="fm-section" aria-labelledby="projects-title">
-    <div class="fm-container">
-      <header class="fm-section-head fm-reveal">
-        <h2 id="projects-title" data-scene-accent="heading">Selected Work</h2>
-        <p>Projects spanning product engineering, frontend architecture, and systems thinking</p>
-      </header>
-
-      <div class="fm-grid fm-grid-two">
-        {% for project in projects %}
-        <article class="fm-card fm-project-card fm-reveal">
-          <div class="fm-project-card-head">
-            <h3>{{ project.title }}</h3>
-            <a href="{{ project.url }}"{% if project.external %} target="_blank" rel="noopener noreferrer"{% endif %} class="fm-project-link">
-              <span class="fm-project-link-text">{{ project.linkText }}</span>
-              <span class="fm-project-link-icon" aria-hidden="true">{% lucide "squareArrowOutUpRight" %}</span>
-              <span class="fm-visually-hidden"> for {{ project.title }}{% if project.external %} (opens in a new tab){% endif %}</span>
-            </a>
-          </div>
-          <p>{{ project.description }}</p>
-          <ul class="fm-tags">
-            {% for tag in project.tags %}
-            <li>{{ tag }}</li>
-            {% endfor %}
-          </ul>
-        </article>
-        {% endfor %}
       </div>
     </div>
   </section>
@@ -128,7 +139,7 @@
     <div class="fm-container fm-contact-wrap">
       <header class="fm-section-head fm-reveal">
         <h2 id="contact-title" data-scene-accent="heading">Get in Touch</h2>
-        <p>Open to interesting product and engineering conversations</p>
+        <p>{{ site.availability }}</p>
       </header>
 
       <p class="fm-contact-intro fm-reveal">
@@ -142,7 +153,7 @@
             <span class="fm-contact-icon" aria-hidden="true">
               {% lucide contact.icon %}
             </span>
-            <span><small>{{ contact.label }}</small><strong>{{ contact.value }}</strong>{% if contact.external %}<span class="fm-visually-hidden"> (opens in a new tab)</span>{% endif %}</span>
+            <span><small>{{ contact.label }}</small><span class="fm-visually-hidden">: </span><strong>{{ contact.value }}</strong>{% if contact.external %}<span class="fm-visually-hidden"> (opens in a new tab)</span>{% endif %}</span>
           </a>
         </li>
         {% endfor %}
