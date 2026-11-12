@@ -1457,6 +1457,13 @@ function createScarecrow() {
   // The post has settled a little off true.
   group.rotation.x = 0.03;
   castsShadows(group);
+  // The shadow map is drawn once per layout, but the head turns and nods
+  // after that: shadows it received would stay where the hat and straw were
+  // and land on the face as a dark blotch. Nothing else lies between the sun
+  // and the head, so it receives none and still casts its own.
+  head.traverse((child) => {
+    child.receiveShadow = false;
+  });
 
   return {
     group,
