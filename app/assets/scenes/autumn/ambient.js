@@ -22,12 +22,11 @@ import {
   CylinderGeometry,
   DirectionalLight,
   DoubleSide,
-  Euler,
+  Float32BufferAttribute,
   Fog,
   FrontSide,
   Group,
   HemisphereLight,
-  IcosahedronGeometry,
   InstancedBufferAttribute,
   InstancedBufferGeometry,
   InstancedMesh,
@@ -66,7 +65,8 @@ const FADE_IN = "opacity 2.8s cubic-bezier(0.3, 0, 0.2, 1)";
 // and the scene never pops in.
 const FRAMES_BEFORE_FADE = 3;
 const MAX_LEAVES = 40;
-const CROWN_LEAVES = 1400;
+// Leaves on the deciduous tree.
+const CROWN_LEAVES = 14_000;
 // Colours in each theme's leaf palette (THEMES[theme].leaves).
 const LEAF_TONES = 4;
 // Lines of copy the falling leaves keep dim behind (spec 1.9); more are
@@ -79,6 +79,8 @@ const FORMS = {
     pixelRatio: 2,
     shadowMap: 1024,
     leaves: MAX_LEAVES,
+    crownLeaves: CROWN_LEAVES,
+    leafSize: 1,
     groundSegments: [220, 110],
     fps: 60,
   },
@@ -86,6 +88,9 @@ const FORMS = {
     pixelRatio: 1.5,
     shadowMap: 0,
     leaves: 18,
+    // Fewer leaves on the tree, each larger, so the crown stays as full.
+    crownLeaves: CROWN_LEAVES * 0.45,
+    leafSize: 1.45,
     groundSegments: [90, 45],
     fps: 30,
   },
@@ -113,7 +118,6 @@ const THEMES = {
     soil: "#2b2016",
     // Saturated amber, orange and rust.
     leaves: ["#f2a12e", "#e8671d", "#b8431d", "#d9541f"],
-    crownShade: "#8e3614",
     leafContour: 0,
     blobShadow: 0.55,
     // A steady warm glow from inside each pumpkin, lighting the ground
@@ -139,7 +143,6 @@ const THEMES = {
     soil: "#7d5d3b",
     // Rust, burgundy and dark ochre; no pale yellow on cream.
     leaves: ["#a6401c", "#7d2233", "#a87818", "#8a3b1c"],
-    crownShade: "#6a2416",
     leafContour: 1,
     blobShadow: 0.3,
     // Orange skin and dark carved faces, with only a faint inner glow and no
@@ -158,7 +161,7 @@ const PINES = [
   [-0.44, -3.2, 2.2, 4],
 ];
 // The deciduous tree behind the scarecrow: [fraction, z]. It is shown at the
-// size it is built (see CROWN).
+// size it is built (see createTree).
 const TREE = [0.82, -7.5];
 const SCARECROW_X = 0.62;
 const SCARECROW_Z = -2;
@@ -182,6 +185,10 @@ const groundHeight = (x, z) =>
 // it. The leaf shader computes the same sum.
 const gustAt = (time) =>
   Math.sin(time * 0.13) * 0.6 + Math.sin(time * 0.31 + 1.7) * 0.3;
+
+// The wind the tree and the scarecrow's cloth and straw move in: the shared
+// gust's strength, and the time.
+const WIND = { uGust: { value: 0 }, uTime: { value: 0 } };
 
 const nextTask = () =>
   new Promise((resolve) => {
@@ -451,44 +458,6 @@ function createGroundGeometry([widthSegments, depthSegments]) {
   return geometry;
 }
 
-// A lumpy ball: a welded icosphere pushed around by a few sines, with smooth
-// normals. The scarecrow's sack head and the tree's crown are made of these.
-function createLumpyBall(radius, seed, detail, lumpiness) {
-  let geometry = new IcosahedronGeometry(radius, detail);
-  geometry.deleteAttribute("uv");
-  geometry.deleteAttribute("normal");
-  geometry = mergeVertices(geometry);
-
-  const positions = geometry.attributes.position;
-  const point = new Vector3();
-  for (let index = 0; index < positions.count; index++) {
-    point.fromBufferAttribute(positions, index);
-    const lump =
-      Math.sin(point.x * 5 + seed) * Math.sin(point.y * 4.3 + seed * 2) +
-      0.6 * Math.sin(point.z * 9 + seed) * Math.sin(point.x * 7.7);
-    point.multiplyScalar(1 + lump * lumpiness);
-    positions.setXYZ(index, point.x, point.y, point.z);
-  }
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-// A tapered cylinder running from one point to another, with its radius at
-// each end.
-function createLimb(from, to, [radiusFrom, radiusTo], material) {
-  const direction = new Vector3().subVectors(to, from);
-  const limb = new Mesh(
-    new CylinderGeometry(radiusTo, radiusFrom, direction.length(), 7),
-    material,
-  );
-  limb.position.copy(from).addScaledVector(direction, 0.5);
-  limb.quaternion.setFromUnitVectors(
-    new Vector3(0, 1, 0),
-    direction.normalize(),
-  );
-  return limb;
-}
-
 // ---------------------------------------------------------------- pines
 
 async function loadPine(assets) {
@@ -561,109 +530,385 @@ function createPines(pine) {
 
 // ---------------------------------------------------------------- tree
 
-// Crown clusters of the deciduous tree: [x, y, z, radius], for a tree about
-// 3.4 high. Each sits at the end of a limb from the top of the trunk.
-const CROWN = [
-  [0, 2.75, 0, 0.62],
-  [-0.62, 2.35, 0.15, 0.52],
-  [0.6, 2.4, -0.1, 0.55],
-  [-0.25, 2.05, 0.5, 0.45],
-  [0.3, 2.0, 0.45, 0.42],
-  [0.1, 2.3, -0.55, 0.5],
-  [-0.4, 2.85, -0.25, 0.42],
-  [0.42, 2.9, 0.25, 0.4],
-];
-const TRUNK_TOP = 1.45;
-const CROWN_CENTRE = new Vector3(0, 2.45, 0);
+// One procedural deciduous tree in full autumn colour, with no model file
+// and no textures: a skeleton grown from a seed and skinned with tapering
+// tubes, bark drawn in its shader, and several thousand leaves on the twigs
+// with a shader of their own.
 
-// A small leaf card: a broad diamond folded along its midrib, stem at the
-// origin.
-function createLeafCardGeometry() {
+// Leaves fall from about here, and the crown's shading is worked out round it.
+const CROWN_CENTRE = new Vector3(0, 2.4, 0);
+// Forks between the trunk and a twig that bears leaves.
+const TWIG_DEPTH = 5;
+// The grid that counts leaves for the crown's own shadows: cells along each
+// side, and cells per unit of length.
+const GRID = 20;
+const GRID_SCALE = 5;
+
+const NOISE_GLSL = `
+  float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+  }
+  float noise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    f *= f * (3.0 - 2.0 * f);
+    return mix(
+      mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
+      mix(hash(i + vec2(0.0, 1.0)), hash(i + 1.0), f.x),
+      f.y);
+  }`;
+
+// The whole tree leans with the shared gust, more the higher up, and is
+// never quite still. p is a point in the tree's own space.
+const TREE_WIND_GLSL = `
+  uniform float uGust;
+  uniform float uTime;
+  float sway(vec3 p) {
+    return (uGust * 0.35 + sin(uTime * 1.4 + p.x * 2.0 + p.z) * 0.06)
+      * p.y * p.y * 0.01;
+  }`;
+// The camera only pitches, so the tree's x is the view's x.
+const swayAt = (point) =>
+  `mvPosition.x += sway(${point}); gl_Position = projectionMatrix * mvPosition;`;
+
+// Bark: long plates with dark furrows between them, meandering up each limb.
+// aBark is the distance round the limb and along it. The furrows also tilt
+// the normal, so the low sun picks out one side of each, and they fade out
+// where they would be finer than a pixel.
+function createBarkMaterial() {
+  const material = new MeshStandardMaterial({
+    color: "#6d5847",
+    roughness: 0.95,
+  });
+  extendShader(material, {
+    uniforms: WIND,
+    vertex: {
+      common: `${TREE_WIND_GLSL} attribute vec2 aBark; varying vec2 vBark;`,
+      begin_vertex: "vBark = aBark;",
+      project_vertex: swayAt("position"),
+    },
+    fragment: {
+      common: `varying vec2 vBark; ${NOISE_GLSL}`,
+      color_fragment: `
+        vec2 grain = vec2(
+          vBark.x + 1.5 * noise(vBark * vec2(0.4, 1.5)), vBark.y * 3.5);
+        float plate = mix(smoothstep(0.0, 0.3, abs(noise(grain) * 2.0 - 1.0)),
+          0.8, smoothstep(0.2, 0.6, fwidth(grain.x)));
+        diffuseColor.rgb *= mix(0.2, 1.0, plate)
+          * mix(0.7, 1.2, noise(vBark * vec2(0.3, 4.0)))
+          * mix(0.5, 1.0, smoothstep(0.0, 0.25, vBark.y));`,
+      normal_fragment_begin: `
+        vec3 alongX = normalize(dFdx(-vViewPosition));
+        vec3 alongY = normalize(dFdy(-vViewPosition));
+        vec3 tiltX = cross(alongY, normal);
+        vec3 tiltY = cross(normal, alongX);
+        float facing = dot(alongX, tiltX);
+        normal = normalize(abs(facing) * normal
+          - sign(facing) * 1.2 * (dFdx(plate) * tiltX + dFdy(plate) * tiltY));`,
+    },
+  });
+  return material;
+}
+
+// Leaves are lit as a crown, not one by one. aBent is each leaf's normal bent
+// towards the outside of the crown, with the share of sunlight that reaches
+// it through the other leaves in w. Sun on the far side of a leaf shows
+// through it in a deeper colour. Every leaf flutters about its stem, harder
+// in a gust.
+function createFoliageMaterial(leafSize) {
+  const material = new MeshStandardMaterial({
+    side: DoubleSide,
+    roughness: 0.7,
+  });
+  extendShader(material, {
+    uniforms: { ...WIND, uLeaf: leafSize },
+    vertex: {
+      common: `${TREE_WIND_GLSL}
+        attribute vec4 aBent;
+        uniform float uLeaf;
+        varying vec3 vLeaf;
+        varying vec3 vBent;`,
+      begin_vertex: `
+        vLeaf = vec3(position.xy, aBent.w);
+        vBent = normalMatrix * aBent.xyz;
+        float seed = fract(dot(instanceMatrix[3].xyz, vec3(7.3, 3.1, 5.7)));
+        transformed *= uLeaf;
+        transformed.z += sin(uTime * (2.0 + 3.0 * seed) + seed * 40.0)
+          * position.x * (0.07 + 0.3 * abs(uGust));`,
+      project_vertex: swayAt("instanceMatrix[3].xyz"),
+    },
+    fragment: {
+      common: "varying vec3 vLeaf; varying vec3 vBent;",
+      color_fragment: `
+        diffuseColor.rgb *= (0.85 + 0.25 * step(0.0, vLeaf.y))
+          * (0.7 + 0.3 * smoothstep(0.0, 0.06, abs(vLeaf.y)));`,
+      normal_fragment_begin: "normal = normalize(vBent);",
+      lights_fragment_end: `
+        reflectedLight.directDiffuse = vLeaf.z * (reflectedLight.directDiffuse
+          + directionalLights[0].color * diffuseColor.rgb * diffuseColor.rgb
+          * saturate(-dot(normal, directionalLights[0].direction)) * 0.25);
+        reflectedLight.directSpecular *= vLeaf.z;`,
+    },
+  });
+  return material;
+}
+
+// One leaf: a pointed oval folded along its midrib, which runs along x from
+// the stem at the origin.
+function createLeafGeometry() {
   const geometry = new BufferGeometry();
   geometry.setAttribute(
     "position",
-    new BufferAttribute(
-      new Float32Array([
-        0, 0, 0, 0.35, 0.3, 0.08, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0.35, -0.3, 0.08,
-      ]),
+    new Float32BufferAttribute(
+      [
+        0, 0, 0, 0.3, 0.3, 0.1, 0.72, 0.2, 0.07, 1, 0, 0, 0.72, -0.2, 0.07, 0.3,
+        -0.3, 0.1,
+      ],
       3,
     ),
   );
-  geometry.computeVertexNormals();
+  geometry.setIndex([0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5]);
   return geometry;
 }
 
-// One procedural deciduous tree in full autumn colour: a trunk and limbs,
-// lumpy crown clusters in a shaded tone, and leaf cards scattered over them
-// in the theme's leaf colours. No model file.
-function createTree() {
-  const random = createRandom(1031);
-  const bark = new MeshStandardMaterial({ color: "#3d2a1d", roughness: 0.95 });
-  const crownShade = new MeshStandardMaterial({ roughness: 0.9 });
-  const group = new Group();
-
-  const trunkBase = new Vector3(0, 0, 0);
-  const trunkTop = new Vector3(0.04, TRUNK_TOP, 0);
-  group.add(createLimb(trunkBase, trunkTop, [0.17, 0.1], bark));
-
-  for (const [index, [x, y, z, radius]] of CROWN.entries()) {
-    const end = new Vector3(x * 0.8, y - radius * 0.4, z * 0.8);
-    group.add(createLimb(trunkTop, end, [0.08, 0.03], bark));
-    const blob = new Mesh(
-      createLumpyBall(radius, index * 1.7, 2, 0.08),
-      crownShade,
+// Adds one ring of a limb's tube to the tree's mesh, round point and across
+// side and other. flare widens it into roots.
+function addRing(tree, [point, side, other], [sides, radius, flare, grain]) {
+  for (let turn = 0; turn <= sides; turn++) {
+    const angle = (turn / sides) * Math.PI * 2;
+    const normal = side
+      .clone()
+      .multiplyScalar(Math.cos(angle))
+      .addScaledVector(other, Math.sin(angle));
+    tree.positions.push(
+      ...point
+        .clone()
+        .addScaledVector(
+          normal,
+          radius * (1 + flare * (0.7 + 0.25 * Math.sin(angle * 5))),
+        ),
     );
-    blob.position.set(x, y, z);
-    group.add(blob);
+    tree.normals.push(...normal);
+    tree.barkAt.push((turn / sides) * grain[0], grain[1]);
+  }
+}
+
+// Grows one limb as a bent, tapering tube, then forks, until the last forks
+// are twigs. depth is 0 for the trunk; tone is the leaf colour the limb's
+// twigs carry, so the crown turns colour in patches.
+function growLimb(tree, from, heading, [length, radius, depth, tone]) {
+  const { random, spread } = tree;
+  // Sides of the tube, rings after the first, how far it wanders, and its
+  // forks' length as a share of its own.
+  const [sides, steps, wander, shorter] = depth
+    ? [Math.max(3, 9 - depth * 2), 4, 0.5, 0.82]
+    : [12, 8, 0.12, 0.7];
+  const point = from.clone();
+  const direction = heading.clone();
+  // Carried along the limb so its rings never twist; the trunk's seam faces
+  // away from the camera.
+  const side = new Vector3(0, 0, -1);
+  const other = new Vector3();
+  const stray = new Vector3();
+  const grainStart = random() * 9;
+  const first = tree.positions.length / 3;
+  const path = [];
+  for (let step = 0; step <= steps; step++) {
+    const along = step / steps;
+    // Past its first ring a limb wanders, turns up towards the light (twigs
+    // hang instead) and turns back when it strays out of the crown.
+    const moved = Math.min(step, 1);
+    stray.subVectors(point, CROWN_CENTRE);
+    direction.x += spread(wander * moved);
+    direction.y += (0.1 - depth * 0.03) * moved;
+    direction.z += spread(wander * moved);
+    direction
+      .addScaledVector(stray, Math.min(0, 1.05 - stray.length()) * 0.7 * moved)
+      .normalize();
+    point.addScaledVector(direction, (length / steps) * moved);
+    path.push(point.clone());
+    side.addScaledVector(direction, -side.dot(direction)).normalize();
+    other.crossVectors(direction, side);
+    addRing(
+      tree,
+      [point, side, other],
+      [
+        sides,
+        radius * (1 - 0.4 * along),
+        // Only the trunk flares into roots at the ground.
+        Math.exp(-along * 10 - depth * 99),
+        [radius * 130, along * length + grainStart],
+      ],
+    );
+  }
+  // Two triangles between each vertex and the ring above. Those at the seam,
+  // between one ring's end and the next ring's start, have no area.
+  const ring = sides + 1;
+  for (let corner = first; corner < first + steps * ring - 1; corner++) {
+    tree.indices.push(corner, corner + 1, corner + ring);
+    tree.indices.push(corner + 1, corner + ring + 1, corner + ring);
   }
 
-  // Leaf cards on the crown's outer surface, each turned at random.
-  const cards = new InstancedMesh(
-    createLeafCardGeometry(),
-    new MeshStandardMaterial({ side: DoubleSide, roughness: 0.8 }),
+  if (depth === TWIG_DEPTH) {
+    tree.twigs.push([from, point, tone]);
+    return;
+  }
+  // The first fork carries the limb on from its end. Each of the others
+  // leaves it one ring lower, turned away and further round it.
+  const forks = depth ? 2 + (random() < 0.8) : 4;
+  const firstTurn = random() * 6.3;
+  for (let fork = 0; fork < forks; fork++) {
+    const lateral = Math.min(fork, 1);
+    const at = steps - fork;
+    growLimb(
+      tree,
+      path[at],
+      direction
+        .clone()
+        .applyAxisAngle(side, lateral * 0.95 + spread(0.3))
+        .applyAxisAngle(direction, firstTurn + fork * 2.4 + spread(0.8)),
+      [
+        length * shorter * (1 - 0.15 * lateral) * (0.85 + random() * 0.3),
+        radius * (1 - (0.4 * at) / steps) * (1 - 0.3 * lateral),
+        depth + 1,
+        depth > 1 && random() < 0.7 ? tone : Math.floor(random() * LEAF_TONES),
+      ],
+    );
+  }
+}
+
+function createTree() {
+  const random = createRandom(608);
+  const spread = (amount) => (random() - 0.5) * amount;
+  const positions = [];
+  const normals = [];
+  const barkAt = [];
+  const indices = [];
+  // Twigs that bear leaves: [start, end, leaf tone].
+  const twigs = [];
+  growLimb(
+    { random, spread, positions, normals, barkAt, indices, twigs },
+    new Vector3(),
+    new Vector3(0, 1, 0),
+    [1.15, 0.13, 0, 0],
+  );
+
+  const limbs = new BufferGeometry();
+  limbs.setAttribute("position", new Float32BufferAttribute(positions, 3));
+  limbs.setAttribute("normal", new Float32BufferAttribute(normals, 3));
+  limbs.setAttribute("aBark", new Float32BufferAttribute(barkAt, 2));
+  limbs.setIndex(indices);
+
+  const leafSize = { value: 1 };
+  const leaves = new InstancedMesh(
+    createLeafGeometry(),
+    createFoliageMaterial(leafSize),
     CROWN_LEAVES,
   );
+  const bent = new Float32Array(CROWN_LEAVES * 4);
   const tones = new Uint8Array(CROWN_LEAVES);
   const shades = new Float32Array(CROWN_LEAVES);
+  const bases = [];
+  // Leaves in each cell of the grid; one more cell at the end takes
+  // everything outside it.
+  const density = new Float32Array(GRID ** 3 + 1);
+  const cellOf = ({ x, y, z }) => {
+    const column = Math.floor(x * GRID_SCALE + GRID / 2);
+    const layer = Math.floor(y * GRID_SCALE - 3);
+    const row = Math.floor(z * GRID_SCALE + GRID / 2);
+    return Math.min(column, layer, row) < 0 ||
+      Math.max(column, layer, row) >= GRID
+      ? GRID ** 3
+      : column + GRID * (layer + GRID * row);
+  };
+
   const matrix = new Matrix4();
-  const turn = new Quaternion();
-  const point = new Vector3();
-  const size = new Vector3();
+  const stem = new Vector3();
+  const across = new Vector3();
+  const face = new Vector3();
+  const outward = new Vector3();
   for (let index = 0; index < CROWN_LEAVES; index++) {
-    const [x, y, z, radius] = CROWN[index % CROWN.length];
-    // A seeded direction, uniform over the sphere.
-    const rise = random() * 2 - 1;
-    const around = random() * Math.PI * 2;
-    const flat = Math.sqrt(1 - rise * rise);
-    point.set(flat * Math.cos(around), rise, flat * Math.sin(around));
-    // Keep to the side facing away from the crown's centre.
-    const outward = new Vector3(x, y, z).sub(CROWN_CENTRE);
-    if (outward.lengthSq() > 0.01 && point.dot(outward) < -0.2) {
-      point.negate();
-    }
-    point.multiplyScalar(radius * (0.86 + random() * 0.18)).add({ x, y, z });
-    turn.setFromEuler(
-      new Euler(random() * 6.3, random() * 6.3, random() * 6.3),
+    const [from, to, tone] = twigs[index % twigs.length];
+    // Somewhere along the twig or just past its tip, a little off its line.
+    const base = new Vector3()
+      .lerpVectors(from, to, 0.25 + random())
+      .add({ x: spread(0.3), y: spread(0.3), z: spread(0.3) });
+    outward.subVectors(base, CROWN_CENTRE);
+    // The leaf points on from its twig, outwards and a little down, and
+    // turns its face up and out of the crown.
+    stem
+      .subVectors(to, from)
+      .normalize()
+      .add({ x: spread(2), y: spread(2) - 0.5, z: spread(2) })
+      .addScaledVector(outward, 0.4)
+      .normalize();
+    face.set(spread(1.5), 1, spread(1.5)).addScaledVector(outward, 0.5);
+    across.crossVectors(face, stem).normalize();
+    face.crossVectors(stem, across);
+    matrix.makeBasis(stem, across, face).setPosition(base);
+    // The normal it is lit by: out of the crown, out of its own clump, and
+    // only partly its own.
+    outward
+      .multiplyScalar(0.8)
+      .addScaledVector(face, 0.6)
+      .addScaledVector(base, 3)
+      .addScaledVector(to, -3)
+      .normalize()
+      .toArray(bent, index * 4);
+    leaves.setMatrixAt(
+      index,
+      matrix.scale(face.setScalar(0.08 + random() * 0.04)),
     );
-    size.setScalar(0.2 + random() * 0.1);
-    cards.setMatrixAt(index, matrix.compose(point, turn, size));
-    tones[index] = Math.floor(random() * LEAF_TONES);
-    shades[index] = 0.75 + random() * 0.3;
+    tones[index] = random() < 0.7 ? tone : Math.floor(random() * LEAF_TONES);
+    shades[index] = 0.75 + random() * 0.4;
+    density[cellOf(base)] += 1;
+    bases.push(base);
   }
-  group.add(cards);
+  density[GRID ** 3] = 0;
+
+  // The light that reaches a leaf from one direction: less of it the more
+  // leaves lie that way.
+  const probe = new Vector3();
+  const lightFrom = (base, direction, thinning) => {
+    let inTheWay = 0;
+    for (let step = 1; step < 10; step++) {
+      inTheWay +=
+        density[
+          cellOf(probe.copy(base).addScaledVector(direction, step / GRID_SCALE))
+        ];
+    }
+    return Math.exp(-inTheWay * thinning);
+  };
+  // The sun stands in nearly the same place in both themes.
+  const sun = new Vector3(...THEMES.dark.sunPosition).normalize();
+  bases.forEach((base, index) => {
+    bent[index * 4 + 3] = lightFrom(base, sun, 0.03);
+    // Light from the sky dims every colour of a leaf deep in the crown.
+    shades[index] *= 0.5 + 0.5 * lightFrom(base, { x: 0, y: 1, z: 0 }, 0.02);
+  });
+  leaves.geometry.setAttribute("aBent", new InstancedBufferAttribute(bent, 4));
+
+  const group = new Group();
+  group.add(new Mesh(limbs, createBarkMaterial()), leaves);
   castsShadows(group);
+  // The crown shades itself through the grid above instead.
+  leaves.receiveShadow = false;
+
+  const setForm = (form) => {
+    leaves.count = form.crownLeaves;
+    leafSize.value = form.leafSize;
+  };
 
   const applyTheme = (look) => {
-    crownShade.color.set(look.crownShade);
     const color = new Color();
     for (let index = 0; index < CROWN_LEAVES; index++) {
       color.set(look.leaves[tones[index]]).multiplyScalar(shades[index]);
-      cards.setColorAt(index, color);
+      leaves.setColorAt(index, color);
     }
-    cards.instanceColor.needsUpdate = true;
+    leaves.instanceColor.needsUpdate = true;
   };
 
-  return { group, applyTheme };
+  return { group, setForm, applyTheme };
 }
 
 // ---------------------------------------------------------------- scarecrow
@@ -687,18 +932,7 @@ const FABRIC_GLSL = `
   uniform vec3 uA;
   uniform vec3 uB;
   uniform vec3 uC;
-  float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-  }
-  float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    f *= f * (3.0 - 2.0 * f);
-    return mix(
-      mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
-      mix(hash(i + vec2(0.0, 1.0)), hash(i + 1.0), f.x),
-      f.y);
-  }
+  ${NOISE_GLSL}
   float fbm(vec2 p) {
     return 0.5 * noise(p) + 0.3 * noise(p * 2.03) + 0.2 * noise(p * 4.1);
   }
@@ -775,15 +1009,11 @@ const BANDANA_GLSL = `
   color = mix(color, uC, 0.6 * (1.0 - smoothstep(-aa, aa, spot)));
   diffuseColor.rgb = weather(color, 0.3);`;
 
-// The wind the scarecrow's cloth and straw move in: the shared gust's
-// strength, and the time.
-const SCARECROW_WIND = { uGust: { value: 0 }, uTime: { value: 0 } };
-
 // A cloth material: pattern is GLSL that sets diffuseColor from uA, uB and
 // uC. sway moves the lower edge (uv.y = 0) with the gust.
 function createCloth(pattern, colors, sway = 0) {
   const uniforms = {
-    ...SCARECROW_WIND,
+    ...WIND,
     uSway: { value: sway },
     uA: { value: new Color(colors[0]) },
     uB: { value: new Color(colors[1]) },
@@ -957,7 +1187,7 @@ function createStrawMaterial() {
     side: DoubleSide,
   });
   extendShader(material, {
-    uniforms: SCARECROW_WIND,
+    uniforms: WIND,
     vertex: {
       common: "uniform float uGust; uniform float uTime;",
       begin_vertex: `transformed.x += sin(uTime * 2.6 + float(gl_InstanceID) * 2.4)
@@ -1709,6 +1939,7 @@ function buildWorld(stage, pine, context) {
 
   const pines = createPines(pine);
   const tree = createTree();
+  tree.setForm(form);
   const scarecrow = createScarecrow();
   const leaves = createFallingLeaves(palette);
   leaves.geometry.instanceCount = form.leaves;
@@ -1893,8 +2124,8 @@ function animateScarecrow(stage, scarecrow, pointer, clock) {
   const gust = gustAt(clock.time);
   const strength = MathUtils.smoothstep(Math.abs(gust), 0.3, 0.85);
   // The shirt's hem and the straw tips move in the same wind.
-  SCARECROW_WIND.uGust.value = gust * strength;
-  SCARECROW_WIND.uTime.value = clock.time;
+  WIND.uGust.value = gust * strength;
+  WIND.uTime.value = clock.time;
   sleeves.forEach((sleeve, index) => {
     const side = index === 0 ? -1 : 1;
     // The far sleeve, on the gust's lee side, moves less. Each sleeve is
@@ -1921,6 +2152,7 @@ function applyLighterForm(stage, world) {
   stage.sun.shadow.dispose();
   world.blobShadows.group.visible = true;
   world.leaves.geometry.instanceCount = form.leaves;
+  world.tree.setForm(form);
   world.ground.geometry.dispose();
   world.ground.geometry = createGroundGeometry(form.groundSegments);
   stage.renderer.setPixelRatio(
