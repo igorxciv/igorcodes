@@ -18,7 +18,7 @@ module.exports = {
   availability:
     "Open to Principal and Staff roles and contract work in AI product engineering, frontend architecture, and accessibility.",
   person: {
-    jobTitle: "Software Engineer",
+    jobTitle: "Principal Engineer",
     description:
       "Frontend-focused full-stack software engineer with a systems and architecture mindset, building maintainable, performant digital products and developer workflows.",
     knowsAbout: [
