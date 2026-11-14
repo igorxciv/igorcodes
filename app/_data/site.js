@@ -7,7 +7,7 @@ module.exports = {
   locale: "en_US",
   themeColorDark: "#0a0a0a",
   themeColorLight: "#f6f1e8",
-  contentUpdated: "2026-11-12",
+  contentUpdated: "2026-11-14",
   author: "Igor Cheliadinski",
   email: "hi@igorcodes.dev",
   location: "Seattle, WA",
