@@ -3,7 +3,8 @@ module.exports = [
     title: "Loremark — Collect Your Life",
     name: "Loremark",
     preview: "loremark",
-    ask: true,
+    url: "https://getloremark.com",
+    linkText: "Visit site",
     description:
       "Building a web and iPhone product that turns lived experiences into collectibles: work through a Collection, like every US National Park or the IMDb Top 250, and each completed item is revealed as a Mark that keeps its memories and people. A full-stack TypeScript monorepo with a three.js reveal stage, a typed API, and an admin app where an AI chat drafts catalog entries and image briefs for approval before any image is generated.",
     tags: [
