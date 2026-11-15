@@ -34,3 +34,14 @@ yarn-error.log*
 # oh-my-claudecode operational state (skills are the committable exception)
 /.omc/*
 !/.omc/skills/
+
+# Claude Code: agent worktrees (full checkouts with their own node_modules and
+# _site) and personal settings
+/.claude/worktrees/
+/.claude/settings.local.json
+
+# Impeccable: local runtime state and throwaway prototypes. The prototypes
+# folder holds copies of the licensed fonts, so it must never be committed.
+/.impeccable/config.local.json
+/.impeccable/hook.*.json
+/.impeccable/prototypes/
