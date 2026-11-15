@@ -92,6 +92,8 @@ const THEMES = {
     envIntensity: 0.7,
     exposure: 0.95,
     sheen: "#9db7ff",
+    // Pale weathered wood: dark bark vanishes against the night sky.
+    twig: "#a8835f",
     rim: 0,
     rimColor: "#ffffff",
     treeSnow: 0.8,
@@ -120,6 +122,7 @@ const THEMES = {
     envIntensity: 0.5,
     exposure: 0.92,
     sheen: "#bfd6ff",
+    twig: "#4a3423",
     rim: 0.6,
     rimColor: "#7d97c2",
     treeSnow: 0.8,
@@ -386,21 +389,38 @@ function createSnowball(radius, seed, material) {
 
 // ---------------------------------------------------------------- snowman
 
-function createSnowmanArm(side, material) {
+// A stick arm ending in a mitten. The mitten takes the accent colour, like
+// the scarf, so the hands read against either theme's sky.
+function createSnowmanArm(side, twig, accent) {
   const pivot = new Group();
   pivot.position.set(side * 0.38, 1.4, 0);
-  const stick = new Mesh(new CylinderGeometry(0.012, 0.024, 0.75, 6), material);
+  const stick = new Mesh(new CylinderGeometry(0.022, 0.036, 0.75, 7), twig);
   stick.position.y = 0.37;
   pivot.add(stick);
   for (const [angle, y] of [
-    [0.7, 0.55],
-    [-0.6, 0.62],
+    [0.7, 0.36],
+    [-0.6, 0.46],
   ]) {
-    const fork = new Mesh(new CylinderGeometry(0.008, 0.012, 0.2, 5), material);
+    const fork = new Mesh(new CylinderGeometry(0.012, 0.02, 0.2, 6), twig);
     fork.position.set(Math.sin(-angle) * 0.09, y + 0.07, 0);
     fork.rotation.z = angle;
     pivot.add(fork);
   }
+
+  const palm = new Mesh(new IcosahedronGeometry(0.085, 2), accent);
+  palm.scale.set(1, 1.3, 0.65);
+  palm.position.y = 0.8;
+  // Local -x points up for the right arm and +x for the left one, so the
+  // thumb points skyward on both.
+  const thumb = new Mesh(new IcosahedronGeometry(0.038, 1), accent);
+  thumb.scale.set(1, 1.4, 0.8);
+  thumb.position.set(-side * 0.075, 0.76, 0);
+  thumb.rotation.z = side * 0.6;
+  const cuff = new Mesh(new CylinderGeometry(0.07, 0.07, 0.05, 14), accent);
+  cuff.scale.z = 0.7;
+  cuff.position.y = 0.68;
+  pivot.add(palm, thumb, cuff);
+
   pivot.rotation.z = -side * 1.15;
   return pivot;
 }
@@ -441,7 +461,8 @@ function createSnowmanHead(snowMaterial, coal, accent) {
 function createSnowman(snowMaterial) {
   const group = new Group();
   const coal = new MeshStandardMaterial({ color: "#15171a", roughness: 0.6 });
-  const twig = new MeshStandardMaterial({ color: "#4a3423", roughness: 0.9 });
+  // Arm colour is set per theme.
+  const twig = new MeshStandardMaterial({ roughness: 0.9 });
   // Scarf and hat band take the site accent colour.
   const accent = new MeshStandardMaterial({ roughness: 1 });
 
@@ -474,8 +495,8 @@ function createSnowman(snowMaterial) {
   scarfTail.rotation.set(0.25, 0, -0.2);
 
   const head = createSnowmanHead(snowMaterial, coal, accent);
-  const leftArm = createSnowmanArm(-1, twig);
-  const wavingArm = createSnowmanArm(1, twig);
+  const leftArm = createSnowmanArm(-1, twig, accent);
+  const wavingArm = createSnowmanArm(1, twig, accent);
   group.add(scarf, scarfTail, head, leftArm, wavingArm);
   group.rotation.y = -0.4;
 
@@ -486,7 +507,7 @@ function createSnowman(snowMaterial) {
     }
   });
 
-  return { group, head, wavingArm, accent };
+  return { group, head, wavingArm, accent, twig };
 }
 
 // ---------------------------------------------------------------- pines
@@ -1055,6 +1076,7 @@ function applyTheme(stage, world, theme) {
   // Fog in the page background colour; scarf and hat band in the accent.
   readPageColor(host, "--fm-bg", scene.fog.color);
   readPageColor(host, "--fm-accent", world.snowman.accent.color);
+  world.snowman.twig.color.set(look.twig);
 
   world.snow.applyTheme(look);
   world.environment.applyTheme(look);
