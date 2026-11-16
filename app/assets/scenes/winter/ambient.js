@@ -1171,6 +1171,28 @@ function animateSnowman(stage, snowman, pointer, clock) {
     -1.15 + 0.5 * lift + Math.sin(phase * 10) * 0.28 * lift;
 }
 
+// The shadow map is drawn on demand, not every frame. Once the snowman has
+// turned, nodded, waved or swayed this far (radians) from the pose it was
+// last drawn in, it is drawn again; otherwise the stale shadow of the head
+// and hat lands on the turned head.
+const SHADOW_POSE_TOLERANCE = 0.01;
+
+function snowmanPose({ group, head, wavingArm }) {
+  return [
+    head.rotation.x,
+    head.rotation.y,
+    wavingArm.rotation.z,
+    group.rotation.z,
+  ];
+}
+
+function hasPoseMoved(pose, drawnPose) {
+  return pose.some(
+    (angle, index) =>
+      Math.abs(angle - drawnPose[index]) > SHADOW_POSE_TOLERANCE,
+  );
+}
+
 // Switches a running full-form scene to the lighter form. Antialiasing is
 // fixed when the WebGL context is created, so that one setting stays.
 function applyLighterForm(stage, world) {
@@ -1267,6 +1289,7 @@ export async function mount(host, context) {
   // The copy moves without resizing when it transitions (the hero lift,
   // link hovers), so it is measured every frame until shortly after.
   let copyMovingUntil = 0;
+  let shadowPose = snowmanPose(world.snowman);
 
   const draw = (now) => {
     frameRequest = requestAnimationFrame(draw);
@@ -1292,6 +1315,13 @@ export async function mount(host, context) {
       world.copyGuard.measure();
     }
     animateSnowman(stage, world.snowman, tracking.pointer, clock);
+    if (stage.sun.castShadow) {
+      const pose = snowmanPose(world.snowman);
+      if (hasPoseMoved(pose, shadowPose)) {
+        shadowPose = pose;
+        renderer.shadowMap.needsUpdate = true;
+      }
+    }
     world.christmas?.animate(clock.time);
     renderer.render(scene, camera);
 
