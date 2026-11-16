@@ -94,6 +94,8 @@ const THEMES = {
     sheen: "#9db7ff",
     // Pale weathered wood: dark bark vanishes against the night sky.
     twig: "#a8835f",
+    // Moonlit slate: a black hat vanishes against the night sky too.
+    felt: "#5a6684",
     rim: 0,
     rimColor: "#ffffff",
     treeSnow: 0.8,
@@ -123,6 +125,7 @@ const THEMES = {
     exposure: 0.92,
     sheen: "#bfd6ff",
     twig: "#4a3423",
+    felt: "#1b1e24",
     rim: 0.6,
     rimColor: "#7d97c2",
     treeSnow: 0.8,
@@ -426,7 +429,7 @@ function createSnowmanArm(side, twig, accent) {
 }
 
 // The head is its own group so it can turn without the body.
-function createSnowmanHead(snowMaterial, coal, accent) {
+function createSnowmanHead(snowMaterial, coal, accent, felt) {
   const head = new Group();
   head.position.y = 1.93;
   head.add(createSnowball(0.3, 3, snowMaterial));
@@ -442,7 +445,6 @@ function createSnowmanHead(snowMaterial, coal, accent) {
   );
   nose.position.set(0, -0.01, 0.4);
 
-  const felt = new MeshStandardMaterial({ color: "#1b1e24", roughness: 0.75 });
   const brim = new Mesh(new CylinderGeometry(0.3, 0.31, 0.035, 24), felt);
   brim.position.y = 0.22;
   const crown = new Mesh(new CylinderGeometry(0.2, 0.19, 0.3, 24), felt);
@@ -461,8 +463,9 @@ function createSnowmanHead(snowMaterial, coal, accent) {
 function createSnowman(snowMaterial) {
   const group = new Group();
   const coal = new MeshStandardMaterial({ color: "#15171a", roughness: 0.6 });
-  // Arm colour is set per theme.
+  // Arm and hat colours are set per theme.
   const twig = new MeshStandardMaterial({ roughness: 0.9 });
+  const felt = new MeshStandardMaterial({ roughness: 0.75 });
   // Scarf and hat band take the site accent colour.
   const accent = new MeshStandardMaterial({ roughness: 1 });
 
@@ -494,7 +497,7 @@ function createSnowman(snowMaterial) {
   scarfTail.position.set(0.2, 1.48, 0.32);
   scarfTail.rotation.set(0.25, 0, -0.2);
 
-  const head = createSnowmanHead(snowMaterial, coal, accent);
+  const head = createSnowmanHead(snowMaterial, coal, accent, felt);
   const leftArm = createSnowmanArm(-1, twig, accent);
   const wavingArm = createSnowmanArm(1, twig, accent);
   group.add(scarf, scarfTail, head, leftArm, wavingArm);
@@ -507,7 +510,7 @@ function createSnowman(snowMaterial) {
     }
   });
 
-  return { group, head, wavingArm, accent, twig };
+  return { group, head, wavingArm, accent, twig, felt };
 }
 
 // ---------------------------------------------------------------- pines
@@ -1077,6 +1080,7 @@ function applyTheme(stage, world, theme) {
   readPageColor(host, "--fm-bg", scene.fog.color);
   readPageColor(host, "--fm-accent", world.snowman.accent.color);
   world.snowman.twig.color.set(look.twig);
+  world.snowman.felt.color.set(look.felt);
 
   world.snow.applyTheme(look);
   world.environment.applyTheme(look);
